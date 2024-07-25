@@ -25,16 +25,6 @@ app.use('/api/v1', [
 
 app.get('/', async (_, res) => {
   const password = await bcrypt.hash("123456789", 10)
-  
-  await db.user.create({
-    data: {
-      name: "Abdp",
-      email: "a@asadsad.com",
-      facultyId: 1,
-      yearId: 1,
-      password
-    }
-  })
   return res.status(200).json({
     message: "Faculty API - Documentation",
     info: "To start using the api head to this route: /api/login",

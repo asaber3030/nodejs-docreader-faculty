@@ -18,7 +18,6 @@ const cors_1 = __importDefault(require("cors"));
 const helpers_1 = require("./utlis/helpers");
 const routes_1 = require("./routes");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const db_1 = __importDefault(require("./utlis/db"));
 dotenv_1.default.config();
 const port = process.env.APP_PORT;
 const app = (0, express_1.default)();
@@ -33,15 +32,6 @@ app.use('/api/v1', [
 ]);
 app.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     const password = yield bcrypt_1.default.hash("123456789", 10);
-    yield db_1.default.user.create({
-        data: {
-            name: "Abdp",
-            email: "a@asadsad.com",
-            facultyId: 1,
-            yearId: 1,
-            password
-        }
-    });
     return res.status(200).json({
         message: "Faculty API - Documentation",
         info: "To start using the api head to this route: /api/login",
