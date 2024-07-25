@@ -160,6 +160,7 @@ model SubjectPractical {
   title       String
   description String
   url         String
+  x           String
   type        DataType @default(PDF)
 
   subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)

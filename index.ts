@@ -6,6 +6,7 @@ import { showAppURLCMD } from "./utlis/helpers";
 import { authRouter, subjectRouter, userRouter, facultyRouter, moduleRouter } from "./routes";
 
 import bcrypt from 'bcrypt'
+import db from "./utlis/db";
 
 dotenv.config();
 
@@ -24,6 +25,17 @@ app.use('/api/v1', [
 
 app.get('/', async (_, res) => {
   const password = await bcrypt.hash("123456789", 10)
+  await db.faculty.create({
+    data: { name: "X", city: "Y" }
+  })
+  await db.user.create({
+    data: {
+      name: "Abdp",
+      email: "a@a.com",
+      facultyId: 1,
+      password
+    }
+  })
   return res.status(200).json({
     message: "Faculty API - Documentation",
     info: "To start using the api head to this route: /api/login",

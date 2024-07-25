@@ -116,6 +116,7 @@ CREATE TABLE `subject_practical` (
     `title` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NOT NULL,
     `url` VARCHAR(191) NOT NULL,
+    `x` VARCHAR(191) NOT NULL,
     `type` ENUM('Data', 'PDF', 'Record', 'Video') NOT NULL DEFAULT 'PDF',
 
     PRIMARY KEY (`id`)
