@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_DEPLOY")
+  url      = env("DATABASE_DEPLOY2")
 }
 
 enum DataType {
@@ -28,8 +28,6 @@ model Faculty {
   users  User[]
   admins FacultyAdmin[]
   years  StudyingYear[]
-
-  @@map("faculties")
 }
 
 model FacultyAdmin {
@@ -40,8 +38,6 @@ model FacultyAdmin {
   facultyId Int
 
   faculty Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@map("facultyAdmins")
 }
 
 model User {
@@ -56,8 +52,6 @@ model User {
   faculty           Faculty                @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   year              StudyingYear           @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   verificationCodes UserVerificationCode[]
-
-  @@map("users")
 }
 
 model UserVerificationCode {
@@ -66,8 +60,6 @@ model UserVerificationCode {
   code   String
   plain  String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@map("user_verification_codes")
 }
 
 model StudyingYear {
@@ -78,8 +70,6 @@ model StudyingYear {
 
   modules Module[]
   users   User[]
-
-  @@map("studying_years")
 }
 
 model Module {
@@ -90,8 +80,6 @@ model Module {
 
   year     StudyingYear    @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   subjects ModuleSubject[]
-
-  @@map("modules")
 }
 
 model ModuleSubject {
@@ -104,8 +92,6 @@ model ModuleSubject {
   lectures       SubjectLecture[]
   practical      SubjectPractical[]
   finalRevisions SubjectFinalRevision[]
-
-  @@map("module_subjects")
 }
 
 model DataCategory {
@@ -116,8 +102,6 @@ model DataCategory {
   subjectLectures       SubjectLecture[]
   subjectPractical      SubjectPractical[]
   subjectFinalRevisions SubjectFinalRevision[]
-
-  @@map("data_categories")
 }
 
 model SubjectLecture {
@@ -132,8 +116,6 @@ model SubjectLecture {
 
   subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   category DataCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@map("subject_lectures")
 }
 
 model SubjectFinalRevision {
@@ -148,8 +130,6 @@ model SubjectFinalRevision {
 
   subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   category DataCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@map("subject_final_rev")
 }
 
 model SubjectPractical {
@@ -165,6 +145,4 @@ model SubjectPractical {
 
   subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   category DataCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@map("subject_practical")
 }

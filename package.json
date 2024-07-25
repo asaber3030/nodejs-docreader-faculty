@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "compile": "tsc --watch",
-    "start": "nodemon ./src/index.js"
+    "start": "nodemon ./src/index.ts"
   },
   "author": "abdulrahmansaber120@gmail.com",
   "license": "ISC",

@@ -33,14 +33,12 @@ app.use('/api/v1', [
 ]);
 app.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     const password = yield bcrypt_1.default.hash("123456789", 10);
-    yield db_1.default.faculty.create({
-        data: { name: "X", city: "Y" }
-    });
     yield db_1.default.user.create({
         data: {
             name: "Abdp",
             email: "a@a.com",
             facultyId: 1,
+            yearId: 1,
             password
         }
     });

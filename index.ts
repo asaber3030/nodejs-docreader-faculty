@@ -25,14 +25,13 @@ app.use('/api/v1', [
 
 app.get('/', async (_, res) => {
   const password = await bcrypt.hash("123456789", 10)
-  await db.faculty.create({
-    data: { name: "X", city: "Y" }
-  })
+  
   await db.user.create({
     data: {
       name: "Abdp",
       email: "a@a.com",
       facultyId: 1,
+      yearId: 1,
       password
     }
   })
