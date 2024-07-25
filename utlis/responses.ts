@@ -1,9 +1,16 @@
 import { Response } from "express";
 
-export function send(res: Response, message: string = "", status: number = 200) {
+export function send<T, D>(res: Response,
+  message: string = "", 
+  status: number = 200,
+  data?: T,
+  errors?: D
+) {
   return res.status(status).json({
     message,
-    status: status
+    status: status,
+    errors,
+    data
   })
 }
 
@@ -22,9 +29,9 @@ export function notFound(res: Response, message: string = "Error 404 - Not Found
 }
 
 export function badRequest(res: Response, message: string = "Something went wrong.") {
-  return res.status(500).json({
+  return res.status(400).json({
     message,
-    status: 500
+    status: 400
   })
 }
 

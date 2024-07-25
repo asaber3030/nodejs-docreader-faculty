@@ -184,6 +184,19 @@ class AuthController {
             });
         });
     }
+    static user(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const token = (0, helpers_1.extractToken)(req.headers.authorization);
+            try {
+                const userData = jsonwebtoken_1.default.verify(token, AuthController.secret);
+                const user = yield db_1.default.user.findUnique({ where: { id: userData === null || userData === void 0 ? void 0 : userData.id } });
+                return user;
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    }
 }
 AuthController.secret = process.env.APP_USER_SECRET;
 exports.default = AuthController;

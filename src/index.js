@@ -26,7 +26,9 @@ app.use(express_1.default.json());
 app.use('/api/v1', [
     routes_1.authRouter,
     routes_1.userRouter,
-    routes_1.facultyRouter
+    routes_1.facultyRouter,
+    routes_1.moduleRouter,
+    routes_1.subjectRouter
 ]);
 app.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     const password = yield bcrypt_1.default.hash("123456789", 10);

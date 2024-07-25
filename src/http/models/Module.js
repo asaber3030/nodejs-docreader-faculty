@@ -13,18 +13,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = __importDefault(require("../../utlis/db"));
-class User {
+class Module {
+    static create(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield db_1.default.module.create({
+                data
+            });
+        });
+    }
     static findAll() {
         return __awaiter(this, arguments, void 0, function* (search = '', orderBy = 'id', orderType = 'desc') {
             try {
-                return yield db_1.default.user.findMany({
+                return yield db_1.default.module.findMany({
                     where: {
                         OR: [
-                            { name: { contains: search } },
-                            { email: { contains: search } }
+                            { name: { contains: search } }
                         ]
                     },
-                    select: User.dbSelectors,
+                    select: Module.dbSelectors,
                     orderBy: {
                         [orderBy]: orderType
                     }
@@ -37,33 +43,22 @@ class User {
     }
     static find(id_1) {
         return __awaiter(this, arguments, void 0, function* (id, select = null) {
-            return yield db_1.default.user.findUnique({
+            return yield db_1.default.module.findUnique({
                 where: { id },
-                select: select ? select : User.dbSelectors
+                select: select ? select : Module.dbSelectors
             });
-        });
-    }
-    static findBy(value_1) {
-        return __awaiter(this, arguments, void 0, function* (value, by = 'email') {
-            switch (by) {
-                case 'email':
-                    return yield db_1.default.user.findUnique({ where: { email: value } });
-                default:
-                    return yield db_1.default.user.findUnique({ where: { email: value } });
-            }
         });
     }
     static paginate() {
         return __awaiter(this, arguments, void 0, function* (search = '', skip = 0, take = 10, orderBy = 'id', orderType = 'desc') {
             try {
-                return yield db_1.default.user.findMany({
+                return yield db_1.default.module.findMany({
                     where: {
                         OR: [
-                            { name: { contains: search } },
-                            { email: { contains: search } }
+                            { name: { contains: search } }
                         ]
                     },
-                    select: User.dbSelectors,
+                    select: Module.dbSelectors,
                     skip,
                     take,
                     orderBy: {
@@ -76,6 +71,14 @@ class User {
             }
         });
     }
+    static moduleSubjects(moduleId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield db_1.default.moduleSubject.findMany({
+                where: { moduleId },
+                orderBy: { id: 'asc' }
+            });
+        });
+    }
 }
-User.dbSelectors = { id: true, name: true, status: true, email: true, role: true, facultyId: true, createdAt: true, updatedAt: true };
-exports.default = User;
+Module.dbSelectors = { id: true, name: true, icon: true, yearId: true, createdAt: true, updatedAt: true };
+exports.default = Module;

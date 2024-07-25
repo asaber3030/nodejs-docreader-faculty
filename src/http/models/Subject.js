@@ -13,18 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = __importDefault(require("../../utlis/db"));
-class User {
+class Subject {
     static findAll() {
         return __awaiter(this, arguments, void 0, function* (search = '', orderBy = 'id', orderType = 'desc') {
             try {
-                return yield db_1.default.user.findMany({
+                return yield db_1.default.moduleSubject.findMany({
                     where: {
                         OR: [
-                            { name: { contains: search } },
-                            { email: { contains: search } }
+                            { name: { contains: search } }
                         ]
                     },
-                    select: User.dbSelectors,
+                    select: Subject.dbSelectors,
                     orderBy: {
                         [orderBy]: orderType
                     }
@@ -37,33 +36,22 @@ class User {
     }
     static find(id_1) {
         return __awaiter(this, arguments, void 0, function* (id, select = null) {
-            return yield db_1.default.user.findUnique({
+            return yield db_1.default.moduleSubject.findUnique({
                 where: { id },
-                select: select ? select : User.dbSelectors
+                select: select ? select : Subject.dbSelectors
             });
-        });
-    }
-    static findBy(value_1) {
-        return __awaiter(this, arguments, void 0, function* (value, by = 'email') {
-            switch (by) {
-                case 'email':
-                    return yield db_1.default.user.findUnique({ where: { email: value } });
-                default:
-                    return yield db_1.default.user.findUnique({ where: { email: value } });
-            }
         });
     }
     static paginate() {
         return __awaiter(this, arguments, void 0, function* (search = '', skip = 0, take = 10, orderBy = 'id', orderType = 'desc') {
             try {
-                return yield db_1.default.user.findMany({
+                return yield db_1.default.moduleSubject.findMany({
                     where: {
                         OR: [
-                            { name: { contains: search } },
-                            { email: { contains: search } }
+                            { name: { contains: search } }
                         ]
                     },
-                    select: User.dbSelectors,
+                    select: Subject.dbSelectors,
                     skip,
                     take,
                     orderBy: {
@@ -77,5 +65,5 @@ class User {
         });
     }
 }
-User.dbSelectors = { id: true, name: true, status: true, email: true, role: true, facultyId: true, createdAt: true, updatedAt: true };
-exports.default = User;
+Subject.dbSelectors = { id: true, moduleId: true, name: true, icon: true, createdAt: true, updatedAt: true };
+exports.default = Subject;

@@ -1,14 +1,17 @@
-import { Router } from "express";
-import { checkIsAuthenticated } from "../middlewares/isAuthenticated";
+import ModuleController from "../http/controllers/ModuleController"
 
-import FacultyController from "../http/controllers/FacultyController";
+import { checkIsAuthenticated } from "../middlewares/isAuthenticated"
+import { Router } from "express"
 
-const facultyRouter = Router()
+const moduleRouter = Router()
+const controller = new ModuleController()
 
-const controller = new FacultyController()
+moduleRouter.use(checkIsAuthenticated)
+moduleRouter.get('/modules/:yearId', controller.get)
+moduleRouter.post('/modules/:yearId/create', controller.createModule)
+moduleRouter.get('/modules/:yearId/:moduleId', controller.getModule)
+moduleRouter.get('/modules/:yearId/:moduleId/subjects', controller.getModuleSubjects)
+moduleRouter.patch('/modules/:yearId/:moduleId/update', controller.updateModule)
+moduleRouter.delete('/modules/:yearId/:moduleId/delete', controller.deleteModule)
 
-facultyRouter.use(checkIsAuthenticated)
-facultyRouter.get('/modules', controller.get)
-facultyRouter.post('/modules/create', controller.createFaculty)
-facultyRouter.get('/modules/:module', controller.getFaculty)
-export default facultyRouter
+export default moduleRouter

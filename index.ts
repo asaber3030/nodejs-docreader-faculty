@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from 'cors'
 
 import { showAppURLCMD } from "./utlis/helpers";
-import { authRouter, userRouter, facultyRouter } from "./routes";
+import { authRouter, subjectRouter, userRouter, facultyRouter, moduleRouter } from "./routes";
 
 import bcrypt from 'bcrypt'
 
@@ -17,7 +17,9 @@ app.use(express.json())
 app.use('/api/v1', [
   authRouter,
   userRouter,
-  facultyRouter
+  facultyRouter,
+  moduleRouter,
+  subjectRouter
 ])
 
 app.get('/', async (_, res) => {

@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = __importDefault(require("../../utlis/db"));
 class User {
-    static findAll(search = '', orderBy = 'id', orderType = 'desc') {
-        return __awaiter(this, void 0, void 0, function* () {
+    static findAll() {
+        return __awaiter(this, arguments, void 0, function* (search = '', orderBy = 'id', orderType = 'desc') {
             try {
                 return yield db_1.default.user.findMany({
                     where: {
@@ -35,16 +35,16 @@ class User {
             }
         });
     }
-    static find(id, select = null) {
-        return __awaiter(this, void 0, void 0, function* () {
+    static find(id_1) {
+        return __awaiter(this, arguments, void 0, function* (id, select = null) {
             return yield db_1.default.user.findUnique({
                 where: { id },
                 select: select ? select : User.dbSelectors
             });
         });
     }
-    static findBy(value, by = 'email') {
-        return __awaiter(this, void 0, void 0, function* () {
+    static findBy(value_1) {
+        return __awaiter(this, arguments, void 0, function* (value, by = 'email') {
             switch (by) {
                 case 'email':
                     return yield db_1.default.user.findUnique({ where: { email: value } });
@@ -53,8 +53,8 @@ class User {
             }
         });
     }
-    static paginate(search = '', skip = 0, take = 10, orderBy = 'id', orderType = 'desc') {
-        return __awaiter(this, void 0, void 0, function* () {
+    static paginate() {
+        return __awaiter(this, arguments, void 0, function* (search = '', skip = 0, take = 10, orderBy = 'id', orderType = 'desc') {
             try {
                 return yield db_1.default.user.findMany({
                     where: {

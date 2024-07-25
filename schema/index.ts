@@ -52,3 +52,27 @@ export const facultySchema = {
   })
 
 }
+
+export const moduleSchema = {
+  create: z.object({
+    name: z.string().min(1, { message: "Name is required" }),
+    icon: z.string()
+  }),
+
+  update: z.object({
+    name: z.string().min(1, { message: "Name is required" }).optional(),
+    icon: z.any().optional()
+  })
+}
+
+export const subjectSchema = {
+  create: z.object({
+    name: z.string().min(1, { message: "Name is required" }),
+    icon: z.string()
+  }),
+
+  update: z.object({
+    name: z.string().min(1, { message: "Name is required" }).optional(),
+    icon: z.any().optional()
+  })
+}

@@ -13,8 +13,6 @@ import db from "../../utlis/db"
 
 import User from "../models/User"
 import Faculty from "../models/Faculty"
-import mail from "../../services/mail"
-import VerificationCodeTemplate from "../../mail/verification-code"
 import Verification from "../models/VerificationCode"
 
 export default class AuthController {
@@ -188,6 +186,19 @@ export default class AuthController {
         authorized: true
       }
     })
+
+  }
+
+  static async user(req: Request, res: Response) {
+
+    const token = extractToken(req.headers.authorization!)
+    try {
+      const userData = jwt.verify(token, AuthController.secret) as TUser
+      const user = await db.user.findUnique({ where: { id: userData?.id } })
+      return user
+    } catch (error) {
+      return null
+    }
 
   }
 

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.facultySchema = exports.userSchema = exports.categorySchema = void 0;
+exports.subjectSchema = exports.moduleSchema = exports.facultySchema = exports.userSchema = exports.categorySchema = void 0;
 const zod_1 = require("zod");
 exports.categorySchema = {
     update: zod_1.z.object({
@@ -40,5 +40,25 @@ exports.facultySchema = {
     create: zod_1.z.object({
         name: zod_1.z.string().max(255, { message: "Cannot be greater than 255 characters" }),
         city: zod_1.z.string().max(255, { message: "Cannot be greater than 255 characters" })
+    })
+};
+exports.moduleSchema = {
+    create: zod_1.z.object({
+        name: zod_1.z.string().min(1, { message: "Name is required" }),
+        icon: zod_1.z.string()
+    }),
+    update: zod_1.z.object({
+        name: zod_1.z.string().min(1, { message: "Name is required" }).optional(),
+        icon: zod_1.z.any().optional()
+    })
+};
+exports.subjectSchema = {
+    create: zod_1.z.object({
+        name: zod_1.z.string().min(1, { message: "Name is required" }),
+        icon: zod_1.z.string()
+    }),
+    update: zod_1.z.object({
+        name: zod_1.z.string().min(1, { message: "Name is required" }).optional(),
+        icon: zod_1.z.any().optional()
     })
 };
