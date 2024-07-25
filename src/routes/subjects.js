@@ -15,4 +15,7 @@ subjectRouter.get('/subjects/:moduleId/:subjectId/lectures', controller.getSubje
 subjectRouter.get('/subjects/:moduleId/:subjectId/final-revisions', controller.getSubjectFinalRevisions);
 subjectRouter.get('/subjects/:moduleId/:subjectId/practical', controller.getSubjectPractical);
 subjectRouter.post('/subjects/:moduleId/create', controller.createSubject);
+subjectRouter.post('/subjects/:moduleId/:subjectId/create/lecture', controller.createSubject);
+subjectRouter.post('/subjects/:moduleId/:subjectId/create/practical', controller.createSubject);
+subjectRouter.post('/subjects/:moduleId/:subjectId/create/final-revision', controller.createSubject);
 exports.default = subjectRouter;

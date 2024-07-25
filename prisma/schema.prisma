@@ -25,6 +25,9 @@ model Faculty {
   name String
   city String
 
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+
   users  User[]
   admins FacultyAdmin[]
   years  StudyingYear[]
@@ -38,6 +41,9 @@ model FacultyAdmin {
   facultyId Int
 
   faculty Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 }
 
 model User {
@@ -52,6 +58,9 @@ model User {
   faculty           Faculty                @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   year              StudyingYear           @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   verificationCodes UserVerificationCode[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 }
 
 model UserVerificationCode {
@@ -60,16 +69,20 @@ model UserVerificationCode {
   code   String
   plain  String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  expiresIn DateTime @default(now()) @db.Timestamp()
 }
 
 model StudyingYear {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   title     String
   facultyId Int
-  faculty   Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  modules Module[]
-  users   User[]
+  faculty   Faculty  @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+  modules   Module[]
+  users     User[]
 }
 
 model Module {
@@ -80,6 +93,9 @@ model Module {
 
   year     StudyingYear    @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   subjects ModuleSubject[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 }
 
 model ModuleSubject {
@@ -92,6 +108,9 @@ model ModuleSubject {
   lectures       SubjectLecture[]
   practical      SubjectPractical[]
   finalRevisions SubjectFinalRevision[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 }
 
 model DataCategory {
@@ -116,6 +135,9 @@ model SubjectLecture {
 
   subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   category DataCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 }
 
 model SubjectFinalRevision {
@@ -130,6 +152,9 @@ model SubjectFinalRevision {
 
   subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   category DataCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 }
 
 model SubjectPractical {
@@ -140,9 +165,11 @@ model SubjectPractical {
   title       String
   description String
   url         String
-  x           String
   type        DataType @default(PDF)
 
   subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   category DataCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 }

@@ -1,12 +1,11 @@
 import { Request, Response } from "express"
 import { TQueryParameters } from "../../types"
 
-import { moduleSchema, subjectSchema } from "../../schema"
+import { subjectSchema } from "../../schema"
 import { badRequest, conflict, notFound, send, unauthorized } from "../../utlis/responses"
 import { extractErrors, parameterExists } from "../../utlis/helpers"
 
 import db from "../../utlis/db"
-import Module from "../models/Module"
 import AuthController from "./AuthController"
 
 export default class SubjectController {
