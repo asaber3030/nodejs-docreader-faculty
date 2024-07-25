@@ -29,7 +29,7 @@ app.get('/', async (_, res) => {
   await db.user.create({
     data: {
       name: "Abdp",
-      email: "a@a.com",
+      email: "a@asadsad.com",
       facultyId: 1,
       yearId: 1,
       password
