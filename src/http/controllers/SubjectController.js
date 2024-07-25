@@ -49,9 +49,12 @@ class SubjectController {
     }
     createSubject(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const moduleId = req.params.moduleId ? +req.params.moduleId : null;
+            const moduleId = (0, helpers_1.parameterExists)(req, res, "moduleId");
             if (!moduleId)
-                return (0, responses_1.badRequest)(res, "Invalid Year Id");
+                return (0, responses_1.notFound)(res, "Module doesn't exist.");
+            const module = yield db_1.default.module.findUnique({ where: { id: moduleId }, select: { id: true } });
+            if (!module)
+                return (0, responses_1.notFound)(res, "Module not found.");
             const parsedBody = schema_1.subjectSchema.create.safeParse(req.body);
             if (!parsedBody.success)
                 return (0, responses_1.send)(res, "Validation errors", 400, (0, helpers_1.extractErrors)(parsedBody));
@@ -59,7 +62,7 @@ class SubjectController {
                 where: { moduleId, name: parsedBody.data.name }
             });
             if (findSubject)
-                return (0, responses_1.conflict)(res, "Module already exists.");
+                return (0, responses_1.conflict)(res, "Subject already exists.");
             const newSubject = yield db_1.default.moduleSubject.create({
                 data: Object.assign({ moduleId }, parsedBody.data)
             });
@@ -132,22 +135,131 @@ class SubjectController {
             if (findSubject)
                 return (0, responses_1.conflict)(res, "Subject already exists.");
             const updatedSubject = yield db_1.default.moduleSubject.update({
-                where: { id: moduleId },
+                where: { id: subjectId },
                 data: parsedBody.data
             });
             return (0, responses_1.send)(res, "Module has been updated", 200, updatedSubject);
         });
     }
-    deleteModule(req, res) {
+    deleteSubject(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const yearId = req.params.yearId ? +req.params.yearId : null;
-            if (!yearId)
-                return (0, responses_1.badRequest)(res, "Invalid Year Id");
-            const moduleId = req.params.moduleId ? +req.params.moduleId : null;
-            if (!moduleId)
-                return (0, responses_1.badRequest)(res, "Invalid Module Id");
-            const deletedModule = yield db_1.default.module.delete({ where: { id: moduleId } });
-            return (0, responses_1.send)(res, "Module has been deleted", 200, deletedModule);
+            const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+            const findSubject = yield db_1.default.moduleSubject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res);
+            const deletedSubject = yield db_1.default.moduleSubject.delete({ where: { id: subjectId } });
+            return (0, responses_1.send)(res, "Module has been deleted", 200, deletedSubject);
+        });
+    }
+    createLecture(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.subjectLecture.create.safeParse(req.body);
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+            const findSubject = yield db_1.default.moduleSubject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res);
+            const newLecture = yield db_1.default.subjectLecture.create({
+                data: Object.assign(Object.assign({}, data), { subjectId: findSubject.id }),
+            });
+            return (0, responses_1.send)(res, "Subject Lecture has been created successfully.", 201, newLecture);
+        });
+    }
+    updateLecture(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.subjectLecture.update.safeParse(req.body);
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+            const lectureId = (0, helpers_1.parameterExists)(req, res, "lectureId");
+            const findSubject = yield db_1.default.moduleSubject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res, "Subject doesn't exist.");
+            const findLecture = yield db_1.default.subjectLecture.findUnique({ where: { id: lectureId }, select: { id: true, subjectId: true } });
+            if (!findLecture)
+                return (0, responses_1.notFound)(res, "Lecture doesn't exist.");
+            const updatedLecture = yield db_1.default.subjectLecture.update({
+                where: { id: lectureId },
+                data: Object.assign({}, data),
+            });
+            return (0, responses_1.send)(res, "Subject Lecture has been updated successfully.", 200, updatedLecture);
+        });
+    }
+    createPractical(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.subjectPractical.create.safeParse(req.body);
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+            const findSubject = yield db_1.default.moduleSubject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res);
+            const newSubjectPractical = yield db_1.default.subjectPractical.create({
+                data: Object.assign(Object.assign({}, data), { subjectId: findSubject.id }),
+            });
+            return (0, responses_1.send)(res, "Subject Practical Data has been created successfully.", 201, newSubjectPractical);
+        });
+    }
+    updatePractical(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.subjectPractical.update.safeParse(req.body);
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+            const practicalId = (0, helpers_1.parameterExists)(req, res, "practicalId");
+            const findSubject = yield db_1.default.moduleSubject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res, "Subject doesn't exist.");
+            const findPractical = yield db_1.default.subjectPractical.findUnique({ where: { id: practicalId }, select: { id: true, subjectId: true } });
+            if (!findPractical)
+                return (0, responses_1.notFound)(res, "Practical Data doesn't exist.");
+            const updatedPractical = yield db_1.default.subjectPractical.update({
+                where: { id: practicalId },
+                data: Object.assign({}, data),
+            });
+            return (0, responses_1.send)(res, "Subject Practical Data has been updated successfully.", 200, updatedPractical);
+        });
+    }
+    createFinalRevision(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.subjectFinalRevision.create.safeParse(req.body);
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+            const findSubject = yield db_1.default.moduleSubject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res);
+            const newFinalRev = yield db_1.default.subjectFinalRevision.create({
+                data: Object.assign(Object.assign({}, data), { subjectId: findSubject.id }),
+            });
+            return (0, responses_1.send)(res, "Subject Final Revision Data has been created successfully.", 201, newFinalRev);
+        });
+    }
+    updateFinalRevision(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.subjectFinalRevision.update.safeParse(req.body);
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+            const finalId = (0, helpers_1.parameterExists)(req, res, "finalId");
+            const findSubject = yield db_1.default.moduleSubject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res, "Subject doesn't exist.");
+            const findFinalRevision = yield db_1.default.subjectFinalRevision.findUnique({ where: { id: finalId }, select: { id: true, subjectId: true } });
+            if (!findFinalRevision)
+                return (0, responses_1.notFound)(res, "Final Revision doesn't exist.");
+            const updatedFinalRevision = yield db_1.default.subjectFinalRevision.update({
+                where: { id: finalId },
+                data: Object.assign({}, data),
+            });
+            return (0, responses_1.send)(res, "Subject Final Revision Data has been updated successfully.", 200, updatedFinalRevision);
         });
     }
 }

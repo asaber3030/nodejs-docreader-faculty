@@ -144,7 +144,6 @@ export default class AuthController {
     if (user?.status) return send(res, "User has already verified his account before.", 409)
     if (!user) return notFound(res, "User doesn't exist.")
 
-    const isVerified = await Verification.verify(user?.id, data?.code as string)
 
     /* if (!isVerified) return res.status(400).json({ message: "Failed to verify account. Code could be expired." })
     return res.status(200).json({ message: "Account verified successfully." }) */
@@ -152,7 +151,7 @@ export default class AuthController {
     return res.status(200).json({
       ...body.data,
       user,
-      isVerified
+    
     })
   }
 

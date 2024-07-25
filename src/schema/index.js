@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.subjectSchema = exports.moduleSchema = exports.facultySchema = exports.userSchema = exports.categorySchema = void 0;
+exports.subjectFinalRevision = exports.subjectPractical = exports.subjectLecture = exports.subjectSchema = exports.moduleSchema = exports.facultySchema = exports.userSchema = exports.categorySchema = void 0;
+const client_1 = require("@prisma/client");
 const zod_1 = require("zod");
 exports.categorySchema = {
     update: zod_1.z.object({
@@ -60,5 +61,53 @@ exports.subjectSchema = {
     update: zod_1.z.object({
         name: zod_1.z.string().min(1, { message: "Name is required" }).optional(),
         icon: zod_1.z.any().optional()
+    })
+};
+exports.subjectLecture = {
+    create: zod_1.z.object({
+        categoryId: zod_1.z.number(),
+        title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
+        description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
+        url: zod_1.z.string().url(),
+        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }),
+    }),
+    update: zod_1.z.object({
+        categoryId: zod_1.z.number().optional(),
+        title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
+        description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
+        url: zod_1.z.string().url().optional(),
+        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }).optional(),
+    })
+};
+exports.subjectPractical = {
+    create: zod_1.z.object({
+        categoryId: zod_1.z.number(),
+        title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
+        description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
+        url: zod_1.z.string().url(),
+        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }),
+    }),
+    update: zod_1.z.object({
+        categoryId: zod_1.z.number().optional(),
+        title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
+        description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
+        url: zod_1.z.string().url().optional(),
+        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }).optional(),
+    })
+};
+exports.subjectFinalRevision = {
+    create: zod_1.z.object({
+        categoryId: zod_1.z.number(),
+        title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
+        description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
+        url: zod_1.z.string().url(),
+        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }),
+    }),
+    update: zod_1.z.object({
+        categoryId: zod_1.z.number().optional(),
+        title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
+        description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
+        url: zod_1.z.string().url().optional(),
+        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }).optional(),
     })
 };

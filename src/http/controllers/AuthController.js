@@ -32,7 +32,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = __importDefault(require("../../utlis/db"));
 const User_1 = __importDefault(require("../models/User"));
 const Faculty_1 = __importDefault(require("../models/Faculty"));
-const VerificationCode_1 = __importDefault(require("../models/VerificationCode"));
 class AuthController {
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -142,11 +141,9 @@ class AuthController {
                 return (0, responses_1.send)(res, "User has already verified his account before.", 409);
             if (!user)
                 return (0, responses_1.notFound)(res, "User doesn't exist.");
-            const isVerified = yield VerificationCode_1.default.verify(user === null || user === void 0 ? void 0 : user.id, data === null || data === void 0 ? void 0 : data.code);
             /* if (!isVerified) return res.status(400).json({ message: "Failed to verify account. Code could be expired." })
             return res.status(200).json({ message: "Account verified successfully." }) */
-            return res.status(200).json(Object.assign(Object.assign({}, body.data), { user,
-                isVerified }));
+            return res.status(200).json(Object.assign(Object.assign({}, body.data), { user }));
         });
     }
     isAuthenticated(req, res) {

@@ -4,8 +4,11 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_DEPLOY2")
+  url      = env("DATABASE_URL")
 }
+
+// DATABASE_URL
+// DATABASE_DEPLOY
 
 enum DataType {
   Data

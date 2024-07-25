@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 
 import { createPagination, extractErrors, extractToken } from "../../utlis/helpers"
 import { notFound, unauthorized } from "../../utlis/responses"
-import { skillSchema, userSchema } from "../../schema"
+import { userSchema } from "../../schema"
 
 import { User as TUser } from "@prisma/client"
 
