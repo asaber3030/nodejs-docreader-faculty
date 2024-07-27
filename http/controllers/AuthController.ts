@@ -101,23 +101,6 @@ export default class AuthController {
     const { password, ...mainUser } = newUser
     const token = jwt.sign(mainUser, AuthController.secret!)
 
-    /* const code = await Verification.create(mainUser.id) */
-
-    /* try {
-      mail.sendMail({
-        subject: `${findFaculty.name} - Verify Your E-mail!`,
-        html: VerificationCodeTemplate(code, findFaculty.name),
-        to: 'abdulrahmansaber120@gmail.com',
-        from: 'abdulrahmansaber120@gmail.com',
-      })
-    } catch (error) {
-      return res.status(201).json({
-        message: "ERRR",
-        status: 500,
-        data: error
-      })
-    } */
-
     return res.status(201).json({
       message: "User Registered successfully",
       status: 201,
@@ -143,10 +126,6 @@ export default class AuthController {
     })
     if (user?.status) return send(res, "User has already verified his account before.", 409)
     if (!user) return notFound(res, "User doesn't exist.")
-
-
-    /* if (!isVerified) return res.status(400).json({ message: "Failed to verify account. Code could be expired." })
-    return res.status(200).json({ message: "Account verified successfully." }) */
 
     return res.status(200).json({
       ...body.data,
@@ -199,6 +178,19 @@ export default class AuthController {
       return null
     }
 
+  }
+
+  async getUserData(req: Request, res: Response) {
+    const token = extractToken(req.headers.authorization!)
+    try {
+      const tokenData = jwt.verify(token, AuthController.secret) as TUser
+      const user = await db.user.findUnique({ where: { id: tokenData?.id } })
+      if (!user) return unauthorized(res, "User doesn't exist. Unauthorized")
+      const { password, ...mainUser } = user
+      return send(res, "User data", 200, mainUser)
+    } catch (error) {
+      return unauthorized(res, "User doesn't exist. Unauthorized")
+    }
   }
 
 }

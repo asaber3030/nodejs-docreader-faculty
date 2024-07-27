@@ -10,5 +10,6 @@ const authController = new AuthController_1.default();
 authRouter.post('/login', authController.login);
 authRouter.post('/register', authController.register);
 authRouter.get('/is-authenticated', authController.isAuthenticated);
+authRouter.get('/user', authController.getUserData);
 // authRouter.post('/verify-code', authController.verifyAccount)
 exports.default = authRouter;

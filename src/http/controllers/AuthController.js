@@ -100,21 +100,6 @@ class AuthController {
             });
             const { password } = newUser, mainUser = __rest(newUser, ["password"]);
             const token = jsonwebtoken_1.default.sign(mainUser, AuthController.secret);
-            /* const code = await Verification.create(mainUser.id) */
-            /* try {
-              mail.sendMail({
-                subject: `${findFaculty.name} - Verify Your E-mail!`,
-                html: VerificationCodeTemplate(code, findFaculty.name),
-                to: 'abdulrahmansaber120@gmail.com',
-                from: 'abdulrahmansaber120@gmail.com',
-              })
-            } catch (error) {
-              return res.status(201).json({
-                message: "ERRR",
-                status: 500,
-                data: error
-              })
-            } */
             return res.status(201).json({
                 message: "User Registered successfully",
                 status: 201,
@@ -141,8 +126,6 @@ class AuthController {
                 return (0, responses_1.send)(res, "User has already verified his account before.", 409);
             if (!user)
                 return (0, responses_1.notFound)(res, "User doesn't exist.");
-            /* if (!isVerified) return res.status(400).json({ message: "Failed to verify account. Code could be expired." })
-            return res.status(200).json({ message: "Account verified successfully." }) */
             return res.status(200).json(Object.assign(Object.assign({}, body.data), { user }));
         });
     }
@@ -191,6 +174,22 @@ class AuthController {
             }
             catch (error) {
                 return null;
+            }
+        });
+    }
+    getUserData(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const token = (0, helpers_1.extractToken)(req.headers.authorization);
+            try {
+                const tokenData = jsonwebtoken_1.default.verify(token, AuthController.secret);
+                const user = yield db_1.default.user.findUnique({ where: { id: tokenData === null || tokenData === void 0 ? void 0 : tokenData.id } });
+                if (!user)
+                    return (0, responses_1.unauthorized)(res, "User doesn't exist. Unauthorized");
+                const { password } = user, mainUser = __rest(user, ["password"]);
+                return (0, responses_1.send)(res, "User data", 200, mainUser);
+            }
+            catch (error) {
+                return (0, responses_1.unauthorized)(res, "User doesn't exist. Unauthorized");
             }
         });
     }

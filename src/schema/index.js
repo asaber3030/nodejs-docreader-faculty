@@ -24,7 +24,8 @@ exports.userSchema = {
         name: zod_1.z.string().min(1, { message: "Name cannot be less than 1 characters." }),
         email: zod_1.z.string().email({ message: "Invalid Email." }),
         password: zod_1.z.string().min(8, { message: "Password cannot be less than 8 characters." }),
-        facultyId: zod_1.z.number().gt(0)
+        facultyId: zod_1.z.number().gt(0),
+        yearId: zod_1.z.number().gt(0),
     }),
     update: zod_1.z.object({
         name: zod_1.z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
