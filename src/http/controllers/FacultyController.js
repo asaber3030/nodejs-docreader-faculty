@@ -12,11 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Faculty_1 = __importDefault(require("../models/Faculty"));
+const client_1 = require("@prisma/client");
 const responses_1 = require("../../utlis/responses");
-const db_1 = __importDefault(require("../../utlis/db"));
 const schema_1 = require("../../schema");
 const helpers_1 = require("../../utlis/helpers");
+const db_1 = __importDefault(require("../../utlis/db"));
+const Faculty_1 = __importDefault(require("../models/Faculty"));
+const AuthController_1 = __importDefault(require("./AuthController"));
 class FacultyController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -103,11 +105,103 @@ class FacultyController {
             });
         });
     }
+    // Create / Delete / Update => Year for specific facultyId
+    createYear(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.studyingYearSchema.create.safeParse(req.body);
+            const facultyId = (0, helpers_1.parameterExists)(req, res, "facultyId");
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const faculty = yield db_1.default.faculty.findUnique({ where: { id: facultyId }, select: { id: true } });
+            if (!faculty)
+                return (0, responses_1.notFound)(res, "Faculty doesn't exist.");
+            const yearExist = yield db_1.default.studyingYear.findFirst({
+                where: { facultyId, title: data.title }
+            });
+            if (yearExist)
+                return (0, responses_1.conflict)(res, "Year already exists in this faculty.");
+            const newYear = yield db_1.default.studyingYear.create({
+                data: Object.assign({ facultyId: faculty.id }, data)
+            });
+            return (0, responses_1.send)(res, "Year has been created.", 201, newYear);
+        });
+    }
+    updateYear(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.studyingYearSchema.update.safeParse(req.body);
+            const facultyId = (0, helpers_1.parameterExists)(req, res, "facultyId");
+            const yearId = (0, helpers_1.parameterExists)(req, res, "yearId");
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const faculty = yield db_1.default.faculty.findUnique({ where: { id: facultyId }, select: { id: true } });
+            if (!faculty)
+                return (0, responses_1.notFound)(res, "Faculty doesn't exist.");
+            const yearExist = yield db_1.default.studyingYear.findFirst({
+                where: { facultyId, title: data.title, AND: [{ id: { not: yearId } }] }
+            });
+            if (yearExist)
+                return (0, responses_1.conflict)(res, "Year already exists in this faculty.");
+            const findYear = yield db_1.default.studyingYear.findUnique({
+                where: { id: yearId },
+                select: { id: true }
+            });
+            if (!findYear)
+                return (0, responses_1.notFound)(res, "Year doesn't exist.");
+            const updatedYear = yield db_1.default.studyingYear.update({
+                where: { id: yearId },
+                data: Object.assign({}, data)
+            });
+            return (0, responses_1.send)(res, "Year has been updated.", 200, updatedYear);
+        });
+    }
+    deleteYear(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const facultyId = (0, helpers_1.parameterExists)(req, res, "facultyId");
+            const yearId = (0, helpers_1.parameterExists)(req, res, "yearId");
+            const faculty = yield db_1.default.faculty.findUnique({ where: { id: facultyId }, select: { id: true } });
+            if (!faculty)
+                return (0, responses_1.notFound)(res, "Faculty doesn't exist.");
+            const yearExist = yield db_1.default.studyingYear.findFirst({
+                where: { id: yearId }
+            });
+            if (!yearExist)
+                return (0, responses_1.notFound)(res, "Year doesn't exist.");
+            const deletedYear = yield db_1.default.studyingYear.delete({
+                where: { id: yearId }
+            });
+            return (0, responses_1.send)(res, "Year has been deleted.", 200, deletedYear);
+        });
+    }
+    // Create / Delete / Update => Faculty
+    createFaculty(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = req.body;
+            const parsedBody = schema_1.facultySchema.create.safeParse(body);
+            const data = parsedBody.data;
+            const errors = (0, helpers_1.extractErrors)(parsedBody);
+            if (!parsedBody)
+                return res.status(400).json({ message: "Validation errors", errors, status: 400 });
+            if (!data)
+                return res.status(400).json({ message: "Validation errors", errors, status: 400 });
+            const user = yield AuthController_1.default.user(req, res);
+            if (!user || user.role !== client_1.UserRole.Admin)
+                return (0, responses_1.unauthorized)(res, "Unauthorized cannot delete a faculty.");
+            const facultyExists = yield db_1.default.faculty.findFirst({ where: Object.assign({}, data) });
+            if (facultyExists)
+                return (0, responses_1.conflict)(res, "Faculty already exists.");
+            const faculty = yield db_1.default.faculty.create({ data });
+            return res.status(201).json({
+                data: faculty,
+                message: "Faculty has been created successfully.",
+                status: 201
+            });
+        });
+    }
     updateFaculty(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const facultyId = req.params.facultyId ? +req.params.facultyId : null;
-            if (!facultyId)
-                return (0, responses_1.badRequest)(res, "Invalid faculty id");
+            const facultyId = (0, helpers_1.parameterExists)(req, res, "facultyId");
             const body = req.body;
             const parsedBody = schema_1.facultySchema.update.safeParse(body);
             const data = parsedBody.data;
@@ -116,6 +210,9 @@ class FacultyController {
                 return res.status(400).json({ message: "Validation errors", errors, status: 400 });
             if (!data)
                 return res.status(400).json({ message: "Validation errors", errors, status: 400 });
+            const user = yield AuthController_1.default.user(req, res);
+            if (!user || user.role !== client_1.UserRole.Admin)
+                return (0, responses_1.unauthorized)(res, "Unauthorized cannot delete a faculty.");
             const facultyExists = yield db_1.default.faculty.findFirst({
                 where: Object.assign(Object.assign({}, data), { AND: [
                         { id: { not: facultyId } }
@@ -131,23 +228,19 @@ class FacultyController {
             });
         });
     }
-    createFaculty(req, res) {
+    deleteFaculty(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const body = req.body;
-            const parsedBody = schema_1.facultySchema.create.safeParse(body);
-            const data = parsedBody.data;
-            const errors = (0, helpers_1.extractErrors)(parsedBody);
-            if (!parsedBody)
-                return res.status(400).json({ message: "Validation errors", errors, status: 400 });
-            if (!data)
-                return res.status(400).json({ message: "Validation errors", errors, status: 400 });
-            const facultyExists = yield db_1.default.faculty.findFirst({ where: Object.assign({}, data) });
-            if (facultyExists)
-                return (0, responses_1.conflict)(res, "Faculty already exists.");
-            const faculty = yield db_1.default.faculty.create({ data });
+            const facultyId = (0, helpers_1.parameterExists)(req, res, "facultyId");
+            const user = yield AuthController_1.default.user(req, res);
+            if (!user || user.role !== client_1.UserRole.Admin)
+                return (0, responses_1.unauthorized)(res, "Unauthorized cannot delete a faculty.");
+            const findFaculty = yield db_1.default.faculty.findUnique({ where: { id: facultyId } });
+            if (!findFaculty)
+                return (0, responses_1.notFound)(res, "Faculty doesn't exist.");
+            const faculty = yield db_1.default.faculty.delete({ where: { id: facultyId } });
             return res.status(201).json({
                 data: faculty,
-                message: "Faculty has been created successfully.",
+                message: "Faculty has been deleted successfully.",
                 status: 201
             });
         });

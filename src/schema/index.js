@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.subjectFinalRevision = exports.subjectPractical = exports.subjectLecture = exports.subjectSchema = exports.moduleSchema = exports.facultySchema = exports.userSchema = exports.categorySchema = void 0;
+exports.subjectFinalRevision = exports.subjectPractical = exports.subjectLecture = exports.subjectSchema = exports.moduleSchema = exports.studyingYearSchema = exports.facultySchema = exports.userSchema = exports.categorySchema = void 0;
 const client_1 = require("@prisma/client");
 const zod_1 = require("zod");
 exports.categorySchema = {
@@ -30,18 +30,37 @@ exports.userSchema = {
     update: zod_1.z.object({
         name: zod_1.z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
         email: zod_1.z.string().email({ message: "Invalid Email." }).optional(),
-        password: zod_1.z.string().min(8, { message: "Password cannot be less than 8 characters." }).optional(),
-        facultyId: zod_1.z.number().gt(0).optional()
-    })
+    }),
+    changePassword: zod_1.z.object({
+        currentPassword: zod_1.z.string().min(1, { message: "Current password is required." }),
+        newPassword: zod_1.z.string().min(8, { message: "New password cannot be less than 8 characters." }),
+        confirmationPassword: zod_1.z.string().min(8, { message: "Confirmation Password cannot be less than 8 characters." }),
+    }).superRefine(({ confirmationPassword, newPassword }, ctx) => {
+        if (confirmationPassword !== newPassword) {
+            ctx.addIssue({
+                code: "custom",
+                message: "The passwords did not match",
+                path: ['confirmationPassword']
+            });
+        }
+    }),
 };
 exports.facultySchema = {
     update: zod_1.z.object({
-        name: zod_1.z.string().max(255, { message: "Cannot be greater than 255 characters" }).optional(),
-        city: zod_1.z.string().max(255, { message: "Cannot be greater than 255 characters" }).optional()
+        name: zod_1.z.string().min(1, { message: "Name is required" }).min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }).optional(),
+        city: zod_1.z.string().min(1, { message: "City is required" }).min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }).optional()
     }),
     create: zod_1.z.object({
-        name: zod_1.z.string().max(255, { message: "Cannot be greater than 255 characters" }),
-        city: zod_1.z.string().max(255, { message: "Cannot be greater than 255 characters" })
+        name: zod_1.z.string().min(1, { message: "Name is required" }).min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }),
+        city: zod_1.z.string().min(1, { message: "City is required" }).min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" })
+    })
+};
+exports.studyingYearSchema = {
+    update: zod_1.z.object({
+        title: zod_1.z.string().min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }).optional(),
+    }),
+    create: zod_1.z.object({
+        title: zod_1.z.string().min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }),
     })
 };
 exports.moduleSchema = {

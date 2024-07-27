@@ -33,22 +33,46 @@ export const userSchema = {
   update: z.object({
     name: z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
     email: z.string().email({ message: "Invalid Email." }).optional(),
-    password: z.string().min(8, { message: "Password cannot be less than 8 characters." }).optional(),
-    facultyId: z.number().gt(0).optional()
-  })
+  }),
+
+  changePassword: z.object({
+    currentPassword: z.string().min(1, { message: "Current password is required." }),
+    newPassword: z.string().min(8, { message: "New password cannot be less than 8 characters." }),
+    confirmationPassword: z.string().min(8, { message: "Confirmation Password cannot be less than 8 characters." }),
+  }).superRefine(({ confirmationPassword, newPassword }, ctx) => {
+    if (confirmationPassword !== newPassword) {
+      ctx.addIssue({
+        code: "custom",
+        message: "The passwords did not match",
+        path: ['confirmationPassword']
+      });
+    }
+  }),
 
 }
 
 export const facultySchema = {
   
   update: z.object({
-    name: z.string().max(255, { message: "Cannot be greater than 255 characters" }).optional(),
-    city: z.string().max(255, { message: "Cannot be greater than 255 characters" }).optional()
+    name: z.string().min(1, { message: "Name is required" }).min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }).optional(),
+    city: z.string().min(1, { message: "City is required" }).min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }).optional()
   }),
 
   create: z.object({
-    name: z.string().max(255, { message: "Cannot be greater than 255 characters" }),
-    city: z.string().max(255, { message: "Cannot be greater than 255 characters" })
+    name: z.string().min(1, { message: "Name is required" }).min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }),
+    city: z.string().min(1, { message: "City is required" }).min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" })
+  })
+
+}
+
+export const studyingYearSchema = {
+  
+  update: z.object({
+    title: z.string().min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }).optional(),
+  }),
+
+  create: z.object({
+    title: z.string().min(1, { message: "Title is required" }).max(255, { message: "Cannot be greater than 255 characters" }),
   })
 
 }

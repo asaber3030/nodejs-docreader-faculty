@@ -67,19 +67,11 @@ class UserController {
             const user = yield UserController.user(req);
             if (!user)
                 return (0, responses_1.unauthorized)(res);
-            const userData = yield db_1.default.user.findUnique({
-                where: { id: user.id }
-            });
+            const userData = yield db_1.default.user.findUnique({ where: { id: user.id } });
             if (!userData)
                 return (0, responses_1.notFound)(res, "User doesn't exist.");
-            if (!body.success) {
-                const errors = (0, helpers_1.extractErrors)(body);
-                return res.status(400).json({
-                    errors,
-                    message: "Form validation errors.",
-                    status: 400
-                });
-            }
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 200, (0, helpers_1.extractErrors)(body));
             if (!data) {
                 return res.status(400).json({
                     message: "Please check there's valid JSON data in the request body.",
@@ -102,16 +94,11 @@ class UserController {
                     });
                 }
             }
-            let pass = userData.password;
-            if (data.password) {
-                pass = yield bcrypt_1.default.hash(data.password, 10);
-            }
             const updatedUser = yield db_1.default.user.update({
                 where: { id: user.id },
                 data: {
                     name: data.name,
-                    email: data.email,
-                    password: pass
+                    email: data.email
                 }
             });
             const { password } = updatedUser, mainUser = __rest(updatedUser, ["password"]);
@@ -119,6 +106,33 @@ class UserController {
                 message: "User has been updated successfully.",
                 status: 200,
                 data: mainUser
+            });
+        });
+    }
+    changePassword(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.userSchema.changePassword.safeParse(req.body);
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 200, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const user = yield AuthController_1.default.user(req, res);
+            const userFull = yield db_1.default.user.findUnique({ where: { id: user === null || user === void 0 ? void 0 : user.id }, select: { id: true, password: true } });
+            if (!user || !userFull)
+                return (0, responses_1.unauthorized)(res);
+            const comparePasswords = yield bcrypt_1.default.compare(data.currentPassword, userFull === null || userFull === void 0 ? void 0 : userFull.password);
+            if (!comparePasswords)
+                return (0, responses_1.unauthorized)(res, "Invalid password for current user.");
+            const newPassword = yield bcrypt_1.default.hash(data.newPassword, 10);
+            const updatedUser = yield db_1.default.user.update({
+                where: { id: user.id },
+                data: {
+                    password: newPassword
+                },
+                select: { id: true }
+            });
+            return res.status(200).json({
+                message: "Password has been updated successfully.",
+                status: 200,
             });
         });
     }

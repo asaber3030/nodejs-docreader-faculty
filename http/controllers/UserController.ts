@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 
 import { createPagination, extractErrors, extractToken } from "../../utlis/helpers"
-import { notFound, unauthorized } from "../../utlis/responses"
+import { notFound, send, unauthorized } from "../../utlis/responses"
 import { userSchema } from "../../schema"
 
 import { User as TUser } from "@prisma/client"
@@ -43,25 +43,13 @@ export default class UserController {
     
     const body = userSchema.update.safeParse(req.body)
     const data = body.data
-
     const user = await UserController.user(req)
 
     if (!user) return unauthorized(res)
-
-    const userData = await db.user.findUnique({
-      where: { id: user.id }
-    })
+    const userData = await db.user.findUnique({ where: { id: user.id } })
 
     if (!userData) return notFound(res, "User doesn't exist.")
-
-    if (!body.success) {
-      const errors = extractErrors(body)
-      return res.status(400).json({
-        errors,
-        message: "Form validation errors.",
-        status: 400
-      })
-    }
+    if (!body.success) return send(res, "Validation errors", 200, extractErrors(body))
 
     if (!data) {
       return res.status(400).json({
@@ -87,19 +75,11 @@ export default class UserController {
       }
     }
 
-
-    let pass = userData.password;
-    
-    if (data.password) {
-      pass = await bcrypt.hash(data.password!, 10)
-    }
-
     const updatedUser = await db.user.update({
       where: { id: user.id },
       data: {
         name: data.name,
-        email: data.email,
-        password: pass
+        email: data.email
       }
     })
 
@@ -112,6 +92,34 @@ export default class UserController {
     })
 
   }
-  
+
+  async changePassword(req: Request, res: Response) {
+
+    const body = userSchema.changePassword.safeParse(req.body)
+    if (!body.success) return send(res, "Validation errors", 200, extractErrors(body))
+
+    const data = body.data
+    const user = await AuthController.user(req, res)
+    const userFull = await db.user.findUnique({ where: { id: user?.id }, select: { id: true, password: true } })
+
+    if (!user || !userFull) return unauthorized(res)
+
+    const comparePasswords = await bcrypt.compare(data.currentPassword, userFull?.password)
+    if (!comparePasswords) return unauthorized(res, "Invalid password for current user.")
+
+    const newPassword = await bcrypt.hash(data.newPassword, 10)
+    const updatedUser = await db.user.update({
+      where: { id: user.id },
+      data: {
+        password: newPassword
+      },
+      select: { id: true }
+    })
+
+    return res.status(200).json({
+      message: "Password has been updated successfully.",
+      status: 200,
+    })
+  }
 
 }
