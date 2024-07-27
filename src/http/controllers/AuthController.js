@@ -182,7 +182,7 @@ class AuthController {
             const token = (0, helpers_1.extractToken)(req.headers.authorization);
             try {
                 const tokenData = jsonwebtoken_1.default.verify(token, AuthController.secret);
-                const user = yield db_1.default.user.findUnique({ where: { id: tokenData === null || tokenData === void 0 ? void 0 : tokenData.id } });
+                const user = yield db_1.default.user.findUnique({ where: { id: tokenData === null || tokenData === void 0 ? void 0 : tokenData.id }, include: { faculty: true, year: true } });
                 if (!user)
                     return (0, responses_1.unauthorized)(res, "User doesn't exist. Unauthorized");
                 const { password } = user, mainUser = __rest(user, ["password"]);
