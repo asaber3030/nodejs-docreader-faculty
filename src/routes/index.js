@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.facultiesDataRouter = exports.subjectRouter = exports.moduleRouter = exports.facultyRouter = exports.userRouter = exports.authRouter = void 0;
+exports.practicalRouter = exports.finalRevisionRouter = exports.lecturesRouter = exports.facultiesDataRouter = exports.subjectRouter = exports.moduleRouter = exports.facultyRouter = exports.userRouter = exports.authRouter = void 0;
 const auth_1 = __importDefault(require("./auth"));
 exports.authRouter = auth_1.default;
 const users_1 = __importDefault(require("./users"));
@@ -16,3 +16,9 @@ const subjects_1 = __importDefault(require("./subjects"));
 exports.subjectRouter = subjects_1.default;
 const facultiesData_1 = __importDefault(require("./facultiesData"));
 exports.facultiesDataRouter = facultiesData_1.default;
+const lectures_1 = __importDefault(require("./lectures"));
+exports.lecturesRouter = lectures_1.default;
+const final_revisions_1 = __importDefault(require("./final-revisions"));
+exports.finalRevisionRouter = final_revisions_1.default;
+const practical_1 = __importDefault(require("./practical"));
+exports.practicalRouter = practical_1.default;

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.subjectFinalRevision = exports.subjectPractical = exports.subjectLecture = exports.subjectSchema = exports.moduleSchema = exports.studyingYearSchema = exports.facultySchema = exports.userSchema = exports.categorySchema = void 0;
+exports.linkSchema = exports.subjectFinalRevision = exports.subjectPractical = exports.subjectLecture = exports.subjectSchema = exports.moduleSchema = exports.studyingYearSchema = exports.facultySchema = exports.userSchema = exports.categorySchema = void 0;
 const client_1 = require("@prisma/client");
 const zod_1 = require("zod");
 exports.categorySchema = {
@@ -24,8 +24,17 @@ exports.userSchema = {
         name: zod_1.z.string().min(1, { message: "Name cannot be less than 1 characters." }),
         email: zod_1.z.string().email({ message: "Invalid Email." }),
         password: zod_1.z.string().min(8, { message: "Password cannot be less than 8 characters." }),
+        confirmationPassword: zod_1.z.string().min(8, { message: "Password cannot be less than 8 characters." }),
         facultyId: zod_1.z.number().gt(0),
         yearId: zod_1.z.number().gt(0),
+    }).superRefine(({ confirmationPassword, password }, ctx) => {
+        if (confirmationPassword !== password) {
+            ctx.addIssue({
+                code: "custom",
+                message: "The passwords did not match",
+                path: ['confirmationPassword']
+            });
+        }
     }),
     update: zod_1.z.object({
         name: zod_1.z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
@@ -85,18 +94,12 @@ exports.subjectSchema = {
 };
 exports.subjectLecture = {
     create: zod_1.z.object({
-        categoryId: zod_1.z.number(),
         title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
-        description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
-        url: zod_1.z.string().url(),
-        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }),
+        subTitle: zod_1.z.string().min(1, { message: "Sub title must be at least 1 character." }),
     }),
     update: zod_1.z.object({
-        categoryId: zod_1.z.number().optional(),
         title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
-        description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
-        url: zod_1.z.string().url().optional(),
-        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }).optional(),
+        subTitle: zod_1.z.string().min(1, { message: "Sub title must be at least 1 character." }).optional(),
     })
 };
 exports.subjectPractical = {
@@ -129,5 +132,21 @@ exports.subjectFinalRevision = {
         description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
         url: zod_1.z.string().url().optional(),
         type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }).optional(),
+    })
+};
+exports.linkSchema = {
+    create: zod_1.z.object({
+        title: zod_1.z.string().min(1, { message: "Title cannot be less than 1 characters." }),
+        subTitle: zod_1.z.string().min(1, { message: "Sub Title cannot be less than 1 characters." }),
+        url: zod_1.z.string().url(),
+        category: zod_1.z.enum([client_1.CategoryType.College, client_1.CategoryType.Data, client_1.CategoryType.Summary], { message: "Invalid category choose from: College, Data, Summary" }),
+        type: zod_1.z.enum([client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video, client_1.DataType.Data], { message: "Invalid category choose from: PDF, Video, Record, Data" })
+    }),
+    update: zod_1.z.object({
+        title: zod_1.z.string().min(1, { message: "Title cannot be less than 1 characters." }).optional(),
+        subTitle: zod_1.z.string().min(1, { message: "Sub Title cannot be less than 1 characters." }).optional(),
+        url: zod_1.z.string().url().optional(),
+        category: zod_1.z.enum([client_1.CategoryType.College, client_1.CategoryType.Data, client_1.CategoryType.Summary], { message: "Invalid category choose from: College, Data, Summary" }).optional(),
+        type: zod_1.z.enum([client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video, client_1.DataType.Data], { message: "Invalid category choose from: PDF, Video, Record, Data" }).optional()
     })
 };

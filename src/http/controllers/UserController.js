@@ -71,7 +71,7 @@ class UserController {
             if (!userData)
                 return (0, responses_1.notFound)(res, "User doesn't exist.");
             if (!body.success)
-                return (0, responses_1.send)(res, "Validation errors", 200, (0, helpers_1.extractErrors)(body));
+                return (0, responses_1.send)(res, "Validation errors", 400, (0, helpers_1.extractErrors)(body));
             if (!data) {
                 return res.status(400).json({
                     message: "Please check there's valid JSON data in the request body.",
@@ -113,7 +113,7 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             const body = schema_1.userSchema.changePassword.safeParse(req.body);
             if (!body.success)
-                return (0, responses_1.send)(res, "Validation errors", 200, (0, helpers_1.extractErrors)(body));
+                return (0, responses_1.send)(res, "Validation errors", 400, (0, helpers_1.extractErrors)(body));
             const data = body.data;
             const user = yield AuthController_1.default.user(req, res);
             const userFull = yield db_1.default.user.findUnique({ where: { id: user === null || user === void 0 ? void 0 : user.id }, select: { id: true, password: true } });

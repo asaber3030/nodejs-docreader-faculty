@@ -155,28 +155,72 @@ class SubjectController {
             return (0, responses_1.send)(res, "Subject has been deleted", 200, deletedSubject);
         });
     }
+    //////////////
     createLecture(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const body = schema_1.subjectLecture.create.safeParse(req.body);
             if (!body.success)
-                return (0, responses_1.validationErrors)(res, (0, helpers_1.extractErrors)(body));
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
             const data = body.data;
-            const user = yield AuthController_1.default.user(req, res);
-            if ((user === null || user === void 0 ? void 0 : user.role) !== client_1.UserRole.Admin)
-                return (0, responses_1.unauthorized)(res, "Unauthorized - Admin Role Required.");
             const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
             if (!subjectId)
                 return (0, responses_1.badRequest)(res, "Invalid subjectId");
-            const subject = yield db_1.default.subject.findUnique({ where: { id: subjectId } });
-            if (!subject)
-                return (0, responses_1.notFound)(res, "Subject doesn't exist.");
-            const findModule = yield db_1.default.module.findUnique({ where: { id: subject.moduleId } });
-            if ((findModule === null || findModule === void 0 ? void 0 : findModule.yearId) !== (user === null || user === void 0 ? void 0 : user.yearId))
-                return (0, responses_1.unauthorized)(res);
+            const findSubject = yield db_1.default.subject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res);
             const newLecture = yield db_1.default.lectureData.create({
-                data: Object.assign({ subjectId }, data)
+                data: Object.assign({ subjectId }, data),
             });
-            return (0, responses_1.send)(res, "Lecture has been created.", 201, newLecture);
+            return (0, responses_1.send)(res, "Subject Lecture has been created successfully.", 201, newLecture);
+        });
+    }
+    updateLecture(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.subjectLecture.update.safeParse(req.body);
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, null, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+            const lectureId = (0, helpers_1.parameterExists)(req, res, "lectureId");
+            const findSubject = yield db_1.default.subject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res, "Subject doesn't exist.");
+            const findLecture = yield db_1.default.lectureData.findUnique({ where: { id: lectureId }, select: { id: true, subjectId: true } });
+            if (!findLecture)
+                return (0, responses_1.notFound)(res, "Lecture doesn't exist.");
+            const updatedLecture = yield db_1.default.lectureData.update({
+                where: { id: lectureId },
+                data: Object.assign({}, data),
+            });
+            return (0, responses_1.send)(res, "Subject Lecture has been updated successfully.", 200, updatedLecture);
+        });
+    }
+    getLectureLinks(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+            const lectureId = (0, helpers_1.parameterExists)(req, res, "lectureId");
+            const findSubject = yield db_1.default.subject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } });
+            if (!findSubject)
+                return (0, responses_1.notFound)(res, "Subject doesn't exist.");
+            const findLecture = yield db_1.default.lectureData.findUnique({ where: { id: lectureId }, select: { id: true, subjectId: true } });
+            if (!findLecture)
+                return (0, responses_1.notFound)(res, "Lecture doesn't exist.");
+            if (findLecture.subjectId !== findSubject.id)
+                return (0, responses_1.notFound)(res, "Lecture doesn't exist.");
+            const links = yield db_1.default.lectureLinks.findMany({ where: { lectureId } });
+            return (0, responses_1.send)(res, `LectureId: {${lectureId}} Links`, 200, links);
+        });
+    }
+    createLectureLink(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+        });
+    }
+    updateLectureLink(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+        });
+    }
+    deleteLectureLink(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
         });
     }
 }

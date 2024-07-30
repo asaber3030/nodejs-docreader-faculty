@@ -10,7 +10,6 @@ const subjectRouter = (0, express_1.Router)();
 const controller = new SubjectController_1.default();
 subjectRouter.use(isAuthenticated_1.checkIsAuthenticated);
 subjectRouter.get('/subjects/:subjectId', controller.get);
-subjectRouter.post('/subjects/:subjectId/create-lecture', controller.createLecture);
 subjectRouter.get('/subjects/:subjectId/lectures', controller.getLectures);
 subjectRouter.get('/subjects/:subjectId/practical', controller.getPractical);
 subjectRouter.get('/subjects/:subjectId/final-revision', controller.getFinalRevision);

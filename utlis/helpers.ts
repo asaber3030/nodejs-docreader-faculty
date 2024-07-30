@@ -1,7 +1,9 @@
 import { SafeParseReturnType } from "zod"
 import { Request, Response } from "express"
 import { TAKE_LIMIT } from "./constants"
-import { badRequest } from "./responses"
+import { badRequest, notFound, unauthorized } from "./responses"
+import AuthController from "../http/controllers/AuthController"
+import db from "./db"
 
 export function showAppURLCMD(port: string) {
   console.log(`Server running at PORT: http://localhost:${port}`)
@@ -54,8 +56,12 @@ export function generateId(min = 999, max = 9999) {
   return num1.toString().padStart(4, "0") + '-' + num2.toString().padStart(4, "0") + '-' + num3.toString().padStart(4, "0") + '-' + num4.toString().padStart(4, "0")
 }
 
-export function parameterExists(request: Request, response: Response, incomingParam: any, message?: string) {
+export function parameterExists(request: Request, response: Response, incomingParam: any) {
   const param = request.params[incomingParam] ? + request.params[incomingParam] : null
-  if (!param) return 
+  if (!param) return undefined
   return param
+}
+
+export async function checkAuthorityForLecture(req: Request, res: Response, lectureId: number | undefined) {
+
 }

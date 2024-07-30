@@ -44,8 +44,7 @@ class Module {
     static find(id_1) {
         return __awaiter(this, arguments, void 0, function* (id, select = null) {
             return yield db_1.default.module.findUnique({
-                where: { id },
-                select: select ? select : Module.dbSelectors
+                where: { id }
             });
         });
     }
@@ -73,7 +72,7 @@ class Module {
     }
     static moduleSubjects(moduleId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield db_1.default.moduleSubject.findMany({
+            return yield db_1.default.subject.findMany({
                 where: { moduleId },
                 orderBy: { id: 'asc' }
             });

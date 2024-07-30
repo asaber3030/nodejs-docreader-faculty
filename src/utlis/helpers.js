@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.showAppURLCMD = showAppURLCMD;
 exports.extractErrors = extractErrors;
@@ -6,6 +15,7 @@ exports.extractToken = extractToken;
 exports.createPagination = createPagination;
 exports.generateId = generateId;
 exports.parameterExists = parameterExists;
+exports.checkAuthorityForLecture = checkAuthorityForLecture;
 const constants_1 = require("./constants");
 function showAppURLCMD(port) {
     console.log(`Server running at PORT: http://localhost:${port}`);
@@ -50,9 +60,13 @@ function generateId(min = 999, max = 9999) {
     // Return: 0000-0000-0000-0000
     return num1.toString().padStart(4, "0") + '-' + num2.toString().padStart(4, "0") + '-' + num3.toString().padStart(4, "0") + '-' + num4.toString().padStart(4, "0");
 }
-function parameterExists(request, response, incomingParam, message) {
+function parameterExists(request, response, incomingParam) {
     const param = request.params[incomingParam] ? +request.params[incomingParam] : null;
     if (!param)
-        return;
+        return undefined;
     return param;
+}
+function checkAuthorityForLecture(req, res, lectureId) {
+    return __awaiter(this, void 0, void 0, function* () {
+    });
 }

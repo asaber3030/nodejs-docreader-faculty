@@ -17,6 +17,18 @@ enum DataType {
   Video
 }
 
+enum CategoryType {
+  Data
+  College
+  Summary
+}
+
+enum LectureType {
+  Normal
+  Practical
+  FinalRevision
+}
+
 enum UserRole {
   Admin
   User
@@ -92,88 +104,101 @@ model Module {
   id           Int    @id @default(autoincrement())
   yearId       Int
   name         String
-  semesterName String @default("1st Semester")
+  semesterName Int    @default(1) @db.SmallInt
   icon         String
 
-  year     StudyingYear    @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  subjects ModuleSubject[]
+  year     StudyingYear @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  subjects Subject[]
 
   createdAt DateTime @default(now()) @db.Timestamp()
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 }
 
-model ModuleSubject {
-  id       Int    @id @default(autoincrement())
-  moduleId Int
-  name     String
-  icon     String
-
-  module         Module                 @relation(fields: [moduleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  lectures       SubjectLecture[]
-  practical      SubjectPractical[]
-  finalRevisions SubjectFinalRevision[]
-
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
-}
-
-model DataCategory {
+model Subject {
   id   Int    @id @default(autoincrement())
   name String
   icon String
 
-  subjectLectures       SubjectLecture[]
-  subjectPractical      SubjectPractical[]
-  subjectFinalRevisions SubjectFinalRevision[]
-}
+  moduleId Int
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-model SubjectLecture {
-  id         Int @id @default(autoincrement())
-  subjectId  Int
-  categoryId Int
-
-  title       String
-  description String
-  url         String
-  type        DataType @default(PDF)
-
-  subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  category DataCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  lectures      LectureData[]
+  practical     PracticalData?
+  finalRevision FinalRevisionData?
 
   createdAt DateTime @default(now()) @db.Timestamp()
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 }
 
-model SubjectFinalRevision {
-  id         Int @id @default(autoincrement())
-  subjectId  Int
-  categoryId Int
+model LectureData {
+  id        Int     @id @default(autoincrement())
+  title     String
+  subTitle  String
+  subjectId Int
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  title       String
-  description String
-  url         String
-  type        DataType @default(PDF)
-
-  subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  category DataCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+  createdAt DateTime       @default(now()) @db.Timestamp()
+  updatedAt DateTime       @default(now()) @updatedAt @db.Timestamp()
+  links     LectureLinks[]
 }
 
-model SubjectPractical {
-  id         Int @id @default(autoincrement())
-  subjectId  Int
-  categoryId Int
+model PracticalData {
+  id        Int              @id @default(autoincrement())
+  title     String
+  subTitle  String
+  subjectId Int              @unique
+  subject   Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  links     PracticalLinks[]
+  createdAt DateTime         @default(now()) @db.Timestamp()
+  updatedAt DateTime         @default(now()) @updatedAt @db.Timestamp()
+}
 
+model FinalRevisionData {
+  id        Int                  @id @default(autoincrement())
+  title     String
+  subTitle  String
+  subjectId Int                  @unique
+  subject   Subject              @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  links     FinalRevisionLinks[]
+  createdAt DateTime             @default(now()) @db.Timestamp()
+  updatedAt DateTime             @default(now()) @updatedAt @db.Timestamp()
+}
+
+model LectureLinks {
+  id          Int          @id @default(autoincrement())
   title       String
-  description String
+  subTitle    String
   url         String
-  type        DataType @default(PDF)
+  type        DataType     @default(PDF)
+  category    CategoryType @default(Data)
+  lectureId   Int
+  lectureData LectureData  @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt   DateTime     @default(now()) @db.Timestamp()
+  updatedAt   DateTime     @default(now()) @updatedAt @db.Timestamp()
+}
 
-  subject  ModuleSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  category DataCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+model PracticalLinks {
+  id            Int           @id @default(autoincrement())
+  title         String
+  subTitle      String
+  url           String
+  type          DataType      @default(PDF)
+  category      CategoryType  @default(Data)
+  practicalId   Int
+  practicalData PracticalData @relation(fields: [practicalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt     DateTime      @default(now()) @db.Timestamp()
+  updatedAt     DateTime      @default(now()) @updatedAt @db.Timestamp()
+}
 
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+model FinalRevisionLinks {
+  id              Int               @id @default(autoincrement())
+  title           String
+  subTitle        String
+  url             String
+  type            DataType          @default(PDF)
+  category        CategoryType      @default(Data)
+  finalRevisionId Int
+  finalRevision   FinalRevisionData @relation(fields: [finalRevisionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt       DateTime          @default(now()) @db.Timestamp()
+  updatedAt       DateTime          @default(now()) @updatedAt @db.Timestamp()
 }

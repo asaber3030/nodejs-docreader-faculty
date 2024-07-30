@@ -49,7 +49,7 @@ export default class UserController {
     const userData = await db.user.findUnique({ where: { id: user.id } })
 
     if (!userData) return notFound(res, "User doesn't exist.")
-    if (!body.success) return send(res, "Validation errors", 200, extractErrors(body))
+    if (!body.success) return send(res, "Validation errors", 400, extractErrors(body))
 
     if (!data) {
       return res.status(400).json({
@@ -96,7 +96,7 @@ export default class UserController {
   async changePassword(req: Request, res: Response) {
 
     const body = userSchema.changePassword.safeParse(req.body)
-    if (!body.success) return send(res, "Validation errors", 200, extractErrors(body))
+    if (!body.success) return send(res, "Validation errors", 400, extractErrors(body))
 
     const data = body.data
     const user = await AuthController.user(req, res)

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.send = send;
+exports.validationErrors = validationErrors;
 exports.unauthorized = unauthorized;
 exports.notFound = notFound;
 exports.badRequest = badRequest;
@@ -11,6 +12,13 @@ function send(res, message = "", status = 200, data, errors) {
         status: status,
         errors,
         data
+    });
+}
+function validationErrors(res, errors) {
+    return res.status(400).json({
+        message: "Validatione errors",
+        errors,
+        status: 400
     });
 }
 function unauthorized(res, message = "Unauthorized.") {

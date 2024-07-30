@@ -14,6 +14,14 @@ export function send<T, D>(res: Response,
   })
 }
 
+export function validationErrors<T>(res: Response, errors: T) {
+  return res.status(400).json({
+    message: "Validatione errors",
+    errors,
+    status: 400
+  })
+}
+
 export function unauthorized(res: Response, message: string = "Unauthorized.") {
   return res.status(401).json({
     message,

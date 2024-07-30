@@ -34,8 +34,7 @@ export default class Module {
 
   static async find(id: number, select: any = null) {
     return await db.module.findUnique({ 
-      where: { id },
-      select: select ? select : Module.dbSelectors
+      where: { id }
     })
   }
 
@@ -60,7 +59,7 @@ export default class Module {
   }
 
   static async moduleSubjects(moduleId: number) {
-    return await db.moduleSubject.findMany({
+    return await db.subject.findMany({
       where: { moduleId },
       orderBy: { id: 'asc' }
     })

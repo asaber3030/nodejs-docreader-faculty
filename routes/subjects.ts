@@ -7,24 +7,13 @@ const subjectRouter = Router()
 const controller = new SubjectController()
 
 subjectRouter.use(checkIsAuthenticated)
-subjectRouter.get('/subjects/:moduleId', controller.get)
-subjectRouter.post('/subjects/:moduleId/create', controller.createSubject)
+subjectRouter.get('/subjects/:subjectId', controller.get)
+subjectRouter.post('/subjects/:subjectId/create-lecture', controller.createLecture)
+subjectRouter.get('/subjects/:subjectId/lectures', controller.getLectures)
+subjectRouter.get('/subjects/:subjectId/practical', controller.getPractical)
+subjectRouter.get('/subjects/:subjectId/final-revision', controller.getFinalRevision)
 
-subjectRouter.get('/subjects/:moduleId/:subjectId', controller.getSubject)
-subjectRouter.patch('/subjects/:moduleId/:subjectId/update', controller.updateSubject)
-subjectRouter.delete('/subjects/:moduleId/:subjectId/delete', controller.deleteSubject)
-
-subjectRouter.get('/subjects/:moduleId/:subjectId/lectures', controller.getSubjectLectures)
-subjectRouter.get('/subjects/:moduleId/:subjectId/final-revisions', controller.getSubjectFinalRevisions)
-subjectRouter.get('/subjects/:moduleId/:subjectId/practical', controller.getSubjectPractical)
-
-subjectRouter.post('/subjects/:moduleId/:subjectId/create/lecture', controller.createLecture)
-subjectRouter.post('/subjects/:moduleId/:subjectId/create/practical', controller.createPractical)
-subjectRouter.post('/subjects/:moduleId/:subjectId/create/final-revision', controller.createFinalRevision)
-
-subjectRouter.patch('/subjects/:moduleId/:subjectId/create/lecture/:lectureId/update', controller.updateLecture)
-subjectRouter.patch('/subjects/:moduleId/:subjectId/create/practical/:practicalId/update', controller.updatePractical)
-subjectRouter.patch('/subjects/:moduleId/:subjectId/create/final-revision/:finalId/update', controller.updateFinalRevision)
-
+subjectRouter.patch('/subjects/:subjectId/update', controller.updateSubject)
+subjectRouter.delete('/subjects/:subjectId/delete', controller.deleteSubject)
 
 export default subjectRouter

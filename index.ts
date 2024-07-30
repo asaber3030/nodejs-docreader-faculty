@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from 'cors'
 
 import { showAppURLCMD } from "./utlis/helpers";
-import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter } from "./routes";
+import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter, finalRevisionRouter, practicalRouter } from "./routes";
 
 import bcrypt from 'bcrypt'
 import db from "./utlis/db";
@@ -15,6 +15,7 @@ const app = express();
 
 app.use(cors())
 app.use(express.json())
+
 app.use('/api/v1', [
   authRouter,
   facultiesDataRouter,
@@ -22,6 +23,9 @@ app.use('/api/v1', [
   facultyRouter,
   moduleRouter,
   subjectRouter,
+  lecturesRouter,
+  finalRevisionRouter,
+  practicalRouter
 ])
 
 app.get('/', async (_, res) => {
