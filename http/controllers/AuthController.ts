@@ -90,9 +90,12 @@ export default class AuthController {
     if (!findFaculty) return notFound(res, "Faculty doesn't exist with provided Id: " + data.facultyId)
 
     const hashedPassword = await bcrypt.hash(data.password, 10)
+
+    const { confirmationPassword, ...restData } = data
+
     const newUser = await db.user.create({
       data: {
-        ...data,
+        ...restData,
         status: true,
         password: hashedPassword
       }
