@@ -95,8 +95,9 @@ class AuthController {
             if (!findFaculty)
                 return (0, responses_1.notFound)(res, "Faculty doesn't exist with provided Id: " + data.facultyId);
             const hashedPassword = yield bcrypt_1.default.hash(data.password, 10);
+            const { confirmationPassword } = data, restData = __rest(data, ["confirmationPassword"]);
             const newUser = yield db_1.default.user.create({
-                data: Object.assign(Object.assign({}, data), { status: true, password: hashedPassword })
+                data: Object.assign(Object.assign({}, restData), { status: true, password: hashedPassword })
             });
             const { password } = newUser, mainUser = __rest(newUser, ["password"]);
             const token = jsonwebtoken_1.default.sign(mainUser, AuthController.secret);

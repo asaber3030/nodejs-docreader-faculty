@@ -194,6 +194,6 @@ export default class AuthController {
     } catch (error) {
       return unauthorized(res, "User doesn't exist. Unauthorized")
     }
-  }
+  } 
 
 }

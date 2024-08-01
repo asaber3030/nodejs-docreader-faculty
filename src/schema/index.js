@@ -40,6 +40,10 @@ exports.userSchema = {
         name: zod_1.z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
         email: zod_1.z.string().email({ message: "Invalid Email." }).optional(),
     }),
+    updateFaculty: zod_1.z.object({
+        facultyId: zod_1.z.number().gt(0, { message: "facultyId cannot be zero." }),
+        yearId: zod_1.z.number().gt(0, { message: "yearId cannot be zero." }),
+    }),
     changePassword: zod_1.z.object({
         currentPassword: zod_1.z.string().min(1, { message: "Current password is required." }),
         newPassword: zod_1.z.string().min(8, { message: "New password cannot be less than 8 characters." }),

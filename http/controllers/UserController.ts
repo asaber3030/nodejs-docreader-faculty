@@ -93,6 +93,49 @@ export default class UserController {
 
   }
 
+  async updateFaculty(req: Request, res: Response) {
+    
+    const body = userSchema.updateFaculty.safeParse(req.body)
+    const tokenData = await UserController.user(req)
+
+    if (!tokenData) return unauthorized(res)
+    const user = await db.user.findUnique({ where: { id: tokenData.id } })
+
+    if (!user) return notFound(res, "User doesn't exist.")
+    if (!body.success) return send(res, "Validation errors", 400, extractErrors(body))
+
+    const data = body.data
+
+    const faculty = await db.faculty.findUnique({
+      where: { id: data.facultyId }
+    })
+    const studyingYear = await db.studyingYear.findUnique({
+      where: { id: data.yearId }
+    })
+
+    if (!faculty) return notFound(res, "Faculty doesn't exist.")
+    if (!studyingYear) return notFound(res, "Studying year doesn't exist.")
+
+    if (faculty.id !== studyingYear.facultyId) return notFound(res, "Failed. Year id doesn't belongs to the given faculty!")
+
+    const updatedUser = await db.user.update({
+      where: { id: user.id },
+      data: {
+        facultyId: data.facultyId,
+        yearId: data.yearId
+      }
+    })
+
+    const { password, ...mainUser } = updatedUser
+
+    return res.status(200).json({
+      message: "User has been updated successfully.",
+      status: 200,
+      data: mainUser
+    })
+
+  }
+
   async changePassword(req: Request, res: Response) {
 
     const body = userSchema.changePassword.safeParse(req.body)

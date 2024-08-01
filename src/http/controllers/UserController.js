@@ -109,6 +109,45 @@ class UserController {
             });
         });
     }
+    updateFaculty(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = schema_1.userSchema.updateFaculty.safeParse(req.body);
+            const tokenData = yield UserController.user(req);
+            if (!tokenData)
+                return (0, responses_1.unauthorized)(res);
+            const user = yield db_1.default.user.findUnique({ where: { id: tokenData.id } });
+            if (!user)
+                return (0, responses_1.notFound)(res, "User doesn't exist.");
+            if (!body.success)
+                return (0, responses_1.send)(res, "Validation errors", 400, (0, helpers_1.extractErrors)(body));
+            const data = body.data;
+            const faculty = yield db_1.default.faculty.findUnique({
+                where: { id: data.facultyId }
+            });
+            const studyingYear = yield db_1.default.studyingYear.findUnique({
+                where: { id: data.yearId }
+            });
+            if (!faculty)
+                return (0, responses_1.notFound)(res, "Faculty doesn't exist.");
+            if (!studyingYear)
+                return (0, responses_1.notFound)(res, "Studying year doesn't exist.");
+            if (faculty.id !== studyingYear.facultyId)
+                return (0, responses_1.notFound)(res, "Failed. Year id doesn't belongs to the given faculty!");
+            const updatedUser = yield db_1.default.user.update({
+                where: { id: user.id },
+                data: {
+                    facultyId: data.facultyId,
+                    yearId: data.yearId
+                }
+            });
+            const { password } = updatedUser, mainUser = __rest(updatedUser, ["password"]);
+            return res.status(200).json({
+                message: "User has been updated successfully.",
+                status: 200,
+                data: mainUser
+            });
+        });
+    }
     changePassword(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const body = schema_1.userSchema.changePassword.safeParse(req.body);

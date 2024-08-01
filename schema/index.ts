@@ -44,6 +44,11 @@ export const userSchema = {
     email: z.string().email({ message: "Invalid Email." }).optional(),
   }),
 
+  updateFaculty: z.object({
+    facultyId: z.number().gt(0, { message: "facultyId cannot be zero." }),
+    yearId: z.number().gt(0, { message: "yearId cannot be zero." }),
+  }),
+
   changePassword: z.object({
     currentPassword: z.string().min(1, { message: "Current password is required." }),
     newPassword: z.string().min(8, { message: "New password cannot be less than 8 characters." }),
