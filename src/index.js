@@ -42,6 +42,7 @@ app.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
         status: 200,
         password
     });
+    console.log('');
 }));
 app.listen(port, () => {
     (0, helpers_1.showAppURLCMD)(port);

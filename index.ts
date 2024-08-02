@@ -11,6 +11,7 @@ import db from "./utlis/db";
 dotenv.config();
 
 const port = process.env.APP_PORT!
+
 const app = express();
 
 app.use(cors())
@@ -36,6 +37,7 @@ app.get('/', async (_, res) => {
     status: 200,
     password
   })
+  console.log('')
 })
 
 app.listen(port, () => { 
