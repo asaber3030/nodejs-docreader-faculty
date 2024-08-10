@@ -125,7 +125,8 @@ export default class AuthController {
     if (!parsedBody.success) return res.status(400).json({ message: "Validation errors", errors })
 
     const user = await db.user.findUnique({
-      where: { email: data?.email }
+      where: { email: data?.email },
+      select: User.dbSelectors
     })
     if (user?.status) return send(res, "User has already verified his account before.", 409)
     if (!user) return notFound(res, "User doesn't exist.")
@@ -175,7 +176,7 @@ export default class AuthController {
     const token = extractToken(req.headers.authorization!)
     try {
       const userData = jwt.verify(token, AuthController.secret) as TUser
-      const user = await db.user.findUnique({ where: { id: userData?.id } })
+      const user = await db.user.findUnique({ where: { id: userData?.id }, select: User.dbSelectors })
       return user
     } catch (error) {
       return null

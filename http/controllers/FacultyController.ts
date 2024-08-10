@@ -11,6 +11,7 @@ import db from "../../utlis/db"
 
 import Faculty from "../models/Faculty"
 import AuthController from "./AuthController"
+import User from "../models/User"
 
 export default class FacultyController {
   
@@ -85,7 +86,8 @@ export default class FacultyController {
     if (!year) return notFound(res, "Year doesn't exist.")
 
     const students = await db.user.findMany({
-      where: { yearId }
+      where: { yearId },
+      select: User.dbSelectors
     })
 
     return res.status(200).json({

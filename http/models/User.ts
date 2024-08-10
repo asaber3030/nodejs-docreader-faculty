@@ -3,7 +3,7 @@ import db from "../../utlis/db";
 
 export default class User {
 
-  static dbSelectors = { id: true, name: true, status: true, email: true, role: true, facultyId: true, createdAt: true, updatedAt: true }
+  static dbSelectors = { id: true, name: true, status: true, email: true, role: true, facultyId: true, yearId: true, createdAt: true, updatedAt: true }
 
   static async findAll(search: string = '', orderBy: string = 'id', orderType: string = 'desc') {
     try {
