@@ -77,5 +77,5 @@ class User {
         });
     }
 }
-User.dbSelectors = { id: true, name: true, status: true, email: true, role: true, facultyId: true, createdAt: true, updatedAt: true };
+User.dbSelectors = { id: true, name: true, status: true, email: true, role: true, facultyId: true, yearId: true, createdAt: true, updatedAt: true };
 exports.default = User;

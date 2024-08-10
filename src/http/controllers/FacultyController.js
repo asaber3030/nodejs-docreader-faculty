@@ -19,6 +19,7 @@ const helpers_1 = require("../../utlis/helpers");
 const db_1 = __importDefault(require("../../utlis/db"));
 const Faculty_1 = __importDefault(require("../models/Faculty"));
 const AuthController_1 = __importDefault(require("./AuthController"));
+const User_1 = __importDefault(require("../models/User"));
 class FacultyController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -96,7 +97,8 @@ class FacultyController {
             if (!year)
                 return (0, responses_1.notFound)(res, "Year doesn't exist.");
             const students = yield db_1.default.user.findMany({
-                where: { yearId }
+                where: { yearId },
+                select: User_1.default.dbSelectors
             });
             return res.status(200).json({
                 data: students,
@@ -187,7 +189,7 @@ class FacultyController {
                 return res.status(400).json({ message: "Validation errors", errors, status: 400 });
             const user = yield AuthController_1.default.user(req, res);
             if (!user || user.role !== client_1.UserRole.Admin)
-                return (0, responses_1.unauthorized)(res, "Unauthorized cannot delete a faculty.");
+                return (0, responses_1.unauthorized)(res, "Unauthorized cannot create a faculty.");
             const facultyExists = yield db_1.default.faculty.findFirst({ where: Object.assign({}, data) });
             if (facultyExists)
                 return (0, responses_1.conflict)(res, "Faculty already exists.");

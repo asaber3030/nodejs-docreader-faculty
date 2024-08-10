@@ -188,7 +188,7 @@ export default class FacultyController {
     if (!data) return res.status(400).json({ message: "Validation errors", errors, status: 400 })
 
     const user = await AuthController.user(req, res)
-    if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot delete a faculty.")
+    if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot create a faculty.")
 
     const facultyExists = await db.faculty.findFirst({ where: { ...data } })
     if (facultyExists) return conflict(res, "Faculty already exists.")

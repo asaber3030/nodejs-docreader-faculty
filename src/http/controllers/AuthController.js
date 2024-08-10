@@ -121,7 +121,8 @@ class AuthController {
             if (!parsedBody.success)
                 return res.status(400).json({ message: "Validation errors", errors });
             const user = yield db_1.default.user.findUnique({
-                where: { email: data === null || data === void 0 ? void 0 : data.email }
+                where: { email: data === null || data === void 0 ? void 0 : data.email },
+                select: User_1.default.dbSelectors
             });
             if (user === null || user === void 0 ? void 0 : user.status)
                 return (0, responses_1.send)(res, "User has already verified his account before.", 409);
@@ -170,7 +171,7 @@ class AuthController {
             const token = (0, helpers_1.extractToken)(req.headers.authorization);
             try {
                 const userData = jsonwebtoken_1.default.verify(token, AuthController.secret);
-                const user = yield db_1.default.user.findUnique({ where: { id: userData === null || userData === void 0 ? void 0 : userData.id } });
+                const user = yield db_1.default.user.findUnique({ where: { id: userData === null || userData === void 0 ? void 0 : userData.id }, select: User_1.default.dbSelectors });
                 return user;
             }
             catch (error) {
