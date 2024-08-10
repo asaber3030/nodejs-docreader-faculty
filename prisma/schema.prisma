@@ -40,8 +40,8 @@ model Faculty {
   name String
   city String
 
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+  createdAt DateTime? @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 
   users  User[]
   admins FacultyAdmin[]
@@ -57,8 +57,8 @@ model FacultyAdmin {
 
   faculty Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+  createdAt DateTime? @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model User {
@@ -74,8 +74,8 @@ model User {
   year              StudyingYear           @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   verificationCodes UserVerificationCode[]
 
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+  createdAt DateTime? @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model UserVerificationCode {
@@ -85,17 +85,17 @@ model UserVerificationCode {
   plain  String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  createdAt DateTime @default(now()) @db.Timestamp()
-  expiresIn DateTime @default(now()) @db.Timestamp()
+  createdAt DateTime? @db.Timestamp()
+  expiresIn DateTime? @db.Timestamp()
 }
 
 model StudyingYear {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   title     String
   facultyId Int
-  faculty   Faculty  @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+  faculty   Faculty   @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime? @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
   modules   Module[]
   users     User[]
 }
@@ -110,8 +110,8 @@ model Module {
   year     StudyingYear @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   subjects Subject[]
 
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+  createdAt DateTime? @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model Subject {
@@ -126,8 +126,8 @@ model Subject {
   practical     PracticalData?
   finalRevision FinalRevisionData?
 
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+  createdAt DateTime? @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model LectureData {
@@ -137,8 +137,8 @@ model LectureData {
   subjectId Int
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  createdAt DateTime       @default(now()) @db.Timestamp()
-  updatedAt DateTime       @default(now()) @updatedAt @db.Timestamp()
+  createdAt DateTime?      @db.Timestamp()
+  updatedAt DateTime?      @updatedAt @db.Timestamp()
   links     LectureLinks[]
 }
 
@@ -149,8 +149,8 @@ model PracticalData {
   subjectId Int              @unique
   subject   Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   links     PracticalLinks[]
-  createdAt DateTime         @default(now()) @db.Timestamp()
-  updatedAt DateTime         @default(now()) @updatedAt @db.Timestamp()
+  createdAt DateTime?        @db.Timestamp()
+  updatedAt DateTime?        @updatedAt @db.Timestamp()
 }
 
 model FinalRevisionData {
@@ -160,8 +160,8 @@ model FinalRevisionData {
   subjectId Int                  @unique
   subject   Subject              @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   links     FinalRevisionLinks[]
-  createdAt DateTime             @default(now()) @db.Timestamp()
-  updatedAt DateTime             @default(now()) @updatedAt @db.Timestamp()
+  createdAt DateTime?            @db.Timestamp()
+  updatedAt DateTime?            @updatedAt @db.Timestamp()
 }
 
 model LectureLinks {
@@ -173,8 +173,8 @@ model LectureLinks {
   category    CategoryType @default(Data)
   lectureId   Int
   lectureData LectureData  @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt   DateTime     @default(now()) @db.Timestamp()
-  updatedAt   DateTime     @default(now()) @updatedAt @db.Timestamp()
+  createdAt   DateTime?    @db.Timestamp()
+  updatedAt   DateTime?    @updatedAt @db.Timestamp()
 }
 
 model PracticalLinks {
@@ -186,8 +186,8 @@ model PracticalLinks {
   category      CategoryType  @default(Data)
   practicalId   Int
   practicalData PracticalData @relation(fields: [practicalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt     DateTime      @default(now()) @db.Timestamp()
-  updatedAt     DateTime      @default(now()) @updatedAt @db.Timestamp()
+  createdAt     DateTime?     @db.Timestamp()
+  updatedAt     DateTime?     @updatedAt @db.Timestamp()
 }
 
 model FinalRevisionLinks {
@@ -199,6 +199,6 @@ model FinalRevisionLinks {
   category        CategoryType      @default(Data)
   finalRevisionId Int
   finalRevision   FinalRevisionData @relation(fields: [finalRevisionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt       DateTime          @default(now()) @db.Timestamp()
-  updatedAt       DateTime          @default(now()) @updatedAt @db.Timestamp()
+  createdAt       DateTime?         @db.Timestamp()
+  updatedAt       DateTime?         @updatedAt @db.Timestamp()
 }

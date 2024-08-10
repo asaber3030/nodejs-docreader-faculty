@@ -121,7 +121,7 @@ export default class SubjectController {
     const findSubject = await db.subject.findFirst({
       where: { 
         name: parsedBody.data.name,
-        AND: [{ id: { not: findModule?.id } }]
+        AND: [{ id: { not: subjectId } }]
       }
     })
     if (findSubject) return conflict(res, "Subject already exists.")

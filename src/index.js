@@ -17,7 +17,6 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const helpers_1 = require("./utlis/helpers");
 const routes_1 = require("./routes");
-const bcrypt_1 = __importDefault(require("bcrypt"));
 dotenv_1.default.config();
 const port = process.env.APP_PORT;
 const app = (0, express_1.default)();
@@ -35,14 +34,11 @@ app.use('/api/v1', [
     routes_1.practicalRouter
 ]);
 app.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const password = yield bcrypt_1.default.hash("123456789", 10);
     return res.status(200).json({
         message: "Faculty API - Documentation",
         info: "To start using the api head to this route: /api/login",
-        status: 200,
-        password
+        status: 200
     });
-    console.log('');
 }));
 app.listen(port, () => {
     (0, helpers_1.showAppURLCMD)(port);

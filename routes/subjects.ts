@@ -7,6 +7,7 @@ const subjectRouter = Router()
 const controller = new SubjectController()
 
 subjectRouter.use(checkIsAuthenticated)
+
 subjectRouter.get('/subjects/:subjectId', controller.get)
 subjectRouter.post('/subjects/:subjectId/create-lecture', controller.createLecture)
 subjectRouter.get('/subjects/:subjectId/lectures', controller.getLectures)

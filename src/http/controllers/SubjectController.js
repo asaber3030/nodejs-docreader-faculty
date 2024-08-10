@@ -125,7 +125,7 @@ class SubjectController {
             const findSubject = yield db_1.default.subject.findFirst({
                 where: {
                     name: parsedBody.data.name,
-                    AND: [{ id: { not: findModule === null || findModule === void 0 ? void 0 : findModule.id } }]
+                    AND: [{ id: { not: subjectId } }]
                 }
             });
             if (findSubject)

@@ -6,7 +6,7 @@ export default class Subject {
 
   static async findAll(search: string = '', orderBy: string = 'id', orderType: string = 'desc') {
     try {
-      return await db.moduleSubject.findMany({
+      return await db.subject.findMany({
         where: {
           OR: [
             { name: { contains: search } }
@@ -23,7 +23,7 @@ export default class Subject {
   }
 
   static async find(id: number, select: any = null) {
-    return await db.moduleSubject.findUnique({ 
+    return await db.subject.findUnique({ 
       where: { id },
       select: select ? select : Subject.dbSelectors
     })
@@ -31,7 +31,7 @@ export default class Subject {
 
   static async paginate(search: string = '', skip: number = 0, take: number = 10, orderBy: string = 'id', orderType: string = 'desc') {
     try {
-      return await db.moduleSubject.findMany({
+      return await db.subject.findMany({
         where: {
           OR: [
             { name: { contains: search } }

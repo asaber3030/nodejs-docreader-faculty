@@ -17,7 +17,7 @@ class Subject {
     static findAll() {
         return __awaiter(this, arguments, void 0, function* (search = '', orderBy = 'id', orderType = 'desc') {
             try {
-                return yield db_1.default.moduleSubject.findMany({
+                return yield db_1.default.subject.findMany({
                     where: {
                         OR: [
                             { name: { contains: search } }
@@ -36,7 +36,7 @@ class Subject {
     }
     static find(id_1) {
         return __awaiter(this, arguments, void 0, function* (id, select = null) {
-            return yield db_1.default.moduleSubject.findUnique({
+            return yield db_1.default.subject.findUnique({
                 where: { id },
                 select: select ? select : Subject.dbSelectors
             });
@@ -45,7 +45,7 @@ class Subject {
     static paginate() {
         return __awaiter(this, arguments, void 0, function* (search = '', skip = 0, take = 10, orderBy = 'id', orderType = 'desc') {
             try {
-                return yield db_1.default.moduleSubject.findMany({
+                return yield db_1.default.subject.findMany({
                     where: {
                         OR: [
                             { name: { contains: search } }
