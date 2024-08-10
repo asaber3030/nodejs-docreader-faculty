@@ -39,6 +39,24 @@ export const userSchema = {
     }
   }),
 
+  createAdmin: z.object({
+    passcode: z.string().min(1, { message: "Passcode Cannot be empty" }),
+    name: z.string().min(1, { message: "Name cannot be less than 1 characters." }),
+    email: z.string().email({ message: "Invalid Email." }),
+    password: z.string().min(8, { message: "Password cannot be less than 8 characters." }),
+    confirmationPassword: z.string().min(8, { message: "Password cannot be less than 8 characters." }),
+    facultyId: z.number().gt(0),
+    yearId: z.number().gt(0),
+  }).superRefine(({ confirmationPassword, password }, ctx) => {
+    if (confirmationPassword !== password) {
+      ctx.addIssue({
+        code: "custom",
+        message: "The passwords did not match",
+        path: ['confirmationPassword']
+      });
+    }
+  }),
+
   update: z.object({
     name: z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
     email: z.string().email({ message: "Invalid Email." }).optional(),

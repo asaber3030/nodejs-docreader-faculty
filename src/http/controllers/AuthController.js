@@ -27,6 +27,7 @@ const zod_1 = require("zod");
 const responses_1 = require("../../utlis/responses");
 const helpers_1 = require("../../utlis/helpers");
 const schema_1 = require("../../schema");
+const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = __importDefault(require("../../utlis/db"));
@@ -192,6 +193,70 @@ class AuthController {
             }
             catch (error) {
                 return (0, responses_1.unauthorized)(res, "User doesn't exist. Unauthorized");
+            }
+        });
+    }
+    createAdmin(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const body = schema_1.userSchema.createAdmin.safeParse(req.body);
+                const data = body.data;
+                if (!body.success) {
+                    const errors = (0, helpers_1.extractErrors)(body);
+                    return res.status(400).json({
+                        errors,
+                        message: "Form validation errors.",
+                        status: 400
+                    });
+                }
+                if (!data) {
+                    return res.status(400).json({
+                        message: "Please check there's valid JSON data in the request body.",
+                        status: 400
+                    });
+                }
+                const userByEmail = yield User_1.default.findBy(data.email);
+                if (userByEmail) {
+                    return res.status(409).json({
+                        message: "E-mail Already exists.",
+                        status: 409
+                    });
+                }
+                const findFaculty = yield Faculty_1.default.find(data.facultyId);
+                if (!findFaculty)
+                    return (0, responses_1.notFound)(res, "Faculty doesn't exist with provided Id: " + data.facultyId);
+                const hashedPassword = yield bcrypt_1.default.hash(data.password, 10);
+                const { confirmationPassword } = data, restData = __rest(data, ["confirmationPassword"]);
+                if (data.passcode !== process.env.PASSCODE) {
+                    return (0, responses_1.unauthorized)(res, "Invalid Passcode.");
+                }
+                const newUser = yield db_1.default.user.create({
+                    data: {
+                        name: restData.name,
+                        email: restData.email,
+                        yearId: restData.yearId,
+                        facultyId: restData.facultyId,
+                        password: hashedPassword,
+                        role: client_1.UserRole.Admin,
+                    }
+                });
+                const { password } = newUser, mainUser = __rest(newUser, ["password"]);
+                const token = jsonwebtoken_1.default.sign(mainUser, AuthController.secret);
+                return res.status(201).json({
+                    message: "Admin Registered successfully",
+                    status: 201,
+                    data: {
+                        user: mainUser,
+                        token
+                    }
+                });
+            }
+            catch (error) {
+                return res.status(500).json({
+                    message: "Error",
+                    status: 201,
+                    errorObject: error
+                });
             }
         });
     }

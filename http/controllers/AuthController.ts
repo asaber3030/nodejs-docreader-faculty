@@ -5,7 +5,7 @@ import { badRequest, notFound, send, unauthorized } from "../../utlis/responses"
 import { extractErrors, extractToken } from "../../utlis/helpers"
 import { userSchema } from "../../schema"
 
-import { User as TUser } from "@prisma/client"
+import { User as TUser, UserRole } from "@prisma/client"
 
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
@@ -116,6 +116,7 @@ export default class AuthController {
   }
 
   async verifyAccount(req: Request, res: Response) {
+    
     const body = req.body
     const schema = z.object({ code: z.string(), email: z.string().email({ message: "Invalid Email" }) })
     const parsedBody = schema.safeParse(body)
@@ -197,4 +198,74 @@ export default class AuthController {
     }
   } 
 
+  async createAdmin(req: Request, res: Response) {
+    try {
+      const body = userSchema.createAdmin.safeParse(req.body)
+      const data = body.data
+  
+      if (!body.success) {
+        const errors = extractErrors(body)
+        return res.status(400).json({
+          errors,
+          message: "Form validation errors.",
+          status: 400
+        })
+      }
+  
+      if (!data) {
+        return res.status(400).json({
+          message: "Please check there's valid JSON data in the request body.",
+          status: 400
+        }) 
+      }
+  
+      const userByEmail = await User.findBy(data.email)
+      if (userByEmail) {
+        return res.status(409).json({
+          message: "E-mail Already exists.",
+          status: 409
+        })
+      }
+  
+      const findFaculty = await Faculty.find(data.facultyId)
+      if (!findFaculty) return notFound(res, "Faculty doesn't exist with provided Id: " + data.facultyId)
+  
+      const hashedPassword = await bcrypt.hash(data.password, 10)
+  
+      const { confirmationPassword, ...restData } = data
+
+      if (data.passcode !== process.env.PASSCODE) {
+        return unauthorized(res, "Invalid Passcode.")
+      }
+  
+      const newUser = await db.user.create({
+        data: {
+          name: restData.name,
+          email: restData.email,
+          yearId: restData.yearId,
+          facultyId: restData.facultyId,
+          password: hashedPassword,
+          role: UserRole.Admin,
+        }
+      })
+  
+      const { password, ...mainUser } = newUser
+      const token = jwt.sign(mainUser, AuthController.secret!)
+  
+      return res.status(201).json({
+        message: "Admin Registered successfully",
+        status: 201,
+        data: {
+          user: mainUser,
+          token
+        }
+      })
+    } catch (error) {
+      return res.status(500).json({
+        message: "Error",
+        status: 201,
+        errorObject: error
+      })
+    }
+  }
 }

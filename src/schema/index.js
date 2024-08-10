@@ -36,6 +36,23 @@ exports.userSchema = {
             });
         }
     }),
+    createAdmin: zod_1.z.object({
+        passcode: zod_1.z.string().min(1, { message: "Passcode Cannot be empty" }),
+        name: zod_1.z.string().min(1, { message: "Name cannot be less than 1 characters." }),
+        email: zod_1.z.string().email({ message: "Invalid Email." }),
+        password: zod_1.z.string().min(8, { message: "Password cannot be less than 8 characters." }),
+        confirmationPassword: zod_1.z.string().min(8, { message: "Password cannot be less than 8 characters." }),
+        facultyId: zod_1.z.number().gt(0),
+        yearId: zod_1.z.number().gt(0),
+    }).superRefine(({ confirmationPassword, password }, ctx) => {
+        if (confirmationPassword !== password) {
+            ctx.addIssue({
+                code: "custom",
+                message: "The passwords did not match",
+                path: ['confirmationPassword']
+            });
+        }
+    }),
     update: zod_1.z.object({
         name: zod_1.z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
         email: zod_1.z.string().email({ message: "Invalid Email." }).optional(),

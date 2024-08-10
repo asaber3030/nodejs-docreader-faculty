@@ -7,6 +7,7 @@ const express_1 = require("express");
 const AuthController_1 = __importDefault(require("../http/controllers/AuthController"));
 const authRouter = (0, express_1.Router)();
 const authController = new AuthController_1.default();
+authRouter.post('/create-admin', authController.createAdmin);
 authRouter.post('/login', authController.login);
 authRouter.post('/register', authController.register);
 authRouter.get('/is-authenticated', authController.isAuthenticated);
