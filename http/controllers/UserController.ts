@@ -50,21 +50,12 @@ export default class UserController {
 
     try {
       const body = userSchema.update.safeParse(req.body)
-      const data = body.data
       const user = await UserController.user(req)
   
       if (!user) return unauthorized(res)
-      const userData = await db.user.findUnique({ where: { id: user.id } })
-  
-      if (!userData) return notFound(res, "User doesn't exist.")
       if (!body.success) return send(res, "Validation errors", 400, extractErrors(body))
-  
-      if (!data) {
-        return res.status(400).json({
-          message: "Please check there's valid JSON data in the request body.",
-          status: 400
-        }) 
-      }
+
+      const data = body.data
 
       const year = await db.studyingYear.findUnique({ where: { id: data.yearId } })
       const faculty = await db.faculty.findUnique({ where: { id: data.facultyId } })
@@ -79,7 +70,7 @@ export default class UserController {
         data: {
           name: data.name,
           facultyId: data.facultyId,
-          yearId: data.facultyId
+          yearId: data.yearId
         }
       })
   

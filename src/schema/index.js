@@ -93,11 +93,13 @@ exports.studyingYearSchema = {
 exports.moduleSchema = {
     create: zod_1.z.object({
         name: zod_1.z.string().min(1, { message: "Name is required" }),
-        icon: zod_1.z.string()
+        icon: zod_1.z.string(),
+        semesterName: zod_1.z.number().min(0, { message: "Semester cannot be less than 1" })
     }),
     update: zod_1.z.object({
         name: zod_1.z.string().min(1, { message: "Name is required" }).optional(),
-        icon: zod_1.z.any().optional()
+        icon: zod_1.z.any().optional(),
+        semesterName: zod_1.z.number().min(0, { message: "Semester cannot be less than 1" }).optional()
     })
 };
 exports.subjectSchema = {

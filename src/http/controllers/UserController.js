@@ -73,21 +73,12 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const body = schema_1.userSchema.update.safeParse(req.body);
-                const data = body.data;
                 const user = yield UserController.user(req);
                 if (!user)
                     return (0, responses_1.unauthorized)(res);
-                const userData = yield db_1.default.user.findUnique({ where: { id: user.id } });
-                if (!userData)
-                    return (0, responses_1.notFound)(res, "User doesn't exist.");
                 if (!body.success)
                     return (0, responses_1.send)(res, "Validation errors", 400, (0, helpers_1.extractErrors)(body));
-                if (!data) {
-                    return res.status(400).json({
-                        message: "Please check there's valid JSON data in the request body.",
-                        status: 400
-                    });
-                }
+                const data = body.data;
                 const year = yield db_1.default.studyingYear.findUnique({ where: { id: data.yearId } });
                 const faculty = yield db_1.default.faculty.findUnique({ where: { id: data.facultyId } });
                 if (!year)
@@ -101,7 +92,7 @@ class UserController {
                     data: {
                         name: data.name,
                         facultyId: data.facultyId,
-                        yearId: data.facultyId
+                        yearId: data.yearId
                     }
                 });
                 const { password } = updatedUser, mainUser = __rest(updatedUser, ["password"]);
