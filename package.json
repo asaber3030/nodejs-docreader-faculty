@@ -11,7 +11,9 @@
   "license": "ISC",
   "baseUrl": "src",
   "paths": {
-    "@/*": ["/*"]
+    "@/*": [
+      "/*"
+    ]
   },
   "dependencies": {
     "@netlify/functions": "^2.8.0",

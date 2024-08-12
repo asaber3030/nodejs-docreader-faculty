@@ -1,9 +1,12 @@
 import { SafeParseReturnType } from "zod"
 import { Request, Response } from "express"
 import { TAKE_LIMIT } from "./constants"
-import { badRequest, notFound, unauthorized } from "./responses"
-import AuthController from "../http/controllers/AuthController"
-import db from "./db"
+
+import moment from "moment"
+
+export function currentDate() {
+  return new Date(moment().add(3, 'hour').format())
+}
 
 export function showAppURLCMD(port: string) {
   console.log(`Server running at PORT: http://localhost:${port}`)

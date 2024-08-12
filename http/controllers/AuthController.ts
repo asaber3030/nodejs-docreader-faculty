@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 
 import { z } from "zod"
 import { badRequest, notFound, send, unauthorized } from "../../utlis/responses"
-import { extractErrors, extractToken } from "../../utlis/helpers"
+import { currentDate, extractErrors, extractToken } from "../../utlis/helpers"
 import { userSchema } from "../../schema"
 
 import { User as TUser, UserRole } from "@prisma/client"
@@ -13,130 +13,121 @@ import db from "../../utlis/db"
 
 import User from "../models/User"
 import Faculty from "../models/Faculty"
-import Verification from "../models/VerificationCode"
+import moment, { now } from "moment"
 
 export default class AuthController {
   
   static secret: string = process.env.APP_USER_SECRET!;
 
   async login(req: Request, res: Response) {
-    
-    const body = userSchema.login.safeParse(req.body)
-    const data = body.data
 
-    if (!body.success) {
-      const errors = extractErrors(body)
-      return res.status(400).json({
-        errors,
-        message: "Form validation errors."
+    try {
+
+      const body = userSchema.login.safeParse(req.body)
+      const data = body.data
+  
+      if (!body.success) {
+        const errors = extractErrors(body)
+        return res.status(400).json({
+          errors,
+          message: "Form validation errors."
+        })
+      }
+      if (!data) return send(res, "No data was submitted.", 409)
+  
+      const user = await User.findBy(data.email)
+      if (!user) return notFound(res, "No User was found")
+      
+      const comparePasswords = await bcrypt.compare(data.password, user.password)
+      if (!comparePasswords) {
+        return res.status(400).json({
+          message: "Invalid email or password."
+        })
+      }
+  
+      const { password, ...mainUser } = user
+
+      const token = jwt.sign(mainUser, AuthController.secret!)
+  
+      return res.status(200).json({
+        message: "Logged in successfully.",
+        status: 200,
+        data: { token, user: mainUser }
+      })
+    } catch(errorObject) {
+      return res.status(500).json({
+        message: "Error - Something went wrong.",
+        status: 500,
+        errorObject
       })
     }
-    if (!data) return send(res, "No data was submitted.", 409)
-
-    const user = await User.findBy(data.email)
-    if (!user) return notFound(res, "No User was found")
-    
-    const comparePasswords = await bcrypt.compare(data.password, user.password)
-    if (!comparePasswords) {
-      return res.status(400).json({
-        message: "Invalid email or password."
-      })
-    }
-
-    const { password, ...mainUser } = user
-
-    if (!user.status) return unauthorized(res, "Please verify your e-mail before trying to login.")
-
-    const token = jwt.sign(mainUser, AuthController.secret!)
-
-    return res.status(200).json({
-      message: "Logged in successfully.",
-      status: 200,
-      data: { token, user: mainUser }
-    })
-
   }
 
   async register(req: Request, res: Response) {
     
-    const body = userSchema.register.safeParse(req.body)
-    const data = body.data
-
-    if (!body.success) {
-      const errors = extractErrors(body)
-      return res.status(400).json({
-        errors,
-        message: "Form validation errors.",
-        status: 400
+    try {
+      const body = userSchema.register.safeParse(req.body)
+      const data = body.data
+  
+      if (!body.success) {
+        const errors = extractErrors(body)
+        return res.status(400).json({
+          errors,
+          message: "Form validation errors.",
+          status: 400
+        })
+      }
+  
+      if (!data) {
+        return res.status(400).json({
+          message: "Please check there's valid JSON data in the request body.",
+          status: 400
+        }) 
+      }
+  
+      const userByEmail = await User.findBy(data.email)
+      if (userByEmail) {
+        return res.status(409).json({
+          message: "E-mail Already exists.",
+          status: 409
+        })
+      }
+  
+      const findFaculty = await Faculty.find(data.facultyId)
+      if (!findFaculty) return notFound(res, "Faculty doesn't exist with provided Id: " + data.facultyId)
+  
+      const hashedPassword = await bcrypt.hash(data.password, 10)
+  
+      const { confirmationPassword, ...restData } = data
+  
+      const newUser = await db.user.create({
+        data: {
+          ...restData,
+          status: true,
+          password: hashedPassword,
+          createdAt: currentDate(),
+        }
+      })
+  
+      const { password, ...mainUser } = newUser
+      const token = jwt.sign(mainUser, AuthController.secret!)
+  
+      return res.status(201).json({
+        message: "User Registered successfully",
+        status: 201,
+        data: {
+          user: mainUser,
+          token
+        }
+      })
+    } catch(errorObject) {
+      return res.status(500).json({
+        message: "Server Crashed",
+        status: 500,
+        errorObject
       })
     }
 
-    if (!data) {
-      return res.status(400).json({
-        message: "Please check there's valid JSON data in the request body.",
-        status: 400
-      }) 
-    }
-
-    const userByEmail = await User.findBy(data.email)
-    if (userByEmail) {
-      return res.status(409).json({
-        message: "E-mail Already exists.",
-        status: 409
-      })
-    }
-
-    const findFaculty = await Faculty.find(data.facultyId)
-    if (!findFaculty) return notFound(res, "Faculty doesn't exist with provided Id: " + data.facultyId)
-
-    const hashedPassword = await bcrypt.hash(data.password, 10)
-
-    const { confirmationPassword, ...restData } = data
-
-    const newUser = await db.user.create({
-      data: {
-        ...restData,
-        status: true,
-        password: hashedPassword
-      }
-    })
-
-    const { password, ...mainUser } = newUser
-    const token = jwt.sign(mainUser, AuthController.secret!)
-
-    return res.status(201).json({
-      message: "User Registered successfully",
-      status: 201,
-      data: {
-        user: mainUser,
-        token
-      }
-    })
-
-  }
-
-  async verifyAccount(req: Request, res: Response) {
-    
-    const body = req.body
-    const schema = z.object({ code: z.string(), email: z.string().email({ message: "Invalid Email" }) })
-    const parsedBody = schema.safeParse(body)
-    const errors = extractErrors(parsedBody)
-    const data = parsedBody.data
-
-    if (!parsedBody.success) return res.status(400).json({ message: "Validation errors", errors })
-
-    const user = await db.user.findUnique({
-      where: { email: data?.email },
-      select: User.dbSelectors
-    })
-    if (user?.status) return send(res, "User has already verified his account before.", 409)
-    if (!user) return notFound(res, "User doesn't exist.")
-
-    return res.status(200).json({
-      ...body.data,
-      user,
-    
-    })
   }
 
   async isAuthenticated(req: Request, res: Response) {
@@ -245,7 +236,9 @@ export default class AuthController {
           yearId: restData.yearId,
           facultyId: restData.facultyId,
           password: hashedPassword,
+          status: true,
           role: UserRole.Admin,
+          createdAt: currentDate(),
         }
       })
   
@@ -260,11 +253,11 @@ export default class AuthController {
           token
         }
       })
-    } catch (error) {
+    } catch (errorObject) {
       return res.status(500).json({
         message: "Error",
-        status: 201,
-        errorObject: error
+        status: 500,
+        errorObject
       })
     }
   }

@@ -23,7 +23,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const zod_1 = require("zod");
 const responses_1 = require("../../utlis/responses");
 const helpers_1 = require("../../utlis/helpers");
 const schema_1 = require("../../schema");
@@ -36,100 +35,96 @@ const Faculty_1 = __importDefault(require("../models/Faculty"));
 class AuthController {
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const body = schema_1.userSchema.login.safeParse(req.body);
-            const data = body.data;
-            if (!body.success) {
-                const errors = (0, helpers_1.extractErrors)(body);
-                return res.status(400).json({
-                    errors,
-                    message: "Form validation errors."
+            try {
+                const body = schema_1.userSchema.login.safeParse(req.body);
+                const data = body.data;
+                if (!body.success) {
+                    const errors = (0, helpers_1.extractErrors)(body);
+                    return res.status(400).json({
+                        errors,
+                        message: "Form validation errors."
+                    });
+                }
+                if (!data)
+                    return (0, responses_1.send)(res, "No data was submitted.", 409);
+                const user = yield User_1.default.findBy(data.email);
+                if (!user)
+                    return (0, responses_1.notFound)(res, "No User was found");
+                const comparePasswords = yield bcrypt_1.default.compare(data.password, user.password);
+                if (!comparePasswords) {
+                    return res.status(400).json({
+                        message: "Invalid email or password."
+                    });
+                }
+                const { password } = user, mainUser = __rest(user, ["password"]);
+                const token = jsonwebtoken_1.default.sign(mainUser, AuthController.secret);
+                return res.status(200).json({
+                    message: "Logged in successfully.",
+                    status: 200,
+                    data: { token, user: mainUser }
                 });
             }
-            if (!data)
-                return (0, responses_1.send)(res, "No data was submitted.", 409);
-            const user = yield User_1.default.findBy(data.email);
-            if (!user)
-                return (0, responses_1.notFound)(res, "No User was found");
-            const comparePasswords = yield bcrypt_1.default.compare(data.password, user.password);
-            if (!comparePasswords) {
-                return res.status(400).json({
-                    message: "Invalid email or password."
+            catch (errorObject) {
+                return res.status(500).json({
+                    message: "Error - Something went wrong.",
+                    status: 500,
+                    errorObject
                 });
             }
-            const { password } = user, mainUser = __rest(user, ["password"]);
-            if (!user.status)
-                return (0, responses_1.unauthorized)(res, "Please verify your e-mail before trying to login.");
-            const token = jsonwebtoken_1.default.sign(mainUser, AuthController.secret);
-            return res.status(200).json({
-                message: "Logged in successfully.",
-                status: 200,
-                data: { token, user: mainUser }
-            });
         });
     }
     register(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const body = schema_1.userSchema.register.safeParse(req.body);
-            const data = body.data;
-            if (!body.success) {
-                const errors = (0, helpers_1.extractErrors)(body);
-                return res.status(400).json({
-                    errors,
-                    message: "Form validation errors.",
-                    status: 400
-                });
-            }
-            if (!data) {
-                return res.status(400).json({
-                    message: "Please check there's valid JSON data in the request body.",
-                    status: 400
-                });
-            }
-            const userByEmail = yield User_1.default.findBy(data.email);
-            if (userByEmail) {
-                return res.status(409).json({
-                    message: "E-mail Already exists.",
-                    status: 409
-                });
-            }
-            const findFaculty = yield Faculty_1.default.find(data.facultyId);
-            if (!findFaculty)
-                return (0, responses_1.notFound)(res, "Faculty doesn't exist with provided Id: " + data.facultyId);
-            const hashedPassword = yield bcrypt_1.default.hash(data.password, 10);
-            const { confirmationPassword } = data, restData = __rest(data, ["confirmationPassword"]);
-            const newUser = yield db_1.default.user.create({
-                data: Object.assign(Object.assign({}, restData), { status: true, password: hashedPassword })
-            });
-            const { password } = newUser, mainUser = __rest(newUser, ["password"]);
-            const token = jsonwebtoken_1.default.sign(mainUser, AuthController.secret);
-            return res.status(201).json({
-                message: "User Registered successfully",
-                status: 201,
-                data: {
-                    user: mainUser,
-                    token
+            try {
+                const body = schema_1.userSchema.register.safeParse(req.body);
+                const data = body.data;
+                if (!body.success) {
+                    const errors = (0, helpers_1.extractErrors)(body);
+                    return res.status(400).json({
+                        errors,
+                        message: "Form validation errors.",
+                        status: 400
+                    });
                 }
-            });
-        });
-    }
-    verifyAccount(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const body = req.body;
-            const schema = zod_1.z.object({ code: zod_1.z.string(), email: zod_1.z.string().email({ message: "Invalid Email" }) });
-            const parsedBody = schema.safeParse(body);
-            const errors = (0, helpers_1.extractErrors)(parsedBody);
-            const data = parsedBody.data;
-            if (!parsedBody.success)
-                return res.status(400).json({ message: "Validation errors", errors });
-            const user = yield db_1.default.user.findUnique({
-                where: { email: data === null || data === void 0 ? void 0 : data.email },
-                select: User_1.default.dbSelectors
-            });
-            if (user === null || user === void 0 ? void 0 : user.status)
-                return (0, responses_1.send)(res, "User has already verified his account before.", 409);
-            if (!user)
-                return (0, responses_1.notFound)(res, "User doesn't exist.");
-            return res.status(200).json(Object.assign(Object.assign({}, body.data), { user }));
+                if (!data) {
+                    return res.status(400).json({
+                        message: "Please check there's valid JSON data in the request body.",
+                        status: 400
+                    });
+                }
+                const userByEmail = yield User_1.default.findBy(data.email);
+                if (userByEmail) {
+                    return res.status(409).json({
+                        message: "E-mail Already exists.",
+                        status: 409
+                    });
+                }
+                const findFaculty = yield Faculty_1.default.find(data.facultyId);
+                if (!findFaculty)
+                    return (0, responses_1.notFound)(res, "Faculty doesn't exist with provided Id: " + data.facultyId);
+                const hashedPassword = yield bcrypt_1.default.hash(data.password, 10);
+                const { confirmationPassword } = data, restData = __rest(data, ["confirmationPassword"]);
+                const newUser = yield db_1.default.user.create({
+                    data: Object.assign(Object.assign({}, restData), { status: true, password: hashedPassword, createdAt: (0, helpers_1.currentDate)() })
+                });
+                const { password } = newUser, mainUser = __rest(newUser, ["password"]);
+                const token = jsonwebtoken_1.default.sign(mainUser, AuthController.secret);
+                return res.status(201).json({
+                    message: "User Registered successfully",
+                    status: 201,
+                    data: {
+                        user: mainUser,
+                        token
+                    }
+                });
+            }
+            catch (errorObject) {
+                return res.status(500).json({
+                    message: "Server Crashed",
+                    status: 500,
+                    errorObject
+                });
+            }
         });
     }
     isAuthenticated(req, res) {
@@ -237,7 +232,9 @@ class AuthController {
                         yearId: restData.yearId,
                         facultyId: restData.facultyId,
                         password: hashedPassword,
+                        status: true,
                         role: client_1.UserRole.Admin,
+                        createdAt: (0, helpers_1.currentDate)(),
                     }
                 });
                 const { password } = newUser, mainUser = __rest(newUser, ["password"]);
@@ -251,11 +248,11 @@ class AuthController {
                     }
                 });
             }
-            catch (error) {
+            catch (errorObject) {
                 return res.status(500).json({
                     message: "Error",
-                    status: 201,
-                    errorObject: error
+                    status: 500,
+                    errorObject
                 });
             }
         });

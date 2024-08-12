@@ -8,7 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.currentDate = currentDate;
 exports.showAppURLCMD = showAppURLCMD;
 exports.extractErrors = extractErrors;
 exports.extractToken = extractToken;
@@ -17,6 +21,10 @@ exports.generateId = generateId;
 exports.parameterExists = parameterExists;
 exports.checkAuthorityForLecture = checkAuthorityForLecture;
 const constants_1 = require("./constants");
+const moment_1 = __importDefault(require("moment"));
+function currentDate() {
+    return new Date((0, moment_1.default)().add(3, 'hour').format());
+}
 function showAppURLCMD(port) {
     console.log(`Server running at PORT: http://localhost:${port}`);
 }

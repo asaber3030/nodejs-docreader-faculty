@@ -59,10 +59,6 @@ export const userSchema = {
 
   update: z.object({
     name: z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
-    email: z.string().email({ message: "Invalid Email." }).optional(),
-  }),
-
-  updateFaculty: z.object({
     facultyId: z.number().gt(0, { message: "facultyId cannot be zero." }),
     yearId: z.number().gt(0, { message: "yearId cannot be zero." }),
   }),
