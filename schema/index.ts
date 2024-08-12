@@ -133,6 +133,7 @@ export const subjectLecture = {
   create: z.object({
     title: z.string().min(1, { message: "Title must be at least 1 character." }),
     subTitle: z.string().min(1, { message: "Sub title must be at least 1 character." }),
+    date: z.coerce.date({ message: 'Please provide a date' })
   }),
 
   update: z.object({
@@ -147,7 +148,7 @@ export const subjectPractical = {
     title: z.string().min(1, { message: "Title must be at least 1 character." }),
     description: z.string().min(1, { message: "Title must be at least 1 character." }),
     url: z.string().url(),
-    type: z.enum([DataType.Data, DataType.PDF, DataType.Record, DataType.Video], { message: "Invalid data typer" }),
+    type: z.enum([DataType.Data, DataType.PDF, DataType.Record, DataType.Video], { message: "Invalid data type" }),
   }),
 
   update: z.object({

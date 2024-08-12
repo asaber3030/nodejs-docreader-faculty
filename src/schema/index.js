@@ -114,6 +114,7 @@ exports.subjectLecture = {
     create: zod_1.z.object({
         title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
         subTitle: zod_1.z.string().min(1, { message: "Sub title must be at least 1 character." }),
+        date: zod_1.z.coerce.date({ message: 'Please provide a date' })
     }),
     update: zod_1.z.object({
         title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
@@ -126,7 +127,7 @@ exports.subjectPractical = {
         title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
         description: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
         url: zod_1.z.string().url(),
-        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data typer" }),
+        type: zod_1.z.enum([client_1.DataType.Data, client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video], { message: "Invalid data type" }),
     }),
     update: zod_1.z.object({
         categoryId: zod_1.z.number().optional(),

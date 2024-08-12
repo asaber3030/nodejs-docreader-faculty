@@ -136,7 +136,7 @@ model LectureData {
   subTitle  String
   subjectId Int
   subject   Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  date      DateTime? @db.Timestamp()
+  date      DateTime? @db.Date
 
   createdAt DateTime?      @db.Timestamp()
   updatedAt DateTime?      @updatedAt @db.Timestamp()
