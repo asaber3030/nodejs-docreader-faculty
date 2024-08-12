@@ -65,6 +65,14 @@ export default class UserController {
           status: 400
         }) 
       }
+
+      const year = await db.studyingYear.findUnique({ where: { id: data.yearId } })
+      const faculty = await db.faculty.findUnique({ where: { id: data.facultyId } })
+
+      if (!year) return notFound(res, "Year doesn't exist")
+      if (!faculty) return notFound(res, "Faculty doesn't exist")
+
+      if (year?.facultyId !== faculty?.id) return notFound(res, "Year doesn't belong to given faculty!")
   
       const updatedUser = await db.user.update({
         where: { id: user.id },

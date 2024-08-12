@@ -88,6 +88,14 @@ class UserController {
                         status: 400
                     });
                 }
+                const year = yield db_1.default.studyingYear.findUnique({ where: { id: data.yearId } });
+                const faculty = yield db_1.default.faculty.findUnique({ where: { id: data.facultyId } });
+                if (!year)
+                    return (0, responses_1.notFound)(res, "Year doesn't exist");
+                if (!faculty)
+                    return (0, responses_1.notFound)(res, "Faculty doesn't exist");
+                if ((year === null || year === void 0 ? void 0 : year.facultyId) !== (faculty === null || faculty === void 0 ? void 0 : faculty.id))
+                    return (0, responses_1.notFound)(res, "Year doesn't belong to given faculty!");
                 const updatedUser = yield db_1.default.user.update({
                     where: { id: user.id },
                     data: {
