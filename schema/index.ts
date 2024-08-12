@@ -108,12 +108,14 @@ export const studyingYearSchema = {
 export const moduleSchema = {
   create: z.object({
     name: z.string().min(1, { message: "Name is required" }),
-    icon: z.string()
+    icon: z.string(),
+    semesterName: z.number().min(0, { message: "Semester cannot be less than 1" })
   }),
 
   update: z.object({
     name: z.string().min(1, { message: "Name is required" }).optional(),
-    icon: z.any().optional()
+    icon: z.any().optional(),
+    semesterName: z.number().min(0, { message: "Semester cannot be less than 1" }).optional()
   })
 }
 
