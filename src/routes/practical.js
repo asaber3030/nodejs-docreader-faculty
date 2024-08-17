@@ -12,6 +12,7 @@ practicalRouter.use(isAuthenticated_1.checkIsAuthenticated);
 practicalRouter.get('/practical/:subjectId', controller.get);
 practicalRouter.get('/practical/:subjectId/links', controller.getLinks);
 practicalRouter.post('/practical/:subjectId/links/create', controller.createLink);
+practicalRouter.get('/practical/:subjectId/links/:linkId', controller.getLink);
 practicalRouter.patch('/practical/:subjectId/links/:linkId/update', controller.updateLink);
 practicalRouter.delete('/practical/:subjectId/links/:linkId/delete', controller.deleteLink);
 exports.default = practicalRouter;

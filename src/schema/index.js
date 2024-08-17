@@ -7,7 +7,7 @@ exports.categorySchema = {
     update: zod_1.z.object({
         name: zod_1.z.string().min(1, { message: "Name is required" }).max(255, { message: "Cannot be greater than 255 characters" }).optional(),
         keywords: zod_1.z.string().min(1, { message: "Keywords is required. Separate them with ',' " }).max(255, { message: "Cannot be greater than 255 characters" }).optional(),
-        icon: zod_1.z.string().url({ message: "Icon must be a URL." })
+        icon: zod_1.z.string().url({ message: "Icon must be a URL." }).optional()
     }),
     create: zod_1.z.object({
         name: zod_1.z.string().max(255, { message: "Cannot be greater than 255 characters" }),
@@ -55,8 +55,8 @@ exports.userSchema = {
     }),
     update: zod_1.z.object({
         name: zod_1.z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
-        facultyId: zod_1.z.number().gt(0, { message: "facultyId cannot be zero." }),
-        yearId: zod_1.z.number().gt(0, { message: "yearId cannot be zero." }),
+        facultyId: zod_1.z.number().gt(0, { message: "facultyId cannot be zero." }).optional(),
+        yearId: zod_1.z.number().gt(0, { message: "yearId cannot be zero." }).optional(),
     }),
     changePassword: zod_1.z.object({
         currentPassword: zod_1.z.string().min(1, { message: "Current password is required." }),
@@ -115,12 +115,15 @@ exports.subjectSchema = {
 exports.subjectLecture = {
     create: zod_1.z.object({
         title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }),
-        subTitle: zod_1.z.string().min(1, { message: "Sub title must be at least 1 character." }),
-        date: zod_1.z.coerce.date({ message: 'Please provide a date' })
+        subTitle: zod_1.z.string().min(1, { message: "Sub title must be at least 1 character." }).optional(),
+        date: zod_1.z.coerce.date({ message: 'Please provide a date' }),
+        subjectId: zod_1.z.number()
     }),
     update: zod_1.z.object({
         title: zod_1.z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
         subTitle: zod_1.z.string().min(1, { message: "Sub title must be at least 1 character." }).optional(),
+        date: zod_1.z.coerce.date({ message: 'Please provide a date' }).optional(),
+        subjectId: zod_1.z.number().optional()
     })
 };
 exports.subjectPractical = {
@@ -158,7 +161,7 @@ exports.subjectFinalRevision = {
 exports.linkSchema = {
     create: zod_1.z.object({
         title: zod_1.z.string().min(1, { message: "Title cannot be less than 1 characters." }),
-        subTitle: zod_1.z.string().min(1, { message: "Sub Title cannot be less than 1 characters." }),
+        subTitle: zod_1.z.string().min(1, { message: "Sub Title cannot be less than 1 characters." }).optional(),
         url: zod_1.z.string().url(),
         category: zod_1.z.enum([client_1.CategoryType.College, client_1.CategoryType.Data, client_1.CategoryType.Summary], { message: "Invalid category choose from: College, Data, Summary" }),
         type: zod_1.z.enum([client_1.DataType.PDF, client_1.DataType.Record, client_1.DataType.Video, client_1.DataType.Data], { message: "Invalid category choose from: PDF, Video, Record, Data" })

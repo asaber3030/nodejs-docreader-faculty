@@ -1,4 +1,5 @@
 import { Request, Response } from "express"
+import { UserRole } from "@prisma/client"
 
 import { linkSchema } from "../../schema"
 import { badRequest, notFound, send, unauthorized, validationErrors } from "../../utlis/responses"
@@ -6,10 +7,9 @@ import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers
 
 import db from "../../utlis/db"
 import AuthController from "./AuthController"
-import { UserRole } from "@prisma/client"
+
 
 export default class FinalRevisionController {
-  
   async get(req: Request, res: Response) {
     try {
       const user = await AuthController.user(req, res)
@@ -100,9 +100,10 @@ export default class FinalRevisionController {
       const data = body.data
       const createdLink = await db.finalRevisionLinks.create({
         data: { 
-          ...data, 
+          ...data,
+          subTitle: data.subTitle ?? '',
           finalRevisionId: finalRevisionData.id,
-          createdAt: currentDate(),
+          createdAt: currentDate()
         }
       })
       return send(res, "finalRevision Link has been created", 201, createdLink)
@@ -114,6 +115,25 @@ export default class FinalRevisionController {
       })
     }
     
+  }
+
+  async getLink(req: Request, res: Response) {
+    try {
+      const linkId = parameterExists(req, res, "linkId")
+      if (!linkId) return badRequest(res, "Invalid linkId")
+
+      const link = await db.finalRevisionLinks.findUnique({ where: { id: linkId } })
+      if (!link) return notFound(res, "Link not found.")
+
+      return send(res, "Link Data", 200, link)
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500
+      })
+    }
+
   }
     
   async updateLink(req: Request, res: Response) {
@@ -198,5 +218,4 @@ export default class FinalRevisionController {
     }
 
   }
-  
 }

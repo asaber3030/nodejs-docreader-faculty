@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const client_1 = require("@prisma/client");
 const schema_1 = require("../../schema");
 const responses_1 = require("../../utlis/responses");
 const helpers_1 = require("../../utlis/helpers");
 const db_1 = __importDefault(require("../../utlis/db"));
 const AuthController_1 = __importDefault(require("./AuthController"));
-const client_1 = require("@prisma/client");
 class FinalRevisionController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -84,6 +84,7 @@ class FinalRevisionController {
     }
     createLink(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const user = yield AuthController_1.default.user(req, res);
                 if (!user || user.role !== client_1.UserRole.Admin)
@@ -108,9 +109,29 @@ class FinalRevisionController {
                     return (0, responses_1.validationErrors)(res, (0, helpers_1.extractErrors)(body));
                 const data = body.data;
                 const createdLink = yield db_1.default.finalRevisionLinks.create({
-                    data: Object.assign(Object.assign({}, data), { finalRevisionId: finalRevisionData.id, createdAt: (0, helpers_1.currentDate)() })
+                    data: Object.assign(Object.assign({}, data), { subTitle: (_a = data.subTitle) !== null && _a !== void 0 ? _a : '', finalRevisionId: finalRevisionData.id, createdAt: (0, helpers_1.currentDate)() })
                 });
                 return (0, responses_1.send)(res, "finalRevision Link has been created", 201, createdLink);
+            }
+            catch (errorObject) {
+                return res.status(500).json({
+                    errorObject,
+                    message: "Error - Something Went Wrong.",
+                    status: 500
+                });
+            }
+        });
+    }
+    getLink(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const linkId = (0, helpers_1.parameterExists)(req, res, "linkId");
+                if (!linkId)
+                    return (0, responses_1.badRequest)(res, "Invalid linkId");
+                const link = yield db_1.default.finalRevisionLinks.findUnique({ where: { id: linkId } });
+                if (!link)
+                    return (0, responses_1.notFound)(res, "Link not found.");
+                return (0, responses_1.send)(res, "Link Data", 200, link);
             }
             catch (errorObject) {
                 return res.status(500).json({

@@ -5,7 +5,7 @@ export const categorySchema = {
   update: z.object({
     name: z.string().min(1, { message: "Name is required" }).max(255, { message: "Cannot be greater than 255 characters" }).optional(),
     keywords: z.string().min(1, { message: "Keywords is required. Separate them with ',' " }).max(255, { message: "Cannot be greater than 255 characters" }).optional(),
-    icon: z.string().url({ message: "Icon must be a URL." })
+    icon: z.string().url({ message: "Icon must be a URL." }).optional()
   }),
 
   create: z.object({
@@ -59,8 +59,8 @@ export const userSchema = {
 
   update: z.object({
     name: z.string().min(1, { message: "Name cannot be less than 1 characters." }).optional(),
-    facultyId: z.number().gt(0, { message: "facultyId cannot be zero." }),
-    yearId: z.number().gt(0, { message: "yearId cannot be zero." }),
+    facultyId: z.number().gt(0, { message: "facultyId cannot be zero." }).optional(),
+    yearId: z.number().gt(0, { message: "yearId cannot be zero." }).optional(),
   }),
 
   changePassword: z.object({
@@ -134,13 +134,16 @@ export const subjectSchema = {
 export const subjectLecture = {
   create: z.object({
     title: z.string().min(1, { message: "Title must be at least 1 character." }),
-    subTitle: z.string().min(1, { message: "Sub title must be at least 1 character." }),
-    date: z.coerce.date({ message: 'Please provide a date' })
+    subTitle: z.string().min(1, { message: "Sub title must be at least 1 character." }).optional(),
+    date: z.coerce.date({ message: 'Please provide a date' }),
+    subjectId: z.number()
   }),
 
   update: z.object({
     title: z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
     subTitle: z.string().min(1, { message: "Sub title must be at least 1 character." }).optional(),
+    date: z.coerce.date({ message: 'Please provide a date' }).optional(),
+    subjectId: z.number().optional()
   })
 }
 
@@ -183,7 +186,7 @@ export const subjectFinalRevision = {
 export const linkSchema = {
   create: z.object({
     title: z.string().min(1, { message: "Title cannot be less than 1 characters." }),
-    subTitle: z.string().min(1, { message: "Sub Title cannot be less than 1 characters." }),
+    subTitle: z.string().min(1, { message: "Sub Title cannot be less than 1 characters." }).optional(),
     url: z.string().url(),
     category: z.enum([CategoryType.College, CategoryType.Data, CategoryType.Summary], { message: "Invalid category choose from: College, Data, Summary" }),
     type: z.enum([DataType.PDF, DataType.Record, DataType.Video, DataType.Data], { message: "Invalid category choose from: PDF, Video, Record, Data" })

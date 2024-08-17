@@ -211,6 +211,7 @@ class SubjectController {
     }
     createLecture(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const body = schema_1.subjectLecture.create.safeParse(req.body);
                 if (!body.success)
@@ -229,7 +230,7 @@ class SubjectController {
                 if ((findModule === null || findModule === void 0 ? void 0 : findModule.yearId) !== (user === null || user === void 0 ? void 0 : user.yearId))
                     return (0, responses_1.unauthorized)(res);
                 const newLecture = yield db_1.default.lectureData.create({
-                    data: Object.assign(Object.assign({ subjectId }, data), { createdAt: (0, helpers_1.currentDate)() })
+                    data: Object.assign(Object.assign({}, data), { subjectId, subTitle: (_a = data.subTitle) !== null && _a !== void 0 ? _a : '', createdAt: (0, helpers_1.currentDate)() })
                 });
                 return (0, responses_1.send)(res, "Lecture has been created.", 201, newLecture);
             }

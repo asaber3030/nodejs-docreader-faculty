@@ -100,6 +100,7 @@ export default class PracticalController {
       const createdLink = await db.practicalLinks.create({
         data: { 
           ...data, 
+          subTitle: data.subTitle ?? '',
           createdAt: currentDate(),
           practicalId: practicalData.id 
         }
@@ -113,6 +114,25 @@ export default class PracticalController {
       })
     }
     
+  }
+
+  async getLink(req: Request, res: Response) {
+    try {
+      const linkId = parameterExists(req, res, "linkId")
+      if (!linkId) return badRequest(res, "Invalid linkId")
+
+      const link = await db.practicalLinks.findUnique({ where: { id: linkId } })
+      if (!link) return notFound(res, "Link not found.")
+
+      return send(res, "Link Data", 200, link)
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500
+      })
+    }
+
   }
     
   async updateLink(req: Request, res: Response) {

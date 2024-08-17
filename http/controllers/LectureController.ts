@@ -57,14 +57,25 @@ export default class LectureController {
     
       const body = subjectLecture.update.safeParse(req.body)
       if (!body.success) return validationErrors(res, extractErrors(body))
-
+      
       const data = body.data
+      if (body.data.subjectId) {
+        const subject = await db.subject.findUnique({ where: { id: body.data.subjectId } })
+        if (!subject) return notFound(res, "Subject id doesn't exist.")
+      }
+
       const updatedLecture = await db.lectureData.update({
         where: { id: lectureId },
-        data
+        data: {
+          ...data,
+          subjectId: data.subjectId ? data.subjectId : lecture.subjectId,
+          subTitle: data.subTitle ?? '',
+        }
       })
+
       return send(res, "Lecture has been updated", 200, updatedLecture)
     } catch (errorObject) {
+      console.log(errorObject)
       return res.status(500).json({
         errorObject,
         message: "Error - Something Went Wrong.",
@@ -135,6 +146,25 @@ export default class LectureController {
       })
     }
   }
+
+  async getLink(req: Request, res: Response) {
+    try {
+      const linkId = parameterExists(req, res, "linkId")
+      if (!linkId) return badRequest(res, "Invalid linkId")
+
+      const link = await db.lectureLinks.findUnique({ where: { id: linkId } })
+      if (!link) return notFound(res, "Link not found.")
+
+      return send(res, "Link Data", 200, link)
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500
+      })
+    }
+
+  }
     
   async createLink(req: Request, res: Response) {
     try {
@@ -160,6 +190,7 @@ export default class LectureController {
       const createdLink = await db.lectureLinks.create({
         data: {
           ...data,
+          subTitle: data.subTitle ?? '',
           lectureId: lecture.id,
           createdAt: currentDate()
         }

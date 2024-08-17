@@ -212,6 +212,7 @@ export default class SubjectController {
       if (!body.success) return validationErrors(res, extractErrors(body))
     
       const data = body.data
+
       const user = await AuthController.user(req, res)
       if (!user || user?.role !== UserRole.Admin) return unauthorized(res, "Unauthorized - Admin Role Required.")
       
@@ -225,10 +226,11 @@ export default class SubjectController {
       if (findModule?.yearId !== user?.yearId) return unauthorized(res)
   
       const newLecture = await db.lectureData.create({
-        data: { subjectId, ...data, createdAt: currentDate() }
+        data: { ...data, subjectId, subTitle: data.subTitle ?? '', createdAt: currentDate() }
       })
   
       return send(res, "Lecture has been created.", 201, newLecture)
+      
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
