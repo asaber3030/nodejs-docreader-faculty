@@ -15,7 +15,8 @@ lecturesRouter.delete('/lectures/:lectureId/delete', controller.deleteLecture)
 lecturesRouter.get('/lectures/:lectureId/links', controller.getLinks)
 lecturesRouter.post('/lectures/:lectureId/links/create', controller.createLink)
 
-lecturesRouter.get('/lectures/:lectureId/links/:linkId', controller.getLink)
+lecturesRouter.get('/lectures/links/:linkId', controller.getLink)
+
 lecturesRouter.patch('/lectures/:lectureId/links/:linkId/update', controller.updateLink)
 lecturesRouter.delete('/lectures/:lectureId/links/:linkId/delete', controller.deleteLink)
 
