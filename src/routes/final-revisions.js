@@ -13,6 +13,6 @@ finalRevisionRouter.get('/final-revision/:subjectId', controller.get);
 finalRevisionRouter.get('/final-revision/:subjectId/links', controller.getLinks);
 finalRevisionRouter.post('/final-revision/:subjectId/links/create', controller.createLink);
 finalRevisionRouter.get('/final-revision/links/:linkId', controller.getLink);
-finalRevisionRouter.patch('/final-revision/:subjectId/links/:linkId/update', controller.updateLink);
-finalRevisionRouter.delete('/final-revision/:subjectId/links/:linkId/delete', controller.deleteLink);
+finalRevisionRouter.patch('/final-revision/links/:linkId/update', controller.updateLink);
+finalRevisionRouter.delete('/final-revision/links/:linkId/delete', controller.deleteLink);
 exports.default = finalRevisionRouter;

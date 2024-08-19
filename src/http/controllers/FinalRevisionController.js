@@ -148,24 +148,9 @@ class FinalRevisionController {
                 const user = yield AuthController_1.default.user(req, res);
                 if (!user || user.role !== client_1.UserRole.Admin)
                     return (0, responses_1.unauthorized)(res, "Unauthorized cannot update a link.");
-                const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
                 const linkId = (0, helpers_1.parameterExists)(req, res, "linkId");
-                const findSubject = yield db_1.default.subject.findUnique({ where: { id: subjectId } });
-                if (!findSubject)
-                    return (0, responses_1.notFound)(res, "Subject doesn't exist.");
-                if (!subjectId)
-                    return (0, responses_1.badRequest)(res, "Invalid subjectId");
                 if (!linkId)
                     return (0, responses_1.badRequest)(res, "Invalid linkId");
-                const finalRevisionData = yield db_1.default.finalRevisionData.findUnique({
-                    where: { subjectId },
-                    include: { subject: true }
-                });
-                if (!finalRevisionData)
-                    return (0, responses_1.notFound)(res, "Final Revision Data doesn't exist.");
-                const module = yield db_1.default.module.findUnique({ where: { id: finalRevisionData === null || finalRevisionData === void 0 ? void 0 : finalRevisionData.subject.moduleId } });
-                if ((user === null || user === void 0 ? void 0 : user.yearId) !== (module === null || module === void 0 ? void 0 : module.yearId))
-                    return (0, responses_1.unauthorized)(res, "Unauthorized");
                 const link = yield db_1.default.finalRevisionLinks.findUnique({ where: { id: linkId } });
                 if (!link)
                     return (0, responses_1.notFound)(res, "Link doesn't exist.");
@@ -194,24 +179,9 @@ class FinalRevisionController {
                 const user = yield AuthController_1.default.user(req, res);
                 if (!user || user.role !== client_1.UserRole.Admin)
                     return (0, responses_1.unauthorized)(res, "Unauthorized cannot delete a link.");
-                const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
                 const linkId = (0, helpers_1.parameterExists)(req, res, "linkId");
-                const findSubject = yield db_1.default.subject.findUnique({ where: { id: subjectId } });
-                if (!findSubject)
-                    return (0, responses_1.notFound)(res, "Subject doesn't exist.");
-                if (!subjectId)
-                    return (0, responses_1.badRequest)(res, "Invalid subjectId");
                 if (!linkId)
                     return (0, responses_1.badRequest)(res, "Invalid linkId");
-                const finalRevisionData = yield db_1.default.finalRevisionData.findUnique({
-                    where: { subjectId },
-                    include: { subject: true }
-                });
-                if (!finalRevisionData)
-                    return (0, responses_1.notFound)(res, "Final Revision Data doesn't exist.");
-                const module = yield db_1.default.module.findUnique({ where: { id: finalRevisionData === null || finalRevisionData === void 0 ? void 0 : finalRevisionData.subject.moduleId } });
-                if ((user === null || user === void 0 ? void 0 : user.yearId) !== (module === null || module === void 0 ? void 0 : module.yearId))
-                    return (0, responses_1.unauthorized)(res, "Unauthorized");
                 const link = yield db_1.default.finalRevisionLinks.findUnique({ where: { id: linkId } });
                 if (!link)
                     return (0, responses_1.notFound)(res, "Link doesn't exist.");

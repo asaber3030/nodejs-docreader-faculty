@@ -215,24 +215,12 @@ class LectureController {
                 const user = yield AuthController_1.default.user(req, res);
                 if (!user || user.role !== client_1.UserRole.Admin)
                     return (0, responses_1.unauthorized)(res, "Unauthorized cannot update a link.");
-                const lectureId = (0, helpers_1.parameterExists)(req, res, "lectureId");
                 const linkId = (0, helpers_1.parameterExists)(req, res, "linkId");
-                if (!lectureId)
-                    return (0, responses_1.badRequest)(res, "Invalid lectureId");
                 if (!linkId)
                     return (0, responses_1.badRequest)(res, "Invalid linkId");
-                const lecture = yield db_1.default.lectureData.findUnique({
-                    where: { id: lectureId },
-                    include: { subject: true }
-                });
                 const link = yield db_1.default.lectureLinks.findUnique({ where: { id: linkId } });
-                if (!lecture)
-                    return (0, responses_1.notFound)(res, "Lecture doesn't exist.");
                 if (!link)
                     return (0, responses_1.notFound)(res, "Link doesn't exist.");
-                const module = yield db_1.default.module.findUnique({ where: { id: lecture === null || lecture === void 0 ? void 0 : lecture.subject.moduleId } });
-                if ((user === null || user === void 0 ? void 0 : user.yearId) !== (module === null || module === void 0 ? void 0 : module.yearId))
-                    return (0, responses_1.unauthorized)(res, "Unauthorized");
                 const body = schema_1.linkSchema.update.safeParse(req.body);
                 if (!body.success)
                     return (0, responses_1.validationErrors)(res, (0, helpers_1.extractErrors)(body));
@@ -258,24 +246,12 @@ class LectureController {
                 const user = yield AuthController_1.default.user(req, res);
                 if (!user || user.role !== client_1.UserRole.Admin)
                     return (0, responses_1.unauthorized)(res, "Unauthorized cannot delete a link.");
-                const lectureId = (0, helpers_1.parameterExists)(req, res, "lectureId");
                 const linkId = (0, helpers_1.parameterExists)(req, res, "linkId");
-                if (!lectureId)
-                    return (0, responses_1.badRequest)(res, "Invalid lectureId");
                 if (!linkId)
                     return (0, responses_1.badRequest)(res, "Invalid linkId");
-                const lecture = yield db_1.default.lectureData.findUnique({
-                    where: { id: lectureId },
-                    include: { subject: true }
-                });
                 const link = yield db_1.default.lectureLinks.findUnique({ where: { id: linkId } });
-                if (!lecture)
-                    return (0, responses_1.notFound)(res, "Lecture doesn't exist.");
                 if (!link)
                     return (0, responses_1.notFound)(res, "Link doesn't exist.");
-                const module = yield db_1.default.module.findUnique({ where: { id: lecture === null || lecture === void 0 ? void 0 : lecture.subject.moduleId } });
-                if ((user === null || user === void 0 ? void 0 : user.yearId) !== (module === null || module === void 0 ? void 0 : module.yearId))
-                    return (0, responses_1.unauthorized)(res, "Unauthorized");
                 const deletedLink = yield db_1.default.lectureLinks.delete({
                     where: { id: link.id }
                 });

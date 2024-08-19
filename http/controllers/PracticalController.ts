@@ -140,24 +140,10 @@ export default class PracticalController {
       const user = await AuthController.user(req, res)
       if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot update a link.")
 
-      const subjectId = parameterExists(req, res, "subjectId")
       const linkId = parameterExists(req, res, "linkId")
      
-      const findSubject = await db.subject.findUnique({ where: { id: subjectId } })
-      if (!findSubject) return notFound(res, "Subject doesn't exist.")
-      
-      if (!subjectId) return badRequest(res, "Invalid subjectId")
       if (!linkId) return badRequest(res, "Invalid linkId")
       
-      const practicalData = await db.practicalData.findUnique({ 
-        where: { subjectId },
-        include: { subject: true } 
-      })
-      if (!practicalData) return notFound(res, "Practical Data doesn't exist.")
-  
-      const module = await db.module.findUnique({ where: { id: practicalData?.subject.moduleId } })
-      if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
-  
       const link = await db.practicalLinks.findUnique({ where: { id: linkId } })
       if (!link) return notFound(res, "Link doesn't exist.")
      
@@ -184,24 +170,9 @@ export default class PracticalController {
       const user = await AuthController.user(req, res)
       if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot delete a link.")
 
-      const subjectId = parameterExists(req, res, "subjectId")
       const linkId = parameterExists(req, res, "linkId")
-  
-      const findSubject = await db.subject.findUnique({ where: { id: subjectId } })
-      if (!findSubject) return notFound(res, "Subject doesn't exist.")
-      
-      if (!subjectId) return badRequest(res, "Invalid subjectId")
       if (!linkId) return badRequest(res, "Invalid linkId")
       
-      const practicalData = await db.practicalData.findUnique({ 
-        where: { subjectId },
-        include: { subject: true } 
-      })
-      if (!practicalData) return notFound(res, "Practical Data doesn't exist.")
-  
-      const module = await db.module.findUnique({ where: { id: practicalData?.subject.moduleId } })
-      if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
-  
       const link = await db.practicalLinks.findUnique({ where: { id: linkId } })
       if (!link) return notFound(res, "Link doesn't exist.")
   

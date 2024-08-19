@@ -210,24 +210,12 @@ export default class LectureController {
       const user = await AuthController.user(req, res)
       if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot update a link.")
 
-      const lectureId = parameterExists(req, res, "lectureId")
       const linkId = parameterExists(req, res, "linkId")
-  
-      if (!lectureId) return badRequest(res, "Invalid lectureId")
       if (!linkId) return badRequest(res, "Invalid linkId")
       
-      const lecture = await db.lectureData.findUnique({ 
-        where: { id: lectureId },
-        include: { subject: true } 
-      })
       const link = await db.lectureLinks.findUnique({ where: { id: linkId } })
-  
-      if (!lecture) return notFound(res, "Lecture doesn't exist.")
       if (!link) return notFound(res, "Link doesn't exist.")
       
-      const module = await db.module.findUnique({ where: { id: lecture?.subject.moduleId } })
-      if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
-     
       const body = linkSchema.update.safeParse(req.body)
       if (!body.success) return validationErrors(res, extractErrors(body))
   
@@ -255,23 +243,11 @@ export default class LectureController {
       const user = await AuthController.user(req, res)
       if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot delete a link.")
 
-      const lectureId = parameterExists(req, res, "lectureId")
       const linkId = parameterExists(req, res, "linkId")
-  
-      if (!lectureId) return badRequest(res, "Invalid lectureId")
       if (!linkId) return badRequest(res, "Invalid linkId")
       
-      const lecture = await db.lectureData.findUnique({ 
-        where: { id: lectureId },
-        include: { subject: true } 
-      })
       const link = await db.lectureLinks.findUnique({ where: { id: linkId } })
-  
-      if (!lecture) return notFound(res, "Lecture doesn't exist.")
       if (!link) return notFound(res, "Link doesn't exist.")
-      
-      const module = await db.module.findUnique({ where: { id: lecture?.subject.moduleId } })
-      if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
      
       const deletedLink = await db.lectureLinks.delete({
         where: { id: link.id }

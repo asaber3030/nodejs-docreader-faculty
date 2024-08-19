@@ -138,25 +138,13 @@ export default class FinalRevisionController {
     
   async updateLink(req: Request, res: Response) {
     try {
+
       const user = await AuthController.user(req, res)
       if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot update a link.")
-      const subjectId = parameterExists(req, res, "subjectId")
+
+
       const linkId = parameterExists(req, res, "linkId")
-     
-      const findSubject = await db.subject.findUnique({ where: { id: subjectId } })
-      if (!findSubject) return notFound(res, "Subject doesn't exist.")
-      
-      if (!subjectId) return badRequest(res, "Invalid subjectId")
       if (!linkId) return badRequest(res, "Invalid linkId")
-      
-      const finalRevisionData = await db.finalRevisionData.findUnique({ 
-        where: { subjectId },
-        include: { subject: true } 
-      })
-      if (!finalRevisionData) return notFound(res, "Final Revision Data doesn't exist.")
-  
-      const module = await db.module.findUnique({ where: { id: finalRevisionData?.subject.moduleId } })
-      if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
   
       const link = await db.finalRevisionLinks.findUnique({ where: { id: linkId } })
       if (!link) return notFound(res, "Link doesn't exist.")
@@ -186,29 +174,15 @@ export default class FinalRevisionController {
       const user = await AuthController.user(req, res)
       if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot delete a link.")
 
-      const subjectId = parameterExists(req, res, "subjectId")
       const linkId = parameterExists(req, res, "linkId")
-
-      const findSubject = await db.subject.findUnique({ where: { id: subjectId } })
-      if (!findSubject) return notFound(res, "Subject doesn't exist.")
-      
-      if (!subjectId) return badRequest(res, "Invalid subjectId")
       if (!linkId) return badRequest(res, "Invalid linkId")
-      
-      const finalRevisionData = await db.finalRevisionData.findUnique({ 
-        where: { subjectId },
-        include: { subject: true } 
-      })
-      if (!finalRevisionData) return notFound(res, "Final Revision Data doesn't exist.")
-
-      const module = await db.module.findUnique({ where: { id: finalRevisionData?.subject.moduleId } })
-      if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
 
       const link = await db.finalRevisionLinks.findUnique({ where: { id: linkId } })
       if (!link) return notFound(res, "Link doesn't exist.")
 
       const deletedLink = await db.finalRevisionLinks.delete({ where: { id: link.id } })
       return send(res, "Link has been deleted", 200, deletedLink)
+      
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
