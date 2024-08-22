@@ -1,4 +1,23 @@
-import express from "express";
+import express, { Express, Request, Response } from "express";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const app = express();
+const port = 8080;
+
+app.get("/", (req: Request, res: Response) => {
+  res.json({
+    message: "MAIN_FUNCTION",
+    status: "APP_STATUS"
+  });
+});
+
+app.listen(port, () => {
+  console.log(`[server]: Server is running at http://localhost:${port}`);
+});
+
+/* import express from "express";
 import dotenv from "dotenv";
 import cors from 'cors'
 
@@ -7,7 +26,7 @@ import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRout
 
 dotenv.config();
 
-const port = process.env.APP_PORT!
+const port = process.env.APP_PORT
 
 const app = express();
 
@@ -26,8 +45,8 @@ app.use('/api/v1', [
   practicalRouter
 ])
 
-app.get('/', async (_, res) => {
-  return res.status(200).json({
+app.get('/', (req, res) => {
+ res.status(200).json({
     message: "Faculty API - Documentation",
     info: "To start using the api head to this route: /api/login",
     status: 200
@@ -35,7 +54,6 @@ app.get('/', async (_, res) => {
 })
 
 app.listen(port, () => { 
-  showAppURLCMD(port!)
+  console.log("running")
 })
-
-export default app
+ */
