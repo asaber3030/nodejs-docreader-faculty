@@ -2,8 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from 'cors'
 
-import { showAppURLCMD } from "./utlis/helpers";
-import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter, finalRevisionRouter, practicalRouter } from "./routes";
+import { showAppURLCMD } from "../utlis/helpers";
+import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter, finalRevisionRouter, practicalRouter } from "../routes";
 
 dotenv.config();
 

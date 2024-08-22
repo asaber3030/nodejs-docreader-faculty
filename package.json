@@ -4,8 +4,8 @@
   "description": "SaaS - For Creating code snippets and organize them for you.",
   "main": "src/index.js",
   "scripts": {
-    "compile": "tsc --watch",
-    "start": "nodemon ./src/index.ts"
+    "start": "nodemon ./src/index.js",
+    "compile": "tsc --watch"
   },
   "author": "abdulrahmansaber120@gmail.com",
   "license": "ISC",
