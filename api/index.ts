@@ -1,9 +1,17 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, Router } from "express";
 import dotenv from "dotenv";
 import cors from 'cors'
 
 import { showAppURLCMD } from "../utlis/helpers";
 import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter, finalRevisionRouter, practicalRouter } from "../routes";
+
+import LectureController from "../http/controllers/LectureController";
+import PracticalController from "../http/controllers/PracticalController";
+import AuthController from "../http/controllers/AuthController";
+import UserController from "../http/controllers/UserController";
+import ModuleController from "../http/controllers/ModuleController";
+import SubjectController from "../http/controllers/SubjectController";
+import FinalRevisionController from "../http/controllers/FinalRevisionController";
 
 dotenv.config();
 
@@ -13,7 +21,15 @@ const port = 8080
 app.use(cors())
 app.use(express.json())
 
-app.use(authRouter)
+const router = Router()
+
+router.get('/test-api', (req, res) => {
+  res.json({
+    api: "test-api"
+  })
+})
+
+app.use(router)
 
 /*app.use('/api/v1', [
   authRouter,
