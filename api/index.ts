@@ -21,9 +21,14 @@ const port = 8080
 app.use(cors())
 app.use(express.json())
 
-app.use(subjectRouter)
+app.get("/", (req: Request, res: Response) => {
+  res.json({
+    message: "MAIN_FUNCTION",
+    status: "APP_STATUS"
+  });
+});
 
-/*app.use('/api/v1', [
+app.use('/api/v1', [
   authRouter,
   facultiesDataRouter,
   userRouter,
@@ -33,14 +38,7 @@ app.use(subjectRouter)
   lecturesRouter,
   finalRevisionRouter,
   practicalRouter
-])*/
-
-app.get("/", (req: Request, res: Response) => {
-  res.json({
-    message: "MAIN_FUNCTION",
-    status: "APP_STATUS"
-  });
-});
+])
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
