@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon ./src/index.js",
     "compile": "tsc --watch",
-    "postinstall": "prisma generate"
+    "build": "nodemon ./api/index.ts",
+    "postinstall": "npx prisma generate"
   },
   "author": "abdulrahmansaber120@gmail.com",
   "license": "ISC",
