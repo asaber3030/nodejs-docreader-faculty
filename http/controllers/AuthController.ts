@@ -1,6 +1,5 @@
 import { Request, Response } from "express"
 
-import { z } from "zod"
 import { badRequest, notFound, send, unauthorized } from "../../utlis/responses"
 import { currentDate, extractErrors, extractToken } from "../../utlis/helpers"
 import { userSchema } from "../../schema"
@@ -13,11 +12,16 @@ import db from "../../utlis/db"
 
 import User from "../models/User"
 import Faculty from "../models/Faculty"
-import moment, { now } from "moment"
+import dotenv from 'dotenv'
 
 export default class AuthController {
-  
-  static secret: string = process.env.APP_USER_SECRET!;
+
+  static secret: string;
+
+  static {
+    dotenv.config();
+    this.secret = process.env.APP_USER_SECRET!;
+  }
 
   async login(req: Request, res: Response) {
 
