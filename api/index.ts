@@ -13,7 +13,7 @@ const port = 8080
 //app.use(cors())
 app.use(express.json())
 
-/* app.use('/api/v1', [
+app.use('/api/v1', [
   authRouter,
   facultiesDataRouter,
   userRouter,
@@ -23,7 +23,7 @@ app.use(express.json())
   lecturesRouter,
   finalRevisionRouter,
   practicalRouter
-]) */
+])
 
 app.get("/", (req: Request, res: Response) => {
   res.json({
