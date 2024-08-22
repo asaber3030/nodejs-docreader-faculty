@@ -23,8 +23,8 @@ app.use(express.json())
 
 app.get("/", (req: Request, res: Response) => {
   res.json({
-    message: "MAIN_FUNCTION",
-    status: "APP_STATUS"
+    message: "DocReader API - For Faculty",
+    status: "Running..."
   });
 });
 
