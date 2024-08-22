@@ -4,9 +4,9 @@
   "description": "SaaS - For Creating code snippets and organize them for you.",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon ./src/index.js",
+    "start": "nodemon ./api/index.js",
     "compile": "tsc --watch",
-    "build": "nodemon ./api/index.ts",
+    "build": "npx ts-node ./api/index.ts",
     "postinstall": "npx prisma generate"
   },
   "author": "abdulrahmansaber120@gmail.com",
