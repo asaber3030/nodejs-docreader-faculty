@@ -106,6 +106,26 @@ export default class ModuleController {
           createdAt: currentDate()
         }
       })
+
+      await db.lecture.create({
+        data: {
+          title: "Practical Data",
+          subTitle: "Practical Data Description",
+          subjectId: newSubject.id,
+          type: LectureType.Practical,
+          createdAt: currentDate()
+        }
+      })
+      await db.lecture.create({
+        data: {
+          title: "Final Revision Data",
+          subTitle: "Final Revision Data Description",
+          subjectId: newSubject.id,
+          type: LectureType.FinalRevision,
+          createdAt: currentDate()
+        }
+      })
+
       return send(res, "Subject has been created", 201, newSubject)
     } catch (errorObject) {
       return res.status(500).json({
