@@ -1,0 +1,201 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const client_1 = require("@prisma/client");
+const schema_1 = require("../../schema");
+const responses_1 = require("../../utlis/responses");
+const helpers_1 = require("../../utlis/helpers");
+const db_1 = __importDefault(require("../../utlis/db"));
+const AuthController_1 = __importDefault(require("./AuthController"));
+class FinalRevisionController {
+    get(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield AuthController_1.default.user(req, res);
+                const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+                if (!subjectId)
+                    return (0, responses_1.badRequest)(res, "Invalid subjectId");
+                const findSubject = yield db_1.default.subject.findUnique({ where: { id: subjectId } });
+                if (!findSubject)
+                    return (0, responses_1.notFound)(res, "Subject doesn't exist.");
+                const finalRevisionData = yield db_1.default.finalRevisionData.findUnique({
+                    where: { subjectId },
+                    include: { subject: true }
+                });
+                if (!finalRevisionData)
+                    return (0, responses_1.notFound)(res, "finalRevision Data doesn't exist.");
+                const module = yield db_1.default.module.findUnique({ where: { id: finalRevisionData === null || finalRevisionData === void 0 ? void 0 : finalRevisionData.subject.moduleId } });
+                if ((user === null || user === void 0 ? void 0 : user.yearId) !== (module === null || module === void 0 ? void 0 : module.yearId))
+                    return (0, responses_1.unauthorized)(res, "Unauthorized");
+                return (0, responses_1.send)(res, `subjectId [${subjectId}] - Data`, 200, finalRevisionData);
+            }
+            catch (errorObject) {
+                return res.status(500).json({
+                    errorObject,
+                    message: "Error - Something Went Wrong.",
+                    status: 500
+                });
+            }
+        });
+    }
+    getLinks(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield AuthController_1.default.user(req, res);
+                const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+                if (!subjectId)
+                    return (0, responses_1.badRequest)(res, "Invalid subjectId");
+                const findSubject = yield db_1.default.subject.findUnique({ where: { id: subjectId } });
+                if (!findSubject)
+                    return (0, responses_1.notFound)(res, "Subject doesn't exist.");
+                const finalRevisionData = yield db_1.default.finalRevisionData.findUnique({
+                    where: { subjectId },
+                    include: { subject: true }
+                });
+                if (!finalRevisionData)
+                    return (0, responses_1.notFound)(res, "finalRevision Data doesn't exist.");
+                const module = yield db_1.default.module.findUnique({ where: { id: finalRevisionData === null || finalRevisionData === void 0 ? void 0 : finalRevisionData.subject.moduleId } });
+                if ((user === null || user === void 0 ? void 0 : user.yearId) !== (module === null || module === void 0 ? void 0 : module.yearId))
+                    return (0, responses_1.unauthorized)(res, "Unauthorized");
+                const links = yield db_1.default.finalRevisionLinks.findMany({
+                    where: { finalRevisionId: finalRevisionData.id }
+                });
+                return (0, responses_1.send)(res, `subjectId [${subjectId}] - Final Revision Data Links`, 200, links);
+            }
+            catch (errorObject) {
+                return res.status(500).json({
+                    errorObject,
+                    message: "Error - Something Went Wrong.",
+                    status: 500
+                });
+            }
+        });
+    }
+    createLink(req, res) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield AuthController_1.default.user(req, res);
+                if (!user || user.role !== client_1.UserRole.Admin)
+                    return (0, responses_1.unauthorized)(res, "Unauthorized cannot create a link.");
+                const subjectId = (0, helpers_1.parameterExists)(req, res, "subjectId");
+                if (!subjectId)
+                    return (0, responses_1.badRequest)(res, "Invalid subjectId");
+                const findSubject = yield db_1.default.subject.findUnique({ where: { id: subjectId } });
+                if (!findSubject)
+                    return (0, responses_1.notFound)(res, "Subject doesn't exist.");
+                const finalRevisionData = yield db_1.default.finalRevisionData.findUnique({
+                    where: { subjectId },
+                    include: { subject: true }
+                });
+                if (!finalRevisionData)
+                    return (0, responses_1.notFound)(res, "finalReFinal Revisionvision Data doesn't exist.");
+                const module = yield db_1.default.module.findUnique({ where: { id: finalRevisionData === null || finalRevisionData === void 0 ? void 0 : finalRevisionData.subject.moduleId } });
+                if ((user === null || user === void 0 ? void 0 : user.yearId) !== (module === null || module === void 0 ? void 0 : module.yearId))
+                    return (0, responses_1.unauthorized)(res, "Unauthorized");
+                const body = schema_1.linkSchema.create.safeParse(req.body);
+                if (!body.success)
+                    return (0, responses_1.validationErrors)(res, (0, helpers_1.extractErrors)(body));
+                const data = body.data;
+                const createdLink = yield db_1.default.finalRevisionLinks.create({
+                    data: Object.assign(Object.assign({}, data), { subTitle: (_a = data.subTitle) !== null && _a !== void 0 ? _a : '', finalRevisionId: finalRevisionData.id, createdAt: (0, helpers_1.currentDate)() })
+                });
+                return (0, responses_1.send)(res, "finalRevision Link has been created", 201, createdLink);
+            }
+            catch (errorObject) {
+                return res.status(500).json({
+                    errorObject,
+                    message: "Error - Something Went Wrong.",
+                    status: 500
+                });
+            }
+        });
+    }
+    getLink(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const linkId = (0, helpers_1.parameterExists)(req, res, "linkId");
+                if (!linkId)
+                    return (0, responses_1.badRequest)(res, "Invalid linkId");
+                const link = yield db_1.default.finalRevisionLinks.findUnique({ where: { id: linkId } });
+                if (!link)
+                    return (0, responses_1.notFound)(res, "Link not found.");
+                return (0, responses_1.send)(res, "Link Data", 200, link);
+            }
+            catch (errorObject) {
+                return res.status(500).json({
+                    errorObject,
+                    message: "Error - Something Went Wrong.",
+                    status: 500
+                });
+            }
+        });
+    }
+    updateLink(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield AuthController_1.default.user(req, res);
+                if (!user || user.role !== client_1.UserRole.Admin)
+                    return (0, responses_1.unauthorized)(res, "Unauthorized cannot update a link.");
+                const linkId = (0, helpers_1.parameterExists)(req, res, "linkId");
+                if (!linkId)
+                    return (0, responses_1.badRequest)(res, "Invalid linkId");
+                const link = yield db_1.default.finalRevisionLinks.findUnique({ where: { id: linkId } });
+                if (!link)
+                    return (0, responses_1.notFound)(res, "Link doesn't exist.");
+                const body = schema_1.linkSchema.update.safeParse(req.body);
+                if (!body.success)
+                    return (0, responses_1.validationErrors)(res, (0, helpers_1.extractErrors)(body));
+                const data = body.data;
+                const updatedLink = yield db_1.default.finalRevisionLinks.update({
+                    where: { id: link.id },
+                    data
+                });
+                return (0, responses_1.send)(res, "Link has been updated", 200, updatedLink);
+            }
+            catch (errorObject) {
+                return res.status(500).json({
+                    errorObject,
+                    message: "Error - Something Went Wrong.",
+                    status: 500
+                });
+            }
+        });
+    }
+    deleteLink(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield AuthController_1.default.user(req, res);
+                if (!user || user.role !== client_1.UserRole.Admin)
+                    return (0, responses_1.unauthorized)(res, "Unauthorized cannot delete a link.");
+                const linkId = (0, helpers_1.parameterExists)(req, res, "linkId");
+                if (!linkId)
+                    return (0, responses_1.badRequest)(res, "Invalid linkId");
+                const link = yield db_1.default.finalRevisionLinks.findUnique({ where: { id: linkId } });
+                if (!link)
+                    return (0, responses_1.notFound)(res, "Link doesn't exist.");
+                const deletedLink = yield db_1.default.finalRevisionLinks.delete({ where: { id: link.id } });
+                return (0, responses_1.send)(res, "Link has been deleted", 200, deletedLink);
+            }
+            catch (errorObject) {
+                return res.status(500).json({
+                    errorObject,
+                    message: "Error - Something Went Wrong.",
+                    status: 500
+                });
+            }
+        });
+    }
+}
+exports.default = FinalRevisionController;
