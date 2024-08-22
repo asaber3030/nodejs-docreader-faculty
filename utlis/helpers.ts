@@ -65,6 +65,3 @@ export function parameterExists(request: Request, response: Response, incomingPa
   return param
 }
 
-export async function checkAuthorityForLecture(req: Request, res: Response, lectureId: number | undefined) {
-
-}
