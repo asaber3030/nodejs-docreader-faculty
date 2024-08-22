@@ -7,14 +7,13 @@ import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRout
 
 dotenv.config();
 
-const port = process.env.APP_PORT
-
 const app = express();
+const port = 8080
 
-app.use(cors())
+//app.use(cors())
 app.use(express.json())
 
-app.use('/api/v1', [
+/* app.use('/api/v1', [
   authRouter,
   facultiesDataRouter,
   userRouter,
@@ -24,7 +23,7 @@ app.use('/api/v1', [
   lecturesRouter,
   finalRevisionRouter,
   practicalRouter
-])
+]) */
 
 app.get("/", (req: Request, res: Response) => {
   res.json({
