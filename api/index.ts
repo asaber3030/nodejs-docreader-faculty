@@ -21,15 +21,7 @@ const port = 8080
 app.use(cors())
 app.use(express.json())
 
-const router = Router()
-
-router.get('/test-api', (req, res) => {
-  res.json({
-    api: "test-api"
-  })
-})
-
-app.use(router)
+app.use(subjectRouter)
 
 /*app.use('/api/v1', [
   authRouter,
