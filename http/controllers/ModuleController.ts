@@ -113,6 +113,7 @@ export default class ModuleController {
           subTitle: "Practical Data Description",
           subjectId: newSubject.id,
           type: LectureType.Practical,
+          date: currentDate(),
           createdAt: currentDate()
         }
       })
@@ -122,6 +123,7 @@ export default class ModuleController {
           subTitle: "Final Revision Data Description",
           subjectId: newSubject.id,
           type: LectureType.FinalRevision,
+          date: currentDate(),
           createdAt: currentDate()
         }
       })
