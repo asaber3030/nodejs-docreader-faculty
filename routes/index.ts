@@ -5,8 +5,6 @@ import moduleRouter from './modules'
 import subjectRouter from './subjects'
 import facultiesDataRouter from './facultiesData'
 import lecturesRouter from "./lectures";
-import finalRevisionRouter from "./final-revisions";
-import practicalRouter from "./practical";
 
 export {
   authRouter,
@@ -15,7 +13,5 @@ export {
   moduleRouter,
   subjectRouter,
   facultiesDataRouter,
-  lecturesRouter,
-  finalRevisionRouter,
-  practicalRouter
+  lecturesRouter
 }

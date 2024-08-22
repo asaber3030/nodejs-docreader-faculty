@@ -1,22 +1,13 @@
-import express, { Request, Response, Router } from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from 'cors'
 
-import { showAppURLCMD } from "../utlis/helpers";
-import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter, finalRevisionRouter, practicalRouter } from "../routes";
-
-import LectureController from "../http/controllers/LectureController";
-import PracticalController from "../http/controllers/PracticalController";
-import AuthController from "../http/controllers/AuthController";
-import UserController from "../http/controllers/UserController";
-import ModuleController from "../http/controllers/ModuleController";
-import SubjectController from "../http/controllers/SubjectController";
-import FinalRevisionController from "../http/controllers/FinalRevisionController";
+import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter } from "../routes";
 
 dotenv.config();
 
 const app = express();
-const port = 8080
+const port = process.env.APP_PORT || 8080
 
 app.use(cors())
 app.use(express.json())
@@ -35,9 +26,7 @@ app.use('/api/v1', [
   facultyRouter,
   moduleRouter,
   subjectRouter,
-  lecturesRouter,
-  finalRevisionRouter,
-  practicalRouter
+  lecturesRouter
 ])
 
 app.listen(port, () => {

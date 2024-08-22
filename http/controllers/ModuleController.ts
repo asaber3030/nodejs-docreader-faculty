@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { TQueryParameters } from "../../types"
-import { UserRole } from "@prisma/client" 
+import { LectureType, UserRole } from "@prisma/client" 
 
 import { moduleSchema, subjectSchema } from "../../schema"
 import { badRequest, conflict, notFound, send, unauthorized } from "../../utlis/responses"
@@ -103,22 +103,6 @@ export default class ModuleController {
         data: {
           moduleId,
           ...parsedBody.data,
-          createdAt: currentDate()
-        }
-      })
-      await db.practicalData.create({ 
-        data: {
-          title: "Practical Data",
-          subTitle: "Practical Data is for lab.",
-          subjectId: newSubject.id,
-          createdAt: currentDate()
-        } 
-      })
-      await db.finalRevisionData.create({ 
-        data: {
-          title: "Final Revision Data",
-          subTitle: "Final Data is for Final including final exams and mid-term exams.",
-          subjectId: newSubject.id,
           createdAt: currentDate()
         }
       })

@@ -11,8 +11,6 @@ subjectRouter.use(checkIsAuthenticated)
 subjectRouter.get('/subjects/:subjectId', controller.get)
 subjectRouter.post('/subjects/:subjectId/create-lecture', controller.createLecture)
 subjectRouter.get('/subjects/:subjectId/lectures', controller.getLectures)
-subjectRouter.get('/subjects/:subjectId/practical', controller.getPractical)
-subjectRouter.get('/subjects/:subjectId/final-revision', controller.getFinalRevision)
 
 subjectRouter.patch('/subjects/:subjectId/update', controller.updateSubject)
 subjectRouter.delete('/subjects/:subjectId/delete', controller.deleteSubject)

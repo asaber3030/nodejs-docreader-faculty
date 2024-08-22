@@ -1,4 +1,4 @@
-import { CategoryType, DataType } from "@prisma/client"
+import { CategoryType, DataType, LectureType } from "@prisma/client"
 import { z } from "zod"
 
 export const categorySchema = {
@@ -136,6 +136,7 @@ export const subjectLecture = {
     title: z.string().min(1, { message: "Title must be at least 1 character." }),
     subTitle: z.string().min(1, { message: "Sub title must be at least 1 character." }).optional(),
     date: z.coerce.date({ message: 'Please provide a date' }),
+    type: z.enum([LectureType.Normal, LectureType.Practical, LectureType.FinalRevision], { message: "Only support this types: 'Normal', 'Practical', 'FinalRevision'" }),
     subjectId: z.number()
   }),
 
@@ -143,6 +144,7 @@ export const subjectLecture = {
     title: z.string().min(1, { message: "Title must be at least 1 character." }).optional(),
     subTitle: z.string().min(1, { message: "Sub title must be at least 1 character." }).optional(),
     date: z.coerce.date({ message: 'Please provide a date' }).optional(),
+    type: z.enum([LectureType.Normal, LectureType.Practical, LectureType.FinalRevision], { message: "Only support this types: 'Normal', 'Practical', 'FinalRevision'" }).optional(),
     subjectId: z.number().optional()
   })
 }

@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "compile": "tsc --watch",
-    "postinstall": "npx prisma generate"
+    "postinstall": "npx prisma generate",
+    "start:dev": "nodemon ./api/index.ts"
   },
   "author": "abdulrahmansaber120@gmail.com",
   "license": "ISC",

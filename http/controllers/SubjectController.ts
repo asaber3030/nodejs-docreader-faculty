@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { UserRole } from "@prisma/client"
+import { LectureType, UserRole } from "@prisma/client"
 
 import { subjectLecture, subjectSchema } from "../../schema"
 import { badRequest, conflict, notFound, send, unauthorized, validationErrors } from "../../utlis/responses"
@@ -53,7 +53,7 @@ export default class SubjectController {
       const findModule = await db.module.findUnique({ where: { id: findSubject.moduleId } })
       if (findModule?.yearId !== user?.yearId) return unauthorized(res)
   
-      const lectures = await db.lectureData.findMany({ where: { subjectId } })
+      const lectures = await db.lecture.findMany({ where: { subjectId } })
   
       return res.status(200).json({
         data: lectures,
@@ -68,73 +68,6 @@ export default class SubjectController {
       })
     }
    
-  }
-
-  async getPractical(req: Request, res: Response) {
-    try {
-      const user = await AuthController.user(req, res)
-    
-      const subjectId = parameterExists(req, res, "subjectId")
-      if (!subjectId) return badRequest(res, "Invalid subjectId")
-  
-      const findSubject = await db.subject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } })
-      if (!findSubject) return notFound(res, "Subject doesn't exist.")
-  
-      const findModule = await db.module.findUnique({ where: { id: findSubject.moduleId } })
-      if (findModule?.yearId !== user?.yearId) return unauthorized(res)
-  
-      const practicalData = await db.subject.findUnique({
-        where: { id: subjectId },
-        select: { id: true, practical: true }
-      })
-  
-      return res.status(200).json({
-        data: practicalData?.practical,
-        message: `subjectId [${subjectId}] - practicalData Data`,
-        status: 200
-      })
-    } catch (errorObject) {
-      return res.status(500).json({
-        errorObject,
-        message: "Error - Something Went Wrong.",
-        status: 500
-      })
-    }
-
-  }
-
-  async getFinalRevision(req: Request, res: Response) {
-
-    try {
-      const user = await AuthController.user(req, res)
-    
-      const subjectId = parameterExists(req, res, "subjectId")
-      if (!subjectId) return badRequest(res, "Invalid subjectId")
-  
-      const findSubject = await db.subject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } })
-      if (!findSubject) return notFound(res, "Subject doesn't exist.")
-  
-      const findModule = await db.module.findUnique({ where: { id: findSubject.moduleId } })
-      if (findModule?.yearId !== user?.yearId) return unauthorized(res)
-  
-      const finalRevisionData = await db.subject.findUnique({
-        where: { id: subjectId },
-        select: { id: true, finalRevision: true }
-      })
-  
-      return res.status(200).json({
-        data: finalRevisionData?.finalRevision,
-        message: `subjectId [${subjectId}] - Final Revision Data Data`,
-        status: 200
-      })
-    } catch (errorObject) {
-      return res.status(500).json({
-        errorObject,
-        message: "Error - Something Went Wrong.",
-        status: 500
-      })
-    }
-
   }
 
   async updateSubject(req: Request, res: Response) {
@@ -225,7 +158,7 @@ export default class SubjectController {
       const findModule = await db.module.findUnique({ where: { id: subject.moduleId } })
       if (findModule?.yearId !== user?.yearId) return unauthorized(res)
   
-      const newLecture = await db.lectureData.create({
+      const newLecture = await db.lecture.create({
         data: { ...data, subjectId, subTitle: data.subTitle ?? '', createdAt: currentDate() }
       })
   
