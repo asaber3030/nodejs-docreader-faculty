@@ -7,7 +7,7 @@ import { badRequest, conflict, notFound, send, unauthorized } from "../../utlis/
 import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers"
 
 import Module from "../models/Module"
-import db from "../../utlis/db"
+import db, { findSubjectMany, findSubjectUnique } from "../../utlis/db"
 import AuthController from "./AuthController"
 
 export default class ModuleController {
@@ -99,13 +99,14 @@ export default class ModuleController {
       })
       if (findSubject) return conflict(res, "Subject already exists.")
       
-      const newSubject = await db.subject.create({
+      const { id: subjectId } = await db.subject.create({
         data: {
           moduleId,
           ...parsedBody.data,
           createdAt: currentDate()
         }
       })
+      const newSubject = (await findSubjectUnique("id", subjectId))!;
 
       await db.lecture.create({
         data: {
@@ -172,7 +173,7 @@ export default class ModuleController {
       const module = await Module.find(moduleId)
       if (!module) return notFound(res, "Module doesn't exist.")
   
-      const subjects = await Module.moduleSubjects(moduleId)
+      const subjects = await findSubjectMany("moduleId", moduleId)
       return send(res, "Module subjects", 200, subjects)
     } catch (errorObject) {
       return res.status(500).json({

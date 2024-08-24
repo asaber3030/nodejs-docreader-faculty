@@ -5,6 +5,7 @@ import moduleRouter from './modules'
 import subjectRouter from './subjects'
 import facultiesDataRouter from './facultiesData'
 import lecturesRouter from "./lectures";
+import yearRouter from "./years";
 
 export {
   authRouter,
@@ -13,5 +14,6 @@ export {
   moduleRouter,
   subjectRouter,
   facultiesDataRouter,
-  lecturesRouter
+  lecturesRouter,
+  yearRouter
 }
