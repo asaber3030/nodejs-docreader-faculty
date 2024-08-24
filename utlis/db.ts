@@ -10,7 +10,7 @@ interface LinkWithPath extends LectureLink {
   subjectId: number;
   subjectName: string;
   // lectureId: number;
-  lectureName: string;
+  lectureTitle: string;
 }
 
 export const linkQuery = `SELECT
