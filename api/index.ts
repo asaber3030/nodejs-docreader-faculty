@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from 'cors'
 
-import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter } from "../routes";
+import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter, yearRouter } from "../routes";
 
 dotenv.config();
 
@@ -26,7 +26,8 @@ app.use('/api/v1', [
   facultyRouter,
   moduleRouter,
   subjectRouter,
-  lecturesRouter
+  lecturesRouter,
+  yearRouter
 ])
 
 app.listen(port, () => {
