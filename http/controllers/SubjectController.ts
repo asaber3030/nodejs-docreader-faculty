@@ -5,7 +5,7 @@ import { subjectLecture, subjectSchema } from "../../schema"
 import { badRequest, conflict, notFound, send, unauthorized, validationErrors } from "../../utlis/responses"
 import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers"
 
-import db from "../../utlis/db"
+import db, { findLectureMany, findLectureUnique, findSubjectUnique } from "../../utlis/db"
 import AuthController from "./AuthController"
 
 export default class SubjectController {
@@ -18,13 +18,11 @@ export default class SubjectController {
       const subjectId = parameterExists(req, res, "subjectId")
       if (!subjectId) return badRequest(res, "Invalid subjectId")
 
-      const findSubject = await db.subject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } })
-      if (!findSubject) return notFound(res, "Subject doesn't exist.")
+      const subject = await findSubjectUnique("id", subjectId)
+      if (!subject) return notFound(res, "Subject doesn't exist.")
 
-      const findModule = await db.module.findUnique({ where: { id: findSubject.moduleId } })
+      const findModule = await db.module.findUnique({ where: { id: subject.moduleId } })
       if (findModule?.yearId !== user?.yearId) return unauthorized(res)
-
-      const subject = await db.subject.findUnique({ where: { id: subjectId } })
 
       return res.status(200).json({
         data: subject,
@@ -53,7 +51,7 @@ export default class SubjectController {
       const findModule = await db.module.findUnique({ where: { id: findSubject.moduleId } })
       if (findModule?.yearId !== user?.yearId) return unauthorized(res)
   
-      const lectures = await db.lecture.findMany({ where: { subjectId } })
+      const lectures = await findLectureMany("subjectId", subjectId)
   
       return res.status(200).json({
         data: lectures,
@@ -96,11 +94,12 @@ export default class SubjectController {
       })
       if (findSubject) return conflict(res, "Subject already exists.")
       
-      const updatedSubject = await db.subject.update({
+      await db.subject.update({
         where: { id: subjectId },
         data: parsedBody.data
       })
-  
+      const updatedSubject = await findSubjectUnique("id", subjectId)
+
       return send(res, "Subject has been updated", 200, updatedSubject)
     } catch (errorObject) {
       return res.status(500).json({
@@ -121,14 +120,14 @@ export default class SubjectController {
       const subjectId = parameterExists(req, res, "subjectId")
       if (!subjectId) return badRequest(res, "Invalid subjectId")
   
-      const subject = await db.subject.findUnique({ where: { id: subjectId } })
+      const subject = await findSubjectUnique("id", subjectId)
       if (!subject) return notFound(res, "Subject doesn't exist.")
   
       const findModule = await db.module.findUnique({ where: { id: subject.moduleId } })
       if (findModule?.yearId !== user?.yearId) return unauthorized(res)
   
-      const deletedSubject = await db.subject.delete({ where: { id: subjectId } })
-      return send(res, "Subject has been deleted", 200, deletedSubject)
+      await db.subject.delete({ where: { id: subjectId } })
+      return send(res, "Subject has been deleted", 200, subject)
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
@@ -158,10 +157,11 @@ export default class SubjectController {
       const findModule = await db.module.findUnique({ where: { id: subject.moduleId } })
       if (findModule?.yearId !== user?.yearId) return unauthorized(res)
   
-      const newLecture = await db.lecture.create({
+      const { id: lectureId } = await db.lecture.create({
         data: { ...data, subjectId, subTitle: data.subTitle ?? '', createdAt: currentDate() }
       })
-  
+      const newLecture = await findLectureUnique("id", lectureId)
+
       return send(res, "Lecture has been created.", 201, newLecture)
       
     } catch (errorObject) {
