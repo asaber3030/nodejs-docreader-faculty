@@ -5,11 +5,13 @@ export const categorySchema = {
   update: z.object({
     name: z
       .string()
+      .trim()
       .min(1, { message: "Name is required" })
       .max(255, { message: "Cannot be greater than 255 characters" })
       .optional(),
     keywords: z
       .string()
+      .trim()
       .min(1, { message: "Keywords is required. Separate them with ',' " })
       .max(255, { message: "Cannot be greater than 255 characters" })
       .optional(),
@@ -19,6 +21,7 @@ export const categorySchema = {
   create: z.object({
     name: z
       .string()
+      .trim()
       .max(255, { message: "Cannot be greater than 255 characters" }),
     keywords: z
       .string()
