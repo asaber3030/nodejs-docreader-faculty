@@ -127,7 +127,8 @@ export const subjectSchema = {
 
   update: z.object({
     name: z.string().min(1, { message: "Name is required" }).optional(),
-    icon: z.any().optional()
+    icon: z.any().optional(),
+    moduleId: z.number().optional()
   })
 }
 
@@ -199,6 +200,7 @@ export const linkSchema = {
     subTitle: z.string().min(1, { message: "Sub Title cannot be less than 1 characters." }).optional(),
     url: z.string().url().optional(),
     category: z.enum([CategoryType.College, CategoryType.Data, CategoryType.Summary], { message: "Invalid category choose from: College, Data, Summary" }).optional(),
-    type: z.enum([DataType.PDF, DataType.Record, DataType.Video, DataType.Data], { message: "Invalid category choose from: PDF, Video, Record, Data" }).optional()
+    type: z.enum([DataType.PDF, DataType.Record, DataType.Video, DataType.Data], { message: "Invalid category choose from: PDF, Video, Record, Data" }).optional(),
+    lectureId: z.number().optional()
   })
 }
