@@ -1,4 +1,4 @@
-import db from "../../utlis/db";
+import db, { findSubjectMany } from "../../utlis/db";
 
 import { moduleSchema } from "../../schema";
 import { z } from "zod";
@@ -57,12 +57,4 @@ export default class Module {
       return []
     }
   }
-
-  static async moduleSubjects(moduleId: number) {
-    return await db.subject.findMany({
-      where: { moduleId },
-      orderBy: { id: 'asc' }
-    })
-  }
-  
 }

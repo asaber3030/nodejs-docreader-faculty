@@ -12,7 +12,7 @@ subjectRouter.get('/subjects/:subjectId', controller.get)
 subjectRouter.post('/subjects/:subjectId/create-lecture', controller.createLecture)
 subjectRouter.get('/subjects/:subjectId/lectures', controller.getLectures)
 
-subjectRouter.patch('/subjects/:subjectId/update', controller.updateSubject)
+subjectRouter.post('/subjects/:subjectId/update', controller.updateSubject)
 subjectRouter.delete('/subjects/:subjectId/delete', controller.deleteSubject)
 
 export default subjectRouter

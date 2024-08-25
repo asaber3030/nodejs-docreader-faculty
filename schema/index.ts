@@ -91,8 +91,8 @@ export const userSchema = {
 
   update: z.object({
     name: z
-      .trim()
       .string()
+      .trim()
       .min(1, { message: "Name cannot be less than 1 characters." })
       .optional(),
     facultyId: z

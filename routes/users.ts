@@ -7,7 +7,7 @@ const userRouter = Router()
 const controller = new UserController()
 
 userRouter.use(checkIsAuthenticated)
-userRouter.patch('/user/update', controller.update)
+userRouter.post('/user/update', controller.update)
 userRouter.post('/user/change-password', controller.changePassword)
 
 export default userRouter
