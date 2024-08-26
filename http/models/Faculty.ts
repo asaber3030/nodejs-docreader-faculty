@@ -4,7 +4,7 @@ export default class Faculty {
 
   static dbSelectors = { id: true, name: true, city: true, createdAt: true, updatedAt: true }
 
-  static async findAll(search: string = '', orderBy: string = 'id', orderType: string = 'desc') {
+  static async findAll(search: string = '', orderBy: string = 'id', orderType: string = 'asc') {
     try {
       return await db.faculty.findMany({
         where: {
@@ -12,7 +12,7 @@ export default class Faculty {
             { name: { contains: search } }
           ]
         },
-        select: Faculty.dbSelectors,
+        include: { years: true },
         orderBy: {
           [orderBy]: orderType
         }
