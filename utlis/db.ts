@@ -60,7 +60,7 @@ JOIN
 
 export async function findLectureMany(key: string, value: string | number): Promise<LectureWithPath[]> {
   return db.$queryRawUnsafe(
-    `${lectureQuery} WHERE l.${key} = ?`,
+    `${lectureQuery} WHERE l.${key} = ? ORDER BY l.date`,
     value
   )
 }
