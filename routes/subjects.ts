@@ -1,18 +1,21 @@
-import SubjectController from "../http/controllers/SubjectController"
+import SubjectController from "../http/controllers/SubjectController";
 
-import { checkIsAuthenticated } from "../middlewares/isAuthenticated"
-import { Router } from "express"
+import { checkIsAuthenticated } from "../middlewares/isAuthenticated";
+import { Router } from "express";
 
-const subjectRouter = Router()
-const controller = new SubjectController()
+const subjectRouter = Router();
+const controller = new SubjectController();
 
-subjectRouter.use(checkIsAuthenticated)
+subjectRouter.use(checkIsAuthenticated);
 
-subjectRouter.get('/subjects/:subjectId', controller.get)
-subjectRouter.post('/subjects/:subjectId/create-lecture', controller.createLecture)
-subjectRouter.get('/subjects/:subjectId/lectures', controller.getLectures)
+subjectRouter.get("/subjects/:subjectId", controller.get);
+subjectRouter.post(
+  "/subjects/:subjectId/create-lecture",
+  controller.createLecture
+);
+subjectRouter.get("/subjects/:subjectId/lectures", controller.getLectures);
 
-subjectRouter.post('/subjects/:subjectId/update', controller.updateSubject)
-subjectRouter.delete('/subjects/:subjectId/delete', controller.deleteSubject)
+subjectRouter.post("/subjects/:subjectId/update", controller.updateSubject);
+subjectRouter.delete("/subjects/:subjectId/delete", controller.deleteSubject);
 
-export default subjectRouter
+export default subjectRouter;
