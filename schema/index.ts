@@ -201,6 +201,7 @@ export const subjectSchema = {
   update: z.object({
     name: z.string().min(1, { message: "Name is required" }).optional(),
     icon: z.any().optional(),
+    moduleId: z.number().optional()
   }),
 };
 
@@ -247,76 +248,6 @@ export const subjectLecture = {
   }),
 };
 
-export const subjectPractical = {
-  create: z.object({
-    categoryId: z.number(),
-    title: z
-      .string()
-      .min(1, { message: "Title must be at least 1 character." }),
-    description: z
-      .string()
-      .min(1, { message: "Title must be at least 1 character." }),
-    url: z.string().url(),
-    type: z.enum(
-      [DataType.Data, DataType.PDF, DataType.Record, DataType.Video],
-      { message: "Invalid data type" }
-    ),
-  }),
-
-  update: z.object({
-    categoryId: z.number().optional(),
-    title: z
-      .string()
-      .min(1, { message: "Title must be at least 1 character." })
-      .optional(),
-    description: z
-      .string()
-      .min(1, { message: "Title must be at least 1 character." })
-      .optional(),
-    url: z.string().url().optional(),
-    type: z
-      .enum([DataType.Data, DataType.PDF, DataType.Record, DataType.Video], {
-        message: "Invalid data typer",
-      })
-      .optional(),
-  }),
-};
-
-export const subjectFinalRevision = {
-  create: z.object({
-    categoryId: z.number(),
-    title: z
-      .string()
-      .min(1, { message: "Title must be at least 1 character." }),
-    description: z
-      .string()
-      .min(1, { message: "Title must be at least 1 character." }),
-    url: z.string().url(),
-    type: z.enum(
-      [DataType.Data, DataType.PDF, DataType.Record, DataType.Video],
-      { message: "Invalid data typer" }
-    ),
-  }),
-
-  update: z.object({
-    categoryId: z.number().optional(),
-    title: z
-      .string()
-      .min(1, { message: "Title must be at least 1 character." })
-      .optional(),
-    description: z
-      .string()
-      .min(1, { message: "Title must be at least 1 character." })
-      .optional(),
-    url: z.string().url().optional(),
-    type: z
-      .enum([DataType.Data, DataType.PDF, DataType.Record, DataType.Video], {
-        message: "Invalid data typer",
-      })
-      .optional(),
-  }),
-};
-
 export const linkSchema = {
   create: z.object({
     title: z
@@ -357,5 +288,6 @@ export const linkSchema = {
         message: "Invalid category choose from: PDF, Video, Record, Data",
       })
       .optional(),
+    lectureId: z.number().optional()
   }),
 };
