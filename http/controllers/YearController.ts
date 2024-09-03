@@ -7,7 +7,7 @@ export default class YearController {
   async getSubjects(req: Request, res: Response) {
     const yearId = +req.params.yearId;
     const subjects = await db.$queryRawUnsafe(
-      `${subjectQuery} WHERE m.yearId = ?`,
+      `${subjectQuery} WHERE m.yearId = $1`,
       yearId
     );
     return send(res, "Year subjects", 200, subjects);
@@ -16,7 +16,7 @@ export default class YearController {
   async getLectures(req: Request, res: Response) {
     const yearId = +req.params.yearId;
     const lectures = await db.$queryRawUnsafe(
-      `${lectureQuery} WHERE m.yearId = ?`,
+      `${lectureQuery} WHERE m.yearId = $1`,
       yearId
     );
     return send(res, "Year lectures", 200, lectures);
@@ -25,7 +25,7 @@ export default class YearController {
   async getLinks(req: Request, res: Response) {
     const yearId = +req.params.yearId;
     const links = await db.$queryRawUnsafe(
-      `${linkQuery} WHERE m.yearId = ?`,
+      `${linkQuery} WHERE m.yearId = $1`,
       yearId
     );
     return send(res, "Year links", 200, links);
