@@ -30,7 +30,7 @@ JOIN
 
 export async function findLinkMany(key: string, value: string | number): Promise<LinkWithPath[]> {
   return db.$queryRawUnsafe(
-    `${linkQuery} WHERE ll.${key} = $1`,
+    `${linkQuery} WHERE ll.${key} = ?`,
     value
   )
 }
@@ -60,7 +60,7 @@ JOIN
 
 export async function findLectureMany(key: string, value: string | number): Promise<LectureWithPath[]> {
   return db.$queryRawUnsafe(
-    `${lectureQuery} WHERE l.${key} = $1 ORDER BY l.date`,
+    `${lectureQuery} WHERE l.${key} = ? ORDER BY l.date`,
     value
   )
 }
@@ -85,7 +85,7 @@ JOIN
 
 export async function findSubjectMany(key: string, value: string | number): Promise<SubjectWithPath[]> {
   return db.$queryRawUnsafe(
-    `${subjectQuery} WHERE s.${key} = $1`,
+    `${subjectQuery} WHERE s.${key} = ?`,
     value
   )
 }
