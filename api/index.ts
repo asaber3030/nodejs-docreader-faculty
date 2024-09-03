@@ -14,7 +14,7 @@ app.use(cors())
 app.use(express.json())
 
 app.get("/", async (req: Request, res: Response) => {
-  //return res.json({ message: "DocReader Guide - API", status: "Running" })
+  return res.json({ message: "DocReader Guide - API", status: "Running" })
 })
 
 app.use("/api/v1", [authRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, subjectRouter, lecturesRouter, yearRouter])
