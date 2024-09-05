@@ -15,9 +15,21 @@ export default class YearController {
 
   async getLectures(req: Request, res: Response) {
     const yearId = +req.params.yearId;
+    const { search, limit, offset } = req.query;
+
+    const searchPattern = search ? `%${search}%` : `%`;
+    let limitNum, offsetNum;
+    if (limit) limitNum = +limit;
+    else limitNum = Number.POSITIVE_INFINITY;
+    if (offset) offsetNum = +offset;
+    else offsetNum = 0;
+
     const lectures = await db.$queryRawUnsafe(
-      `${lectureQuery} WHERE m."yearId" = $1`,
-      yearId
+      `${lectureQuery} WHERE m."yearId" = $1 AND LOWER(l.title) LIKE LOWER($2) LIMIT $3 OFFSET $4`,
+      yearId,
+      searchPattern,
+      limitNum,
+      offsetNum
     );
     return send(res, "Year lectures", 200, lectures);
   }
