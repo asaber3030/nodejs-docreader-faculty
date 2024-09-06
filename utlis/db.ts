@@ -28,9 +28,11 @@ JOIN
 JOIN
 	"Module" m ON s."moduleId" = m.id`;
 
+export const linkOrder = "ORDER BY ll.id"
+
 export async function findLinkMany(key: string, value: string | number): Promise<LinkWithPath[]> {
   return db.$queryRawUnsafe(
-    `${linkQuery} WHERE ll."${key}" = $1`,
+    `${linkQuery} WHERE ll."${key}" = $1 ${linkOrder}`,
     value
   )
 }
@@ -57,10 +59,11 @@ JOIN
 	"Subject" s ON l."subjectId" = s.id
 JOIN
 	"Module" m ON s."moduleId" = m.id`
+export const lectureOrder = "ORDER BY l.date"
 
 export async function findLectureMany(key: string, value: string | number): Promise<LectureWithPath[]> {
   return db.$queryRawUnsafe(
-    `${lectureQuery} WHERE l."${key}" = $1 ORDER BY l.date`,
+    `${lectureQuery} WHERE l."${key}" = $1 ${lectureOrder}`,
     value
   )
 }
@@ -82,10 +85,11 @@ FROM
 	"Subject" s
 JOIN
 	"Module" m ON s."moduleId" = m.id`
+export const subjectOrder = "ORDER BY s.id"
 
 export async function findSubjectMany(key: string, value: string | number): Promise<SubjectWithPath[]> {
   return db.$queryRawUnsafe(
-    `${subjectQuery} WHERE s."${key}" = $1`,
+    `${subjectQuery} WHERE s."${key}" = $1 ${subjectOrder}`,
     value
   )
 }

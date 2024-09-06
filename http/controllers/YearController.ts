@@ -1,6 +1,13 @@
 import { Request, Response } from "express";
 
-import db, { lectureQuery, linkQuery, subjectQuery } from "../../utlis/db";
+import db, {
+  lectureOrder,
+  lectureQuery,
+  linkOrder,
+  linkQuery,
+  subjectOrder,
+  subjectQuery,
+} from "../../utlis/db";
 import { send } from "../../utlis/responses";
 
 export default class YearController {
@@ -8,7 +15,7 @@ export default class YearController {
     try {
       const yearId = +req.params.yearId;
       const subjects = await db.$queryRawUnsafe(
-        `${subjectQuery} WHERE m."yearId" = $1`,
+        `${subjectQuery} WHERE m."yearId" = $1 ${subjectOrder}`,
         yearId
       );
       return send(res, "Year subjects", 200, subjects);
@@ -34,7 +41,7 @@ export default class YearController {
       else offsetNum = 0;
 
       const lectures = await db.$queryRawUnsafe(
-        `${lectureQuery} WHERE m."yearId" = $1 AND LOWER(l.title) LIKE LOWER($2) LIMIT $3 OFFSET $4`,
+        `${lectureQuery} WHERE m."yearId" = $1 AND LOWER(l.title) LIKE LOWER($2) ${lectureOrder} LIMIT $3 OFFSET $4`,
         yearId,
         searchPattern,
         limitNum,
@@ -54,7 +61,7 @@ export default class YearController {
     try {
       const yearId = +req.params.yearId;
       const links = await db.$queryRawUnsafe(
-        `${linkQuery} WHERE m."yearId" = $1`,
+        `${linkQuery} WHERE m."yearId" = $1 ${linkOrder}`,
         yearId
       );
       return send(res, "Year links", 200, links);
