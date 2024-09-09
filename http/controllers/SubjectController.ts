@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
-import { LectureType, UserRole } from "@prisma/client"
+import { UserRole } from "@prisma/client"
 
 import { subjectLecture, subjectSchema } from "../../schema"
-import { badRequest, conflict, notFound, send, unauthorized, validationErrors } from "../../utlis/responses"
+import { badRequest, notFound, send, unauthorized, validationErrors } from "../../utlis/responses"
 import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers"
 
 import db, { findLectureMany, findLectureUnique, findSubjectUnique } from "../../utlis/db"
@@ -82,19 +82,10 @@ export default class SubjectController {
       const parsedBody = subjectSchema.update.safeParse(req.body)
       if (!parsedBody.success) return send(res, "Validation errors", 400, extractErrors(parsedBody))
 
-      const findSubject = await db.subject.findFirst({
-        where: {
-          name: parsedBody.data.name,
-          AND: [{ id: { not: subjectId } }],
-        },
-      })
-      if (findSubject) return conflict(res, "Subject already exists.")
-
-      await db.subject.update({
+      const updatedSubject = await db.subject.update({
         where: { id: subjectId },
         data: parsedBody.data,
       })
-      const updatedSubject = await findSubjectUnique("id", subjectId)
 
       return send(res, "Subject has been updated", 200, updatedSubject)
     } catch (errorObject) {

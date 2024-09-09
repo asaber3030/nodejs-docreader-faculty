@@ -1,11 +1,10 @@
-import express, { Request, Response } from "express"
+import express, { Response } from "express"
 import dotenv from "dotenv"
-import db from "../utlis/db"
 import cors from "cors"
 
-import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter, yearRouter } from "../routes"
-
 dotenv.config()
+
+import { authRouter, subjectRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter, yearRouter } from "../routes"
 
 const app = express()
 const port = process.env.APP_PORT || 8080
@@ -13,8 +12,8 @@ const port = process.env.APP_PORT || 8080
 app.use(cors())
 app.use(express.json())
 
-app.get("/", async (req: Request, res: Response) => {
-  return res.json({ message: "DocReader Guide - API", status: "Running" })
+app.get("/", async (_, res: Response) => {
+  res.json({ message: "DocReader Guide - API", status: "Running" })
 })
 
 app.use("/api/v1", [authRouter, facultiesDataRouter, userRouter, facultyRouter, moduleRouter, subjectRouter, lecturesRouter, yearRouter])
