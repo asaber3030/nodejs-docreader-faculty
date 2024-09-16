@@ -166,8 +166,6 @@ export default class YearController {
         notification: {
           title: "تم إضافة مصادر جديدة 🔥",
           body: message,
-          imageUrl:
-            "https://doc-reader-guide.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.9ce39c3e.png&w=750&q=75",
         },
         webpush: {
           fcmOptions: {
