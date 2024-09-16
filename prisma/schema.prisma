@@ -55,7 +55,7 @@ model User {
   yearId    Int          @default(1)
   faculty   Faculty      @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   year      StudyingYear @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
+  devices   Device[]
   createdAt DateTime? @db.Timestamp()
   updatedAt DateTime? @updatedAt @db.Timestamp()
 }
@@ -122,6 +122,14 @@ model LectureLink {
   category    CategoryType @default(Data)
   lectureId   Int
   lectureData Lecture      @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  notifiable  Boolean      @default(true)
   createdAt   DateTime?    @db.Timestamp()
   updatedAt   DateTime?    @updatedAt @db.Timestamp()
+}
+
+model Device {
+  id     Int    @id @default(autoincrement())
+  token  String @unique
+  userId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

@@ -3,7 +3,7 @@ import { PrismaClient, LectureLink, Lecture, Subject } from "@prisma/client";
 const db = new PrismaClient()
 export default db
 
-interface LinkWithPath extends LectureLink {
+export interface LinkWithPath extends LectureLink {
   semesterName: number;
   moduleId: number;
   moduleName: string;

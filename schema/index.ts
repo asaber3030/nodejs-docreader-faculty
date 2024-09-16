@@ -123,6 +123,10 @@ export const userSchema = {
         });
       }
     }),
+
+  registerDevice: z.object({
+    token: z.string()
+  })
 };
 
 export const facultySchema = {
@@ -289,5 +293,14 @@ export const linkSchema = {
       })
       .optional(),
     lectureId: z.number().optional()
+  })
+};
+
+export const notificationSchema = {
+  notify: z.object({
+    links: z.array(z.number()),
+  }),
+  ignore: z.object({
+    links: z.array(z.number()),
   }),
 };

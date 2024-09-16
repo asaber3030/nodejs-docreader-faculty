@@ -23,5 +23,20 @@ yearRouter.get(
   checkHaveSameYearId,
   controller.getLinks
 );
+yearRouter.get(
+  "/years/:yearId/notifiable-links",
+  checkHaveSameYearId,
+  controller.getNotifiableLinks
+);
+yearRouter.post(
+  "/years/:yearId/notifications/notify",
+  checkHaveSameYearId,
+  controller.notify
+);
+yearRouter.post(
+  "/years/:yearId/notifications/ignore",
+  checkHaveSameYearId,
+  controller.ignore
+);
 
 export default yearRouter;

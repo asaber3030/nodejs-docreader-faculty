@@ -6,12 +6,13 @@ import { userSchema } from "../../schema"
 
 import { User as TUser } from "@prisma/client"
 
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt"
 import db from "../../utlis/db"
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken"
 
 import User from "../models/User"
 import AuthController from "./AuthController"
+import { messaging } from "../../utlis/firebase"
 
 export default class UserController {
 
@@ -56,6 +57,7 @@ export default class UserController {
       if (!body.success) return send(res, "Validation errors", 400, extractErrors(body))
 
       const data = body.data
+      const oldYear = user.yearId
 
       const year = await db.studyingYear.findUnique({ where: { id: data.yearId } })
       const faculty = await db.faculty.findUnique({ where: { id: data.facultyId } })
@@ -67,15 +69,30 @@ export default class UserController {
   
       const updatedUser = await db.user.update({
         where: { id: user.id },
+        include: { devices: true },
         data: {
           name: data.name,
           facultyId: data.facultyId,
           yearId: data.yearId
         }
       })
-  
-      const { password, ...mainUser } = updatedUser
-  
+
+      for (const device of updatedUser.devices) {
+        const unsubRes = await messaging.unsubscribeFromTopic(
+          device.token,
+          oldYear.toString()
+        )
+        if (unsubRes.failureCount)
+          throw new Error("Unsubscribing from yearId failed")
+        const subRes = await messaging.subscribeToTopic(
+          device.token,
+          updatedUser.yearId.toString()
+        )
+        if (subRes.failureCount)
+          throw new Error("Subscribing to yearId failed")
+      }
+      const { password, devices, ...mainUser } = updatedUser
+
       return res.status(200).json({
         message: "User has been updated successfully.",
         status: 200,
@@ -124,10 +141,124 @@ export default class UserController {
       return res.status(500).json({
         errorObject,
         message: "Error - Something Went Wrong.",
-        status: 500
+        status: 500,
       })
     }
-    
   }
 
+  async registerDevice(req: Request, res: Response) {
+    try {
+      const user = await UserController.user(req)
+      if (!user) return notFound(res, "No User was found")
+      const body = userSchema.registerDevice.safeParse(req.body)
+      const data = body.data
+
+      if (!body.success) {
+        const errors = extractErrors(body)
+        return res.status(400).json({
+          errors,
+          message: "Form validation errors.",
+          status: 400,
+        })
+      }
+
+      if (!data) {
+        return res.status(400).json({
+          message: "Please check there's valid JSON data in the request body.",
+          status: 400,
+        })
+      }
+
+      if (!(await db.device.findFirst({ where: { token: data.token } }))) {
+        await db.device.create({
+          data: { token: data.token, userId: user.id },
+        })
+
+        const subRes = await messaging.subscribeToTopic(
+          data.token,
+          user.yearId.toString()
+        )
+
+        if (subRes.failureCount)
+          throw new Error("Subscribing to yearId failed")
+      }
+
+      return res.status(200).json({
+        message: "Device token registered successfully.",
+        status: 200,
+      })
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500,
+      })
+    }
+  }
+
+  async unregisterDevice(req: Request, res: Response) {
+    try {
+      const user = await UserController.user(req)
+      if (!user) return notFound(res, "No User was found")
+      const body = userSchema.registerDevice.safeParse(req.body)
+      const data = body.data
+
+      if (!body.success) {
+        const errors = extractErrors(body)
+        return res.status(400).json({
+          errors,
+          message: "Form validation errors.",
+          status: 400,
+        })
+      }
+
+      if (!data) {
+        return res.status(400).json({
+          message: "Please check there's valid JSON data in the request body.",
+          status: 400,
+        })
+      }
+
+      const device = await db.device.findFirst({
+        where: { token: data.token },
+      })
+
+      if (!device)
+        return res.status(400).json({
+          message: "Device doesn't exist.",
+          status: 400,
+        })
+
+      if (device.userId !== user.id)
+        return res.status(400).json({
+          message: "Device doesn't belong to user.",
+          status: 400,
+        })
+
+      await db.device.delete({
+        where: { token: data.token, userId: user.id },
+      })
+
+      const unsubRes = await messaging.unsubscribeFromTopic(
+        device.token,
+        user.yearId.toString()
+      )
+      if (unsubRes.failureCount)
+        return res.status(400).json({
+          message: "Unsubscribing from yearId failed",
+          status: 400,
+        })
+
+      return res.status(200).json({
+        message: "Device uregistered successfully.",
+        status: 200,
+      })
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500,
+      })
+    }
+  }
 }
