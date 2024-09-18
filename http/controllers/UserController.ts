@@ -10,20 +10,19 @@ import bcrypt from "bcrypt"
 import db from "../../utlis/db"
 import jwt from "jsonwebtoken"
 
-import User from "../models/User"
 import AuthController from "./AuthController"
 import { messaging } from "../../utlis/firebase"
 
 export default class UserController {
 
-  static async user(req: Request): Promise<TUser | null> {
+  static async user(req: Request) {
     const token = extractToken(req.headers.authorization!)
     if (!token) return null
     try {
       const verifiedToken = jwt.verify(token, AuthController.secret!) as TUser
       if (!verifiedToken) return null
-      const realUser = await User.find(verifiedToken.id)
-      return realUser as unknown as TUser
+      const realUser = await db.user.findFirst({ where: { id: verifiedToken.id }, include: { devices: true } })
+      return realUser
     } catch (error) {
       return null
     }
@@ -52,12 +51,11 @@ export default class UserController {
     try {
       const body = userSchema.update.safeParse(req.body)
       const user = await UserController.user(req)
-  
+      
       if (!user) return unauthorized(res)
       if (!body.success) return send(res, "Validation errors", 400, extractErrors(body))
 
       const data = body.data
-      const oldYear = user.yearId
 
       const year = await db.studyingYear.findUnique({ where: { id: data.yearId } })
       const faculty = await db.faculty.findUnique({ where: { id: data.facultyId } })
@@ -66,7 +64,25 @@ export default class UserController {
       if (!faculty) return notFound(res, "Faculty doesn't exist")
 
       if (year?.facultyId !== faculty?.id) return notFound(res, "Year doesn't belong to given faculty!")
-  
+
+      const unsubRes = await messaging.unsubscribeFromTopic(
+        user.devices.map(device => device.token),
+        user.yearId.toString()
+      )
+
+      await messaging.subscribeToTopic(
+        user.devices.map(device => device.token),
+        year.id.toString()
+      )
+
+      await db.device.deleteMany({
+        where: {
+          id: {
+            in: unsubRes.errors.map(({ index }) => user.devices[index].id)
+          }
+        }
+      })
+
       const updatedUser = await db.user.update({
         where: { id: user.id },
         include: { devices: true },
@@ -77,20 +93,6 @@ export default class UserController {
         }
       })
 
-      for (const device of updatedUser.devices) {
-        const unsubRes = await messaging.unsubscribeFromTopic(
-          device.token,
-          oldYear.toString()
-        )
-        if (unsubRes.failureCount)
-          res.status(400).json({ errorObject: unsubRes.errors, message: "Unsubscribing from yearId failed", status: 400 })
-        const subRes = await messaging.subscribeToTopic(
-          device.token,
-          updatedUser.yearId.toString()
-        )
-        if (subRes.failureCount)
-          res.status(400).json({ errorObject: subRes.errors, message: "Subscribing to yearId failed", status: 400 })
-      }
       const { password, devices, ...mainUser } = updatedUser
 
       return res.status(200).json({
@@ -180,7 +182,11 @@ export default class UserController {
         )
 
         if (subRes.failureCount)
-          res.status(400).json({errorObject: subRes.errors, message: "Subscribing to yearId failed", status: 400})
+          return res.status(400).json({
+            errorObject: subRes.errors,
+            message: "Subscribing to yearId failed",
+            status: 400}
+          )
       }
 
       return res.status(200).json({
