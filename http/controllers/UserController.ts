@@ -83,13 +83,13 @@ export default class UserController {
           oldYear.toString()
         )
         if (unsubRes.failureCount)
-          throw new Error("Unsubscribing from yearId failed")
+          res.status(400).json({ errorObject: unsubRes.errors, message: "Unsubscribing from yearId failed", status: 400 })
         const subRes = await messaging.subscribeToTopic(
           device.token,
           updatedUser.yearId.toString()
         )
         if (subRes.failureCount)
-          throw new Error("Subscribing to yearId failed")
+          res.status(400).json({ errorObject: subRes.errors, message: "Subscribing to yearId failed", status: 400 })
       }
       const { password, devices, ...mainUser } = updatedUser
 
@@ -180,7 +180,7 @@ export default class UserController {
         )
 
         if (subRes.failureCount)
-          throw new Error("Subscribing to yearId failed")
+          res.status(400).json({errorObject: subRes.errors, message: "Subscribing to yearId failed", status: 400})
       }
 
       return res.status(200).json({
