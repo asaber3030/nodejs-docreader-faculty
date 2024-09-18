@@ -239,16 +239,6 @@ export default class UserController {
         where: { token: data.token, userId: user.id },
       })
 
-      const unsubRes = await messaging.unsubscribeFromTopic(
-        device.token,
-        user.yearId.toString()
-      )
-      if (unsubRes.failureCount)
-        return res.status(400).json({
-          message: "Unsubscribing from yearId failed",
-          status: 400,
-        })
-
       return res.status(200).json({
         message: "Device uregistered successfully.",
         status: 200,
