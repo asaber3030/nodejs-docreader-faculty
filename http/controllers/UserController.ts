@@ -65,27 +65,28 @@ export default class UserController {
 
       if (year?.facultyId !== faculty?.id) return notFound(res, "Year doesn't belong to given faculty!")
 
-      const unsubRes = await messaging.unsubscribeFromTopic(
-        user.devices.map(device => device.token),
-        user.yearId.toString()
-      )
-
-      await messaging.subscribeToTopic(
-        user.devices.map(device => device.token),
-        year.id.toString()
-      )
-
-      await db.device.deleteMany({
-        where: {
-          id: {
-            in: unsubRes.errors.map(({ index }) => user.devices[index].id)
+      if (user.devices.length > 0) {
+        const unsubRes = await messaging.unsubscribeFromTopic(
+          user.devices.map(device => device.token),
+          user.yearId.toString()
+        )
+        
+        await messaging.subscribeToTopic(
+          user.devices.map(device => device.token),
+          year.id.toString()
+        )
+        
+        await db.device.deleteMany({
+          where: {
+            id: {
+              in: unsubRes.errors.map(({ index }) => user.devices[index].id)
+            }
           }
-        }
-      })
+        })
+      }
 
       const updatedUser = await db.user.update({
         where: { id: user.id },
-        include: { devices: true },
         data: {
           name: data.name,
           facultyId: data.facultyId,
@@ -93,7 +94,7 @@ export default class UserController {
         }
       })
 
-      const { password, devices, ...mainUser } = updatedUser
+      const { password, ...mainUser } = updatedUser
 
       return res.status(200).json({
         message: "User has been updated successfully.",
