@@ -11,16 +11,11 @@ import AuthController from "./AuthController"
 export default class SubjectController {
   async get(req: Request, res: Response) {
     try {
-      const user = await AuthController.user(req, res)
-
       const subjectId = parameterExists(req, res, "subjectId")
       if (!subjectId) return badRequest(res, "Invalid subjectId")
 
       const subject = await findSubjectUnique("id", subjectId)
       if (!subject) return notFound(res, "Subject doesn't exist.")
-
-      const findModule = await db.module.findUnique({ where: { id: subject.moduleId } })
-      if (findModule?.yearId !== user?.yearId) return unauthorized(res)
 
       return res.status(200).json({
         data: subject,
@@ -38,16 +33,11 @@ export default class SubjectController {
 
   async getLectures(req: Request, res: Response) {
     try {
-      const user = await AuthController.user(req, res)
-
       const subjectId = parameterExists(req, res, "subjectId")
       if (!subjectId) return badRequest(res, "Invalid subjectId")
 
       const findSubject = await db.subject.findUnique({ where: { id: subjectId }, select: { id: true, moduleId: true } })
       if (!findSubject) return notFound(res, "Subject doesn't exist.")
-
-      const findModule = await db.module.findUnique({ where: { id: findSubject.moduleId } })
-      if (findModule?.yearId !== user?.yearId) return unauthorized(res)
 
       const lectures = await findLectureMany("subjectId", subjectId)
 

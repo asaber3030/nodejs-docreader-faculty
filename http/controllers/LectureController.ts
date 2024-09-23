@@ -12,17 +12,12 @@ export default class LectureController {
   
   async get(req: Request, res: Response) {
     try {
-      const user = await AuthController.user(req, res)
       const lectureId = parameterExists(req, res, "lectureId")
       if (!lectureId) return badRequest(res, "Invalid lectureId")
       
       const lecture = await findLectureUnique("id", lectureId)
       if (!lecture) return notFound(res, "Lecture doesn't exist.")
       
-      const module = await db.module.findUnique({ where: { id: lecture.moduleId } })
-     
-      if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
-     
       return send(res, `lectureId [${lectureId}] - Data`, 200, lecture)
     } catch (errorObject) {
       return res.status(500).json({
@@ -110,17 +105,12 @@ export default class LectureController {
   async getLinks(req: Request, res: Response) {
 
     try {
-      const user = await AuthController.user(req, res)
       const lectureId = parameterExists(req, res, "lectureId")
       if (!lectureId) return badRequest(res, "Invalid lectureId")
       
       const lecture = await findLectureUnique("id", lectureId)
       if (!lecture) return notFound(res, "Lecture doesn't exist.")
       
-      const module = await db.module.findUnique({ where: { id: lecture.moduleId } })
-     
-      if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
-     
       const links = await findLinkMany("lectureId", lectureId)
   
       return send(res, `lectureId [${lectureId}] - Links`, 200, links)
