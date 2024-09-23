@@ -5,10 +5,25 @@ import { subjectLecture, subjectSchema } from "../../schema"
 import { badRequest, notFound, send, unauthorized, validationErrors } from "../../utlis/responses"
 import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers"
 
-import db, { findLectureMany, findLectureUnique, findSubjectUnique } from "../../utlis/db"
+import db, { findLectureMany, findLectureUnique, findSubjectUnique, subjectOrder, subjectQuery } from "../../utlis/db"
 import AuthController from "./AuthController"
 
 export default class SubjectController {
+  async getAllSubjects(req: Request, res: Response) {
+    try {
+      const subjects = await db.$queryRawUnsafe(
+        `${subjectQuery} ${subjectOrder}`,
+      );
+      return send(res, "Subjects", 200, subjects);
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500,
+      });
+    }
+  }
+
   async get(req: Request, res: Response) {
     try {
       const subjectId = parameterExists(req, res, "subjectId")

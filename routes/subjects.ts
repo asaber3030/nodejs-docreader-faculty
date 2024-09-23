@@ -6,6 +6,7 @@ import { checkIsAdmin } from "../middlewares/isAdmin";
 const subjectRouter = Router();
 const controller = new SubjectController();
 
+subjectRouter.get("/subjects", controller.getAllSubjects);
 subjectRouter.get("/subjects/:subjectId", controller.get);
 subjectRouter.post(
   "/subjects/:subjectId/create-lecture",

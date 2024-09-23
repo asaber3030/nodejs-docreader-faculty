@@ -6,6 +6,7 @@ import { checkIsAdmin } from "../middlewares/isAdmin";
 const yearRouter = Router();
 const controller = new YearController();
 
+yearRouter.get("/years/:yearId/modules", controller.getModules);
 yearRouter.get("/years/:yearId/subjects", controller.getSubjects);
 yearRouter.get("/years/:yearId/lectures", controller.getLectures);
 yearRouter.get("/years/:yearId/links", controller.getLinks);

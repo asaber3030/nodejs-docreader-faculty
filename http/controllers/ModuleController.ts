@@ -47,23 +47,17 @@ export default class ModuleController {
   async createModule(req: Request, res: Response) {
 
     try {
-      const yearId = parameterExists(req, res, "yearId")
-      if (!yearId) return badRequest(res, "Invalid yearId")
-  
       const parsedBody = moduleSchema.create.safeParse(req.body)
+      console.log(parsedBody.data)
       if (!parsedBody.success) return send(res, "Validation errors", 400, extractErrors(parsedBody))
       
-      const user = await AuthController.user(req, res)
-      if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot create a module.")
-      
       const findModule = await db.module.findFirst({
-        where: { yearId, name: parsedBody.data.name }
+        where: { yearId: parsedBody.data.yearId, name: parsedBody.data.name }
       })
       if (findModule) return conflict(res, "Module already exists.")
       
       const newModule = await db.module.create({
         data: {
-          yearId,
           ...parsedBody.data,
           createdAt: currentDate()
         }
@@ -82,9 +76,6 @@ export default class ModuleController {
   async createSubject(req: Request, res: Response) {
 
     try {
-      const user = await AuthController.user(req, res)
-      if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot create a subject.")
-      
       const moduleId = parameterExists(req, res, "moduleId")
       if (!moduleId) return notFound(res, "Invalid moduleId")
   
@@ -140,12 +131,22 @@ export default class ModuleController {
 
   }
 
+  async getAllModules(req: Request, res: Response) {
+    try {
+      const modules = await db.module.findMany();
+      return send(res, "Modules", 200, modules);
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500,
+      });
+    }
+  }
+
   async getModule(req: Request, res: Response) {
     try {
-      const yearId = parameterExists(req, res, "yearId")
       const moduleId = parameterExists(req, res, "moduleId")
-  
-      if (!yearId) return badRequest(res, "Invalid yearId")
       if (!moduleId) return badRequest(res, "Invalid Module Id")
       
       const module = await Module.find(moduleId)
@@ -164,10 +165,7 @@ export default class ModuleController {
   async getModuleSubjects(req: Request, res: Response) {
 
     try {
-      const yearId = parameterExists(req, res, "yearId")
       const moduleId = parameterExists(req, res, "moduleId")
-  
-      if (!yearId) return badRequest(res, "Invalid yearId")
       if (!moduleId) return badRequest(res, "Invalid moduleId")
   
       const module = await Module.find(moduleId)
@@ -188,13 +186,7 @@ export default class ModuleController {
   async updateModule(req: Request, res: Response) {
 
     try {
-      const user = await AuthController.user(req, res)
-      if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot update a module.")
-
-      const yearId = parameterExists(req, res, "yearId")
       const moduleId = parameterExists(req, res, "moduleId")
-  
-      if (!yearId) return badRequest(res, "Invalid yearId")
       if (!moduleId) return badRequest(res, "Invalid moduleId")
   
       const module = await Module.find(moduleId)
@@ -205,7 +197,7 @@ export default class ModuleController {
   
       const findModule = await db.module.findFirst({
         where: { 
-          yearId, 
+          yearId: module.yearId, 
           name: parsedBody.data.name,
           AND: [
             { id: { not: moduleId } }
@@ -231,13 +223,7 @@ export default class ModuleController {
 
   async deleteModule(req: Request, res: Response) {
     try {
-      const user = await AuthController.user(req, res)
-      if (!user || user.role !== UserRole.Admin) return unauthorized(res, "Unauthorized cannot delete a module.")
-      
-      const yearId = parameterExists(req, res, "yearId")
       const moduleId = parameterExists(req, res, "moduleId")
-
-      if (!yearId) return badRequest(res, "Invalid yearId")
       if (!moduleId) return badRequest(res, "Invalid moduleId")
       
       const module = await Module.find(moduleId)

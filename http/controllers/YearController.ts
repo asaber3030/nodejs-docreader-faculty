@@ -20,6 +20,20 @@ import { messaging } from "../../utlis/firebase";
 import { WEBAPP_URL } from "../../utlis/constants";
 
 export default class YearController {
+  async getModules(req: Request, res: Response) {
+    try {
+      const yearId = +req.params.yearId;
+      const modules = await db.module.findMany({ where: { yearId } });
+      return send(res, "Year modules", 200, modules);
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500,
+      });
+    }
+  }
+
   async getSubjects(req: Request, res: Response) {
     try {
       const yearId = +req.params.yearId;

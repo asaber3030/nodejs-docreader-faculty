@@ -125,8 +125,8 @@ export const userSchema = {
     }),
 
   registerDevice: z.object({
-    token: z.string()
-  })
+    token: z.string(),
+  }),
 };
 
 export const facultySchema = {
@@ -179,6 +179,7 @@ export const studyingYearSchema = {
 
 export const moduleSchema = {
   create: z.object({
+    yearId: z.number(),
     name: z.string().min(1, { message: "Name is required" }),
     icon: z.string(),
     semesterName: z
@@ -205,7 +206,7 @@ export const subjectSchema = {
   update: z.object({
     name: z.string().min(1, { message: "Name is required" }).optional(),
     icon: z.any().optional(),
-    moduleId: z.number().optional()
+    moduleId: z.number().optional(),
   }),
 };
 
@@ -292,8 +293,8 @@ export const linkSchema = {
         message: "Invalid category choose from: PDF, Video, Record, Data",
       })
       .optional(),
-    lectureId: z.number().optional()
-  })
+    lectureId: z.number().optional(),
+  }),
 };
 
 export const notificationSchema = {

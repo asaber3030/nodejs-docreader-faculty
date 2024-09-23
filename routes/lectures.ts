@@ -6,6 +6,9 @@ import { checkIsAdmin } from "../middlewares/isAdmin";
 const lecturesRouter = Router();
 const lectureController = new LectureController();
 
+lecturesRouter.get("/lectures", lectureController.getAllLectures);
+lecturesRouter.get("/links", lectureController.getAllLinks)
+
 lecturesRouter.get("/lectures/:lectureId", lectureController.get);
 lecturesRouter.post(
   "/lectures/:lectureId/update",

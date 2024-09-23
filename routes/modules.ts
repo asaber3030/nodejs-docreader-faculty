@@ -6,31 +6,24 @@ import { checkIsAdmin } from "../middlewares/isAdmin";
 const moduleRouter = Router();
 const controller = new ModuleController();
 
-moduleRouter.get("/modules/:yearId", controller.get);
+moduleRouter.get("/modules", controller.getAllModules);
+moduleRouter.get("/modules/:moduleId", controller.getModule);
+moduleRouter.get("/modules/:moduleId/subjects", controller.getModuleSubjects);
+moduleRouter.post("/modules/create", checkIsAdmin, controller.createModule);
 moduleRouter.post(
-  "/modules/:yearId/create",
-  checkIsAdmin,
-  controller.createModule
-);
-moduleRouter.get("/modules/:yearId/:moduleId", controller.getModule);
-moduleRouter.get(
-  "/modules/:yearId/:moduleId/subjects",
-  controller.getModuleSubjects
-);
-moduleRouter.post(
-  "/modules/:yearId/:moduleId/subjects/create",
-  checkIsAdmin,
-  controller.createSubject
-);
-moduleRouter.post(
-  "/modules/:yearId/:moduleId/update",
+  "/modules/:moduleId/update",
   checkIsAdmin,
   controller.updateModule
 );
 moduleRouter.delete(
-  "/modules/:yearId/:moduleId/delete",
+  "/modules/:moduleId/delete",
   checkIsAdmin,
   controller.deleteModule
+);
+moduleRouter.post(
+  "/modules/:moduleId/subjects/create",
+  checkIsAdmin,
+  controller.createSubject
 );
 
 export default moduleRouter;

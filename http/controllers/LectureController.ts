@@ -5,11 +5,40 @@ import { linkSchema, subjectLecture } from "../../schema"
 import { badRequest, notFound, send, unauthorized, validationErrors } from "../../utlis/responses"
 import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers"
 
-import db, { findLectureUnique, findLinkMany, findLinkUnique, findSubjectUnique } from "../../utlis/db"
+import db, { findLectureUnique, findLinkMany, findLinkUnique, findSubjectUnique, lectureOrder, lectureQuery, linkOrder, linkQuery } from "../../utlis/db"
 import AuthController from "./AuthController"
 
 export default class LectureController {
-  
+  async getAllLectures(req: Request, res: Response) {
+    try {
+      const lectures = await db.$queryRawUnsafe(
+        `${lectureQuery} ${lectureOrder}`,
+      );
+      return send(res, "Lectures", 200, lectures);
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500,
+      });
+    }
+  }
+
+  async getAllLinks(req: Request, res: Response) {
+    try {
+      const links = await db.$queryRawUnsafe(
+        `${linkQuery} ${linkOrder}`,
+      );
+      return send(res, "Links", 200, links);
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500,
+      });
+    }
+  }
+
   async get(req: Request, res: Response) {
     try {
       const lectureId = parameterExists(req, res, "lectureId")
