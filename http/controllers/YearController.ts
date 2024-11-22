@@ -156,11 +156,21 @@ export default class YearController {
       )) as LinkWithPath[];
 
       const lectures = getUniqueObjectsById(
-        links.map(({ lectureId, lectureTitle, subjectId }) => ({
-          id: lectureId,
-          title: lectureTitle,
-          subjectId,
-        }))
+        links.map(
+          ({
+            lectureId,
+            lectureTitle,
+            subjectId,
+            subjectName,
+            moduleName,
+          }) => ({
+            id: lectureId,
+            title: lectureTitle,
+            subjectId,
+            subjectName,
+            moduleName,
+          })
+        )
       ).map((lecture) => ({
         ...lecture,
         links: links.filter((link) => link.lectureId === lecture.id),
@@ -169,9 +179,21 @@ export default class YearController {
       let message = "";
 
       for (const lecture of lectures) {
-        message += `👈 في المحاضرة ${bolderizeWord(
-          lecture.title
-        )} تم إضافة المصادر التالية:\n${lecture.links
+        message += "👈 ";
+        if (lecture.title === "Practical Data")
+          message +=
+            "في عملي مادة " +
+            bolderizeWord(lecture.subjectName) +
+            " موديول " +
+            bolderizeWord(lecture.moduleName);
+        else if (lecture.title === "Final Revision Data")
+          message +=
+            "في المراجعة النهائية لمادة " +
+            bolderizeWord(lecture.subjectName) +
+            " موديول " +
+            bolderizeWord(lecture.moduleName);
+        else message += "في محاضرة " + bolderizeWord(lecture.title);
+        message += ` تم إضافة المصادر التالية:\n${lecture.links
           .map(({ title }) => `💥 ${title}\n`)
           .join("")}`;
       }
