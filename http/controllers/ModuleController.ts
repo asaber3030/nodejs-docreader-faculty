@@ -52,7 +52,7 @@ export default class ModuleController {
       if (!parsedBody.success) return send(res, "Validation errors", 400, extractErrors(parsedBody))
       
       const findModule = await db.module.findFirst({
-        where: { yearId: parsedBody.data.yearId, name: parsedBody.data.name }
+        where: { yearId: parsedBody.data.yearId, name: parsedBody.data.name, semesterName: parsedBody.data.semesterName }
       })
       if (findModule) return conflict(res, "Module already exists.")
       
@@ -199,6 +199,7 @@ export default class ModuleController {
         where: { 
           yearId: module.yearId, 
           name: parsedBody.data.name,
+          semesterName: parsedBody.data.semesterName,
           AND: [
             { id: { not: moduleId } }
           ]
