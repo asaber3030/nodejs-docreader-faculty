@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { TQueryParameters } from "../../types"
-import { LectureType, UserRole } from "@prisma/client" 
+import { LectureType } from "@prisma/client" 
 
 import { moduleSchema, subjectSchema } from "../../schema"
 import { badRequest, conflict, notFound, send, unauthorized } from "../../utlis/responses"
@@ -8,7 +8,6 @@ import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers
 
 import Module from "../models/Module"
 import db, { findSubjectMany, findSubjectUnique } from "../../utlis/db"
-import AuthController from "./AuthController"
 
 export default class ModuleController {
 
@@ -48,7 +47,6 @@ export default class ModuleController {
 
     try {
       const parsedBody = moduleSchema.create.safeParse(req.body)
-      console.log(parsedBody.data)
       if (!parsedBody.success) return send(res, "Validation errors", 400, extractErrors(parsedBody))
       
       const findModule = await db.module.findFirst({
@@ -97,7 +95,7 @@ export default class ModuleController {
           createdAt: currentDate()
         }
       })
-      const newSubject = (await findSubjectUnique("id", subjectId))!;
+      const newSubject = (await findSubjectUnique({ id: subjectId }))!;
 
       await db.lecture.create({
         data: {
@@ -171,7 +169,7 @@ export default class ModuleController {
       const module = await Module.find(moduleId)
       if (!module) return notFound(res, "Module doesn't exist.")
   
-      const subjects = await findSubjectMany("moduleId", moduleId)
+      const subjects = await findSubjectMany({ module: { id: moduleId } })
       return send(res, "Module subjects", 200, subjects)
     } catch (errorObject) {
       return res.status(500).json({

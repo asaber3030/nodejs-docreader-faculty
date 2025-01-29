@@ -1,100 +1,57 @@
-import { PrismaClient, LectureLink, Lecture, Subject } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
-const db = new PrismaClient()
-export default db
+const db = new PrismaClient();
+export default db;
 
-export interface LinkWithPath extends LectureLink {
-  semesterName: number;
-  moduleId: number;
-  moduleName: string;
-  subjectId: number;
-  subjectName: string;
-  // lectureId: number;
-  lectureTitle: string;
+export const SUBJECT_INCLUDE = {
+  module: { select: { id: true, semesterName: true, name: true } },
+};
+export const SUBJECT_ORDER_BY: any = { id: "asc" };
+
+export function findSubjectMany(where?: any) {
+  return db.subject.findMany({
+    where,
+    include: SUBJECT_INCLUDE,
+    orderBy: SUBJECT_ORDER_BY,
+  });
 }
 
-export const linkQuery = `SELECT
-	ll.id, ll.title, ll."subTitle", ll.url, ll.type,
-	ll.category, ll."createdAt", ll."updatedAt",
-	m."semesterName", m.id AS "moduleId", m.name AS "moduleName",
-  l."subjectId", s.name AS "subjectName", ll."lectureId",
-  l.title AS "lectureTitle"
-FROM
-	"LectureLink" ll
-JOIN
-	"Lecture" l ON ll."lectureId" = l.id
-JOIN
-	"Subject" s ON l."subjectId" = s.id
-JOIN
-	"Module" m ON s."moduleId" = m.id`;
-
-export const linkOrder = "ORDER BY ll.id"
-
-export async function findLinkMany(key: string, value: string | number): Promise<LinkWithPath[]> {
-  return db.$queryRawUnsafe(
-    `${linkQuery} WHERE ll."${key}" = $1 ${linkOrder}`,
-    value
-  )
+export async function findSubjectUnique(where?: any) {
+  return (await findSubjectMany(where))[0];
 }
 
-export async function findLinkUnique(key: string, value: string | number): Promise<LinkWithPath | undefined> {
-  return (await findLinkMany(key, value))[0]
+export const LECTURE_INCLUDE = {
+  subject: { select: { id: true, name: true, ...SUBJECT_INCLUDE } },
+};
+export const LECTURE_ORDER_BY: any = { date: "asc" };
+
+export function findLectureMany(where?: any) {
+  return db.lecture.findMany({
+    where,
+    include: LECTURE_INCLUDE,
+    orderBy: LECTURE_ORDER_BY,
+  });
 }
 
-interface LectureWithPath extends Lecture {
-  semesterName: number;
-  moduleId: number;
-  moduleName: string;
-  // subjectId: number;
-  subjectName: string;
+export async function findLectureUnique(where?: any) {
+  return (await findLectureMany(where))[0];
 }
 
-export const lectureQuery = `SELECT
-	l.id, l.title, l."subTitle", l.type, l.date, l."createdAt", l."updatedAt",
-  m."semesterName", m.id AS "moduleId", m.name AS "moduleName",
-  l."subjectId", s.name AS "subjectName"
-FROM
-	"Lecture" l
-JOIN
-	"Subject" s ON l."subjectId" = s.id
-JOIN
-	"Module" m ON s."moduleId" = m.id`
-export const lectureOrder = "ORDER BY l.date"
+export const LINK_INCLUDE = {
+  lectureData: {
+    select: { id: true, title: true, ...LECTURE_INCLUDE },
+  },
+};
+export const LINK_ORDER_BY: any = { id: "asc" };
 
-export async function findLectureMany(key: string, value: string | number): Promise<LectureWithPath[]> {
-  return db.$queryRawUnsafe(
-    `${lectureQuery} WHERE l."${key}" = $1 ${lectureOrder}`,
-    value
-  )
+export function findLinkMany(where?: any) {
+  return db.lectureLink.findMany({
+    where,
+    include: LINK_INCLUDE,
+    orderBy: LINK_ORDER_BY,
+  });
 }
 
-export async function findLectureUnique(key: string, value: string | number): Promise<LectureWithPath | undefined> {
-  return (await findLectureMany(key, value))[0]
+export async function findLinkUnique(where?: any) {
+  return (await findLinkMany(where))[0];
 }
-
-interface SubjectWithPath extends Subject {
-  semesterName: number;
-  // moduleId: number;
-  moduleName: string;
-}
-
-export const subjectQuery = `SELECT
-	s.id, s.name, s.icon, s."createdAt", s."updatedAt",
-  m."semesterName", m.id AS "moduleId", m.name AS "moduleName"
-FROM
-	"Subject" s
-JOIN
-	"Module" m ON s."moduleId" = m.id`
-export const subjectOrder = "ORDER BY s.id"
-
-export async function findSubjectMany(key: string, value: string | number): Promise<SubjectWithPath[]> {
-  return db.$queryRawUnsafe(
-    `${subjectQuery} WHERE s."${key}" = $1 ${subjectOrder}`,
-    value
-  )
-}
-
-export async function findSubjectUnique(key: string, value: string | number): Promise<SubjectWithPath | undefined> {
-  return (await findSubjectMany(key, value))[0]
-}
-

@@ -1,13 +1,10 @@
 import { Request, Response } from "express";
 
 import db, {
-  lectureOrder,
-  lectureQuery,
-  linkOrder,
-  linkQuery,
-  LinkWithPath,
-  subjectOrder,
-  subjectQuery,
+  findLinkMany,
+  findSubjectMany,
+  LECTURE_INCLUDE,
+  LECTURE_ORDER_BY,
 } from "../../utlis/db";
 import { send } from "../../utlis/responses";
 import { notificationSchema } from "../../schema";
@@ -37,10 +34,7 @@ export default class YearController {
   async getSubjects(req: Request, res: Response) {
     try {
       const yearId = +req.params.yearId;
-      const subjects = await db.$queryRawUnsafe(
-        `${subjectQuery} WHERE m."yearId" = $1 ${subjectOrder}`,
-        yearId
-      );
+      const subjects = await findSubjectMany({ module: { yearId: yearId } });
       return send(res, "Year subjects", 200, subjects);
     } catch (errorObject) {
       return res.status(500).json({
@@ -55,21 +49,21 @@ export default class YearController {
     try {
       const yearId = +req.params.yearId;
       const { search, limit, offset } = req.query;
-
-      const searchPattern = search ? `%${search}%` : `%`;
       let limitNum, offsetNum;
       if (limit) limitNum = +limit;
       else limitNum = Number.POSITIVE_INFINITY;
       if (offset) offsetNum = +offset;
       else offsetNum = 0;
-
-      const lectures = await db.$queryRawUnsafe(
-        `${lectureQuery} WHERE m."yearId" = $1 AND LOWER(l.title) LIKE LOWER($2) ${lectureOrder} LIMIT $3 OFFSET $4`,
-        yearId,
-        searchPattern,
-        limitNum,
-        offsetNum
-      );
+      const lectures = await db.lecture.findMany({
+        where: {
+          subject: { module: { yearId } },
+          title: { contains: search?.toString(), mode: "insensitive" },
+        },
+        include: LECTURE_INCLUDE,
+        orderBy: LECTURE_ORDER_BY,
+        take: limitNum,
+        skip: offsetNum,
+      });
       return send(res, "Year lectures", 200, lectures);
     } catch (errorObject) {
       return res.status(500).json({
@@ -83,10 +77,9 @@ export default class YearController {
   async getLinks(req: Request, res: Response) {
     try {
       const yearId = +req.params.yearId;
-      const links = await db.$queryRawUnsafe(
-        `${linkQuery} WHERE m."yearId" = $1 ${linkOrder}`,
-        yearId
-      );
+      const links = await findLinkMany({
+        lectureData: { subject: { module: { yearId } } },
+      });
       return send(res, "Year links", 200, links);
     } catch (errorObject) {
       return res.status(500).json({
@@ -100,10 +93,10 @@ export default class YearController {
   async getNotifiableLinks(req: Request, res: Response) {
     try {
       const yearId = +req.params.yearId;
-      const links = await db.$queryRawUnsafe(
-        `${linkQuery} WHERE m."yearId" = $1 AND ll.notifiable = TRUE ${linkOrder}`,
-        yearId
-      );
+      const links = await findLinkMany({
+        lectureData: { subject: { module: { yearId } } },
+        notifiable: true,
+      });
       return send(res, "Year links", 200, links);
     } catch (errorObject) {
       return res.status(500).json({
@@ -148,21 +141,23 @@ export default class YearController {
         data: { notifiable: false },
       });
 
-      const links = (await db.$queryRawUnsafe(
-        `${linkQuery} WHERE m."yearId" = $1 AND ll.id IN (${data.links.join(
-          ", "
-        )}) ${linkOrder}`,
-        yearId
-      )) as LinkWithPath[];
+      const links = await findLinkMany({
+        lectureData: { subject: { module: { yearId } } },
+        id: { in: data.links },
+      });
 
       const lectures = getUniqueObjectsById(
         links.map(
           ({
             lectureId,
-            lectureTitle,
-            subjectId,
-            subjectName,
-            moduleName,
+            lectureData: {
+              title: lectureTitle,
+              subject: {
+                id: subjectId,
+                name: subjectName,
+                module: { name: moduleName },
+              },
+            },
           }) => ({
             id: lectureId,
             title: lectureTitle,

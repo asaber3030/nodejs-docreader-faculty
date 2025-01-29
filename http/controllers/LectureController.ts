@@ -5,15 +5,13 @@ import { linkSchema, subjectLecture } from "../../schema"
 import { badRequest, notFound, send, unauthorized, validationErrors } from "../../utlis/responses"
 import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers"
 
-import db, { findLectureUnique, findLinkMany, findLinkUnique, findSubjectUnique, lectureOrder, lectureQuery, linkOrder, linkQuery } from "../../utlis/db"
+import db, { findLectureUnique, findLinkMany, findLinkUnique, findSubjectUnique,  LECTURE_INCLUDE, LINK_INCLUDE, findLectureMany } from "../../utlis/db"
 import AuthController from "./AuthController"
 
 export default class LectureController {
   async getAllLectures(req: Request, res: Response) {
     try {
-      const lectures = await db.$queryRawUnsafe(
-        `${lectureQuery} ${lectureOrder}`,
-      );
+      const lectures = await findLectureMany();
       return send(res, "Lectures", 200, lectures);
     } catch (errorObject) {
       return res.status(500).json({
@@ -26,9 +24,7 @@ export default class LectureController {
 
   async getAllLinks(req: Request, res: Response) {
     try {
-      const links = await db.$queryRawUnsafe(
-        `${linkQuery} ${linkOrder}`,
-      );
+      const links = await findLinkMany({});
       return send(res, "Links", 200, links);
     } catch (errorObject) {
       return res.status(500).json({
@@ -44,7 +40,7 @@ export default class LectureController {
       const lectureId = parameterExists(req, res, "lectureId")
       if (!lectureId) return badRequest(res, "Invalid lectureId")
       
-      const lecture = await findLectureUnique("id", lectureId)
+      const lecture = await findLectureUnique({ id: lectureId })
       if (!lecture) return notFound(res, "Lecture doesn't exist.")
       
       return send(res, `lectureId [${lectureId}] - Data`, 200, lecture)
@@ -66,10 +62,10 @@ export default class LectureController {
       const lectureId = parameterExists(req, res, "lectureId")
       if (!lectureId) return badRequest(res, "Invalid lectureId")
       
-      const lecture = await findLectureUnique("id", lectureId)
+      const lecture = await findLectureUnique({ id: lectureId })
       if (!lecture) return notFound(res, "Lecture doesn't exist.")
       
-      const module = await db.module.findUnique({ where: { id: lecture.moduleId } })
+      const module = await db.module.findUnique({ where: { id: lecture.subject.module.id } })
     
       if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
     
@@ -78,22 +74,21 @@ export default class LectureController {
       
       const data = body.data
       if (body.data.subjectId) {
-        const subject = findSubjectUnique("id", body.data.subjectId)
+        const subject = findSubjectUnique({ id: body.data.subjectId })
         if (!subject) return notFound(res, "Subject id doesn't exist.")
       }
 
-      await db.lecture.update({
+      const updatedLecture = await db.lecture.update({
         where: { id: lectureId },
         data: {
           ...data,
           subjectId: data.subjectId ? data.subjectId : lecture.subjectId,
           subTitle: data.subTitle ?? '',
-        }
+        },
+        include: LECTURE_INCLUDE,
       })
-      const updatedLecture = findLectureUnique("id", lectureId) // :=(
       return send(res, "Lecture has been updated", 200, updatedLecture)
     } catch (errorObject) {
-      console.log(errorObject)
       return res.status(500).json({
         errorObject,
         message: "Error - Something Went Wrong.",
@@ -111,10 +106,10 @@ export default class LectureController {
       const lectureId = parameterExists(req, res, "lectureId")
       if (!lectureId) return badRequest(res, "Invalid lectureId")
       
-      const lecture = await findLectureUnique("id", lectureId)
+      const lecture = await findLectureUnique({ id: lectureId })
       if (!lecture) return notFound(res, "Lecture doesn't exist.")
       
-      const module = await db.module.findUnique({ where: { id: lecture.moduleId } })
+      const module = await db.module.findUnique({ where: { id: lecture.subject.module.id } })
      
       if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
   
@@ -137,10 +132,10 @@ export default class LectureController {
       const lectureId = parameterExists(req, res, "lectureId")
       if (!lectureId) return badRequest(res, "Invalid lectureId")
       
-      const lecture = await findLectureUnique("id", lectureId)
+      const lecture = await findLectureUnique({ id: lectureId })
       if (!lecture) return notFound(res, "Lecture doesn't exist.")
       
-      const links = await findLinkMany("lectureId", lectureId)
+      const links = await findLinkMany({ lectureData: { id: lectureId } })
   
       return send(res, `lectureId [${lectureId}] - Links`, 200, links)
     } catch (errorObject) {
@@ -157,7 +152,7 @@ export default class LectureController {
       const linkId = parameterExists(req, res, "linkId")
       if (!linkId) return badRequest(res, "Invalid linkId")
 
-      const link = await findLinkUnique("id", linkId)
+      const link = await findLinkUnique({ id: linkId })
       if (!link) return notFound(res, "Link not found.")
 
       return send(res, "Link Data", 200, link)
@@ -179,10 +174,10 @@ export default class LectureController {
       const lectureId = parameterExists(req, res, "lectureId")
       if (!lectureId) return badRequest(res, "Invalid lectureId")
       
-      const lecture = await findLectureUnique("id", lectureId)
+      const lecture = await findLectureUnique({ id: lectureId })
       if (!lecture) return notFound(res, "Lecture doesn't exist.")
       
-      const module = await db.module.findUnique({ where: { id: lecture.moduleId } })
+      const module = await db.module.findUnique({ where: { id: lecture.subject.module.id } })
       if (user?.yearId !== module?.yearId) return unauthorized(res, "Unauthorized")
     
       const body = linkSchema.create.safeParse(req.body)
@@ -197,7 +192,7 @@ export default class LectureController {
           createdAt: currentDate()
         }
       })
-      const createdLink = await findLinkUnique("id", linkId)
+      const createdLink = await findLinkUnique({ id: linkId })
       return send(res, "Lecture Link has been created", 201, createdLink)
     } catch (errorObject) {
       return res.status(500).json({
@@ -216,21 +211,21 @@ export default class LectureController {
       const linkId = parameterExists(req, res, "linkId")
       if (!linkId) return badRequest(res, "Invalid linkId")
       
-      const link = await findLinkUnique("id", linkId)
+      const link = await findLinkUnique({ id: linkId })
       if (!link) return notFound(res, "Link doesn't exist.")
       
       const body = linkSchema.update.safeParse(req.body)
       if (!body.success) return validationErrors(res, extractErrors(body))
   
       const data = body.data
-      await db.lectureLink.update({
+      const updatedLink = await db.lectureLink.update({
         where: { id: link.id },
         data: {
           ...data,
           
-        }
+        },
+        include: LINK_INCLUDE,
       })
-      const updatedLink = await findLinkUnique("id", linkId)! // :=(
       return send(res, "Link has been updated", 200, updatedLink)
     } catch (errorObject) {
       return res.status(500).json({
@@ -250,7 +245,7 @@ export default class LectureController {
       const linkId = parameterExists(req, res, "linkId")
       if (!linkId) return badRequest(res, "Invalid linkId")
       
-      const link = await findLinkUnique("id", linkId)
+      const link = await findLinkUnique({ id: linkId })
       if (!link) return notFound(res, "Link doesn't exist.")
      
       await db.lectureLink.delete({
