@@ -7,7 +7,7 @@ import { badRequest, conflict, notFound, send, unauthorized } from "../../utlis/
 import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers"
 
 import Module from "../models/Module"
-import db, { findSubjectMany, findSubjectUnique } from "../../utlis/db"
+import db, { findSubjectMany, findSubjectUnique, MODULE_ORDER_BY } from "../../utlis/db"
 
 export default class ModuleController {
 
@@ -131,7 +131,7 @@ export default class ModuleController {
 
   async getAllModules(req: Request, res: Response) {
     try {
-      const modules = await db.module.findMany();
+      const modules = await db.module.findMany({orderBy: MODULE_ORDER_BY});
       return send(res, "Modules", 200, modules);
     } catch (errorObject) {
       return res.status(500).json({

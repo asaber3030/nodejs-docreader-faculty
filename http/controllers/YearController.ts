@@ -5,6 +5,7 @@ import db, {
   findSubjectMany,
   LECTURE_INCLUDE,
   LECTURE_ORDER_BY,
+  MODULE_ORDER_BY,
 } from "../../utlis/db";
 import { send } from "../../utlis/responses";
 import { notificationSchema } from "../../schema";
@@ -20,7 +21,10 @@ export default class YearController {
   async getModules(req: Request, res: Response) {
     try {
       const yearId = +req.params.yearId;
-      const modules = await db.module.findMany({ where: { yearId } });
+      const modules = await db.module.findMany({
+        where: { yearId },
+        orderBy: MODULE_ORDER_BY,
+      });
       return send(res, "Year modules", 200, modules);
     } catch (errorObject) {
       return res.status(500).json({

@@ -55,3 +55,5 @@ export function findLinkMany(where?: any) {
 export async function findLinkUnique(where?: any) {
   return (await findLinkMany(where))[0];
 }
+
+export const MODULE_ORDER_BY: any = { createdAt: "asc" };
