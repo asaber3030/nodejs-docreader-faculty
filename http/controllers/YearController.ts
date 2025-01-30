@@ -51,7 +51,7 @@ export default class YearController {
       const { search, limit, offset } = req.query;
       let limitNum, offsetNum;
       if (limit) limitNum = +limit;
-      else limitNum = Number.POSITIVE_INFINITY;
+      else limitNum = 100;
       if (offset) offsetNum = +offset;
       else offsetNum = 0;
       const lectures = await db.lecture.findMany({
