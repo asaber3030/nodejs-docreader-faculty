@@ -23,7 +23,7 @@ export async function findSubjectUnique(where?: any) {
 export const LECTURE_INCLUDE = {
   subject: { select: { id: true, name: true, ...SUBJECT_INCLUDE } },
 };
-export const LECTURE_ORDER_BY: any = { date: "asc" };
+export const LECTURE_ORDER_BY: any = [{ date: "asc" }, { createdAt: "asc" }];
 
 export function findLectureMany(where?: any) {
   return db.lecture.findMany({
