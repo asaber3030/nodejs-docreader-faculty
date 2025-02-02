@@ -22,6 +22,7 @@ export async function findSubjectUnique(where?: any) {
 
 export const LECTURE_INCLUDE = {
   subject: { select: { id: true, name: true, ...SUBJECT_INCLUDE } },
+  quizzes: true,
 };
 export const LECTURE_ORDER_BY: any = [{ date: "asc" }, { createdAt: "asc" }];
 
@@ -57,3 +58,21 @@ export async function findLinkUnique(where?: any) {
 }
 
 export const MODULE_ORDER_BY: any = { createdAt: "asc" };
+
+export const QUIZ_INCLUDE = {
+  questions: true,
+  lectureData: { select: { id: true, title: true, ...LECTURE_INCLUDE } },
+};
+export const QUIZ_ORDER_BY: any = { createdAt: "asc" };
+
+export async function findQuizMany(where?: any) {
+  return db.quiz.findMany({
+    where,
+    include: QUIZ_INCLUDE,
+    orderBy: QUIZ_ORDER_BY,
+  });
+}
+
+export async function findQuizUnique(where?: any) {
+  return (await findQuizMany(where))[0];
+}

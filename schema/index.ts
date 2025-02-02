@@ -305,3 +305,36 @@ export const notificationSchema = {
     links: z.array(z.number()),
   }),
 };
+
+export const quizSchema = {
+  quiz: {
+    create: z
+      .object({
+        title: z
+          .string()
+          .min(1, { message: "Title is should be more than one character" }),
+      })
+      .optional(),
+  },
+  question: {
+    create: z.object({
+      image: z.string().optional(),
+      text: z.string().min(1, { message: "Text is required" }),
+      options: z.array(z.string()).length(4, {
+        message: "Options must be exactly 4",
+      }),
+      correctOptionIndex: z.number().min(0).max(3),
+    }),
+    update: z.object({
+      image: z.string().optional(),
+      text: z.string().min(1, { message: "Text is required" }).optional(),
+      options: z
+        .array(z.string())
+        .length(4, {
+          message: "Options must be exactly 4",
+        })
+        .optional(),
+      correctOptionIndex: z.number().min(0).max(3).optional(),
+    }),
+  },
+};

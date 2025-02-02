@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_DEPLOY")
+  provider = "postgresql"
+  url      = env("DATABASE_DEPLOY")
 }
 
 enum DataType {
@@ -45,19 +45,20 @@ model Faculty {
 }
 
 model User {
-  id        Int          @id @default(autoincrement())
-  name      String
-  email     String       @unique
-  password  String
-  status    Boolean      @default(false)
-  role      UserRole     @default(User)
-  facultyId Int
-  yearId    Int          @default(1)
-  faculty   Faculty      @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  year      StudyingYear @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  devices   Device[]
-  createdAt DateTime? @db.Timestamp()
-  updatedAt DateTime? @updatedAt @db.Timestamp()
+  id              Int              @id @default(autoincrement())
+  name            String
+  email           String           @unique
+  password        String
+  status          Boolean          @default(false)
+  role            UserRole         @default(User)
+  facultyId       Int
+  yearId          Int              @default(1)
+  faculty         Faculty          @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  year            StudyingYear     @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  devices         Device[]
+  createdAt       DateTime?        @db.Timestamp()
+  updatedAt       DateTime?        @updatedAt @db.Timestamp()
+  markedQuestions MarkedQuestion[]
 }
 
 model StudyingYear {
@@ -111,6 +112,7 @@ model Lecture {
   createdAt DateTime?     @db.Timestamp()
   updatedAt DateTime?     @updatedAt @db.Timestamp()
   links     LectureLink[]
+  quizzes   Quiz[]
 }
 
 model LectureLink {
@@ -132,4 +134,37 @@ model Device {
   token  String @unique
   userId Int
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Quiz {
+  id          Int        @id @default(autoincrement())
+  lectureId   Int
+  lectureData Lecture    @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  title       String?    @default("Quiz")
+  questions   Question[]
+  createdAt   DateTime?  @db.Timestamp()
+  updatedAt   DateTime?  @updatedAt @db.Timestamp()
+}
+
+model Question {
+  id                 Int              @id @default(autoincrement())
+  quizId             Int
+  quiz               Quiz             @relation(fields: [quizId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  image              String?
+  text               String
+  options            String[]
+  correctOptionIndex Int
+  createdAt          DateTime?        @db.Timestamp()
+  updatedAt          DateTime?        @updatedAt @db.Timestamp()
+  markedBy           MarkedQuestion[]
+}
+
+model MarkedQuestion {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  questionId Int
+  question   Question  @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt  DateTime? @db.Timestamp()
+  updatedAt  DateTime? @updatedAt @db.Timestamp()
 }
