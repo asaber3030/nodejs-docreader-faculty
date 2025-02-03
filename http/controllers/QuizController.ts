@@ -154,6 +154,7 @@ export default class QuizController {
         })
       )
         return badRequest(res, "Question already marked");
+
       await db.markedQuestion.create({
         data: {
           questionId,
