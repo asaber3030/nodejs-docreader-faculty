@@ -55,6 +55,28 @@ export default class QuizController {
     }
   }
 
+  async updateQuiz(req: Request, res: Response) {
+    try {
+      const quizId = +req.params.quizId;
+      const body = quizSchema.quiz.update.safeParse(req.body);
+      const updatedQuiz = await db.quiz.update({
+        where: { id: quizId },
+        data: { ...body.data },
+      });
+      return res.status(200).json({
+        data: updatedQuiz,
+        message: "Quiz has been updated.",
+        status: 200,
+      });
+    } catch (errorObject) {
+      return res.status(500).json({
+        errorObject,
+        message: "Error - Something Went Wrong.",
+        status: 500,
+      });
+    }
+  }
+
   async deleteQuiz(req: Request, res: Response) {
     try {
       const quizId = +req.params.quizId;

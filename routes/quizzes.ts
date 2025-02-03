@@ -13,6 +13,7 @@ quizRouter.post(
   checkIsAdmin,
   controller.createQuiz
 );
+quizRouter.patch("/quizzes/:quizId", checkIsAdmin, controller.updateQuiz);
 quizRouter.delete("/quizzes/:quizId", checkIsAdmin, controller.deleteQuiz);
 
 quizRouter.post(
