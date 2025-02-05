@@ -184,10 +184,11 @@ export default class AuthController {
     const token = extractToken(req.headers.authorization!)
     try {
       const tokenData = jwt.verify(token, AuthController.secret) as TUser
-      const user = await db.user.findUnique({ where: { id: tokenData?.id }, include: { faculty: true, year: true } })
+      const user = await db.user.findUnique({ where: { id: tokenData?.id }, include: { faculty: true, year: true, markedQuestions: { include: { question: true }} } })
       if (!user) return unauthorized(res, "User doesn't exist. Unauthorized")
-      const { password, ...mainUser } = user
-      return send(res, "User data", 200, mainUser)
+      
+      const { password, markedQuestions, ...mainUser } = user
+      return send(res, "User data", 200, {...mainUser, markedQuestions: markedQuestions.map(mq => mq.question)})
     } catch (error) {
       return unauthorized(res, "User doesn't exist. Unauthorized")
     }

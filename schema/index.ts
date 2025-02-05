@@ -284,9 +284,17 @@ export const linkSchema = {
       .optional(),
     url: z.string().url().optional(),
     category: z
-      .enum([CategoryType.College, CategoryType.Data, CategoryType.Summary], {
-        message: "Invalid category choose from: College, Data, Summary",
-      })
+      .enum(
+        [
+          CategoryType.College,
+          CategoryType.Data,
+          CategoryType.Summary,
+          CategoryType.Questions,
+        ],
+        {
+          message: "Invalid category choose from: College, Data, Summary",
+        }
+      )
       .optional(),
     type: z
       .enum([DataType.PDF, DataType.Record, DataType.Video, DataType.Data], {
@@ -304,4 +312,31 @@ export const notificationSchema = {
   ignore: z.object({
     links: z.array(z.number()),
   }),
+};
+
+export const quizSchema = {
+  quiz: {
+    create: z.object({
+      title: z.string().min(1, { message: "Title is required" }),
+    }),
+    update: z.object({
+      title: z.string().min(1, { message: "Title is required" }),
+    }),
+  },
+  question: {
+    create: z.array(
+      z.object({
+        image: z.string().optional(),
+        text: z.string().min(1, { message: "Text is required" }),
+        options: z.array(z.string()),
+        correctOptionIndex: z.number().min(0),
+      })
+    ),
+    update: z.object({
+      image: z.string().optional(),
+      text: z.string().min(1, { message: "Text is required" }).optional(),
+      options: z.array(z.string()).optional(),
+      correctOptionIndex: z.number().min(0).optional(),
+    }),
+  },
 };
