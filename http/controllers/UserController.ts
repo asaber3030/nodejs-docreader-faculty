@@ -21,7 +21,7 @@ export default class UserController {
     try {
       const verifiedToken = jwt.verify(token, AuthController.secret!) as TUser
       if (!verifiedToken) return null
-      const realUser = await db.user.findFirst({ where: { id: verifiedToken.id }, include: { devices: true } })
+      const realUser = await db.user.findFirst({ where: { id: verifiedToken.id }, include: { devices: true, markedQuestions: true } })
       return realUser
     } catch (error) {
       return null

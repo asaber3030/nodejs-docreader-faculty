@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import db, {
   findLinkMany,
+  findLinkManyWithPath,
   findSubjectMany,
   LECTURE_INCLUDE,
   LECTURE_ORDER_BY,
@@ -145,7 +146,7 @@ export default class YearController {
         data: { notifiable: false },
       });
 
-      const links = await findLinkMany({
+      const links = await findLinkManyWithPath({
         lectureData: { subject: { module: { yearId } } },
         id: { in: data.links },
       });
