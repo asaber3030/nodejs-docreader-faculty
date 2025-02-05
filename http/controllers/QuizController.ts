@@ -9,10 +9,10 @@ export default class QuizController {
   async createQuiz(req: Request, res: Response) {
     try {
       const lectureId = +req.params.lectureId;
-      const body = quizSchema.quiz.create.safeParse(req.body);
+      const data = quizSchema.quiz.create.parse(req.body);
       const createdQuiz = await db.quiz.create({
         data: {
-          ...body.data,
+          ...data,
           lectureId,
           createdAt: currentDate(),
         },
@@ -58,10 +58,10 @@ export default class QuizController {
   async updateQuiz(req: Request, res: Response) {
     try {
       const quizId = +req.params.quizId;
-      const body = quizSchema.quiz.update.safeParse(req.body);
+      const data = quizSchema.quiz.update.parse(req.body);
       const updatedQuiz = await db.quiz.update({
         where: { id: quizId },
-        data: { ...body.data },
+        data,
       });
       return res.status(200).json({
         data: updatedQuiz,
@@ -101,16 +101,16 @@ export default class QuizController {
   async createQuestion(req: Request, res: Response) {
     try {
       const quizId = +req.params.quizId;
-      const body = quizSchema.question.create.safeParse(req.body);
-      const createdQuestion = await db.question.create({
-        data: {
-          ...body.data!,
+      const data = quizSchema.question.create.parse(req.body);
+      const createdQuestions = await db.question.createMany({
+        data: data.map((question) => ({
+          ...question,
           quizId,
           createdAt: currentDate(),
-        },
+        })),
       });
       return res.status(201).json({
-        data: createdQuestion,
+        data: createdQuestions,
         message: "Question has been created.",
         status: 201,
       });
@@ -126,10 +126,10 @@ export default class QuizController {
   async updateQuestion(req: Request, res: Response) {
     try {
       const questionId = +req.params.questionId;
-      const body = quizSchema.question.update.safeParse(req.body);
+      const data = quizSchema.question.update.parse(req.body);
       const updatedQuestion = await db.question.update({
         where: { id: questionId },
-        data: { ...body.data },
+        data,
       });
       return res.status(200).json({
         data: updatedQuestion,

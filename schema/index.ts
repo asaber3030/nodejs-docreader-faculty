@@ -324,24 +324,19 @@ export const quizSchema = {
     }),
   },
   question: {
-    create: z.object({
-      image: z.string().optional(),
-      text: z.string().min(1, { message: "Text is required" }),
-      options: z.array(z.string()).length(4, {
-        message: "Options must be exactly 4",
-      }),
-      correctOptionIndex: z.number().min(0).max(3),
-    }),
+    create: z.array(
+      z.object({
+        image: z.string().optional(),
+        text: z.string().min(1, { message: "Text is required" }),
+        options: z.array(z.string()),
+        correctOptionIndex: z.number().min(0),
+      })
+    ),
     update: z.object({
       image: z.string().optional(),
       text: z.string().min(1, { message: "Text is required" }).optional(),
-      options: z
-        .array(z.string())
-        .length(4, {
-          message: "Options must be exactly 4",
-        })
-        .optional(),
-      correctOptionIndex: z.number().min(0).max(3).optional(),
+      options: z.array(z.string()).optional(),
+      correctOptionIndex: z.number().min(0).optional(),
     }),
   },
 };

@@ -72,8 +72,10 @@ export function findLinkUnique(where?: any) {
   });
 }
 
-export const QUIZ_INCLUDE = {
-  questions: true,
+export const QUIZ_INCLUDE: any = {
+  questions: {
+    orderBy: { createdAt: "asc" },
+  },
   lectureData: { select: { id: true, title: true, ...LECTURE_INCLUDE } },
 };
 export const QUIZ_ORDER_BY: any = { createdAt: "asc" };
