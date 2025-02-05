@@ -74,7 +74,7 @@ export function findLinkUnique(where?: any) {
 
 export const QUIZ_INCLUDE: any = {
   questions: {
-    orderBy: { createdAt: "asc" },
+    orderBy: { id: "asc" },
   },
   lectureData: { select: { id: true, title: true, ...LECTURE_INCLUDE } },
 };
