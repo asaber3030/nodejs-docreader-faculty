@@ -261,7 +261,12 @@ export const linkSchema = {
     subTitle: z.string().optional(),
     url: z.string().url(),
     category: z.enum(
-      [CategoryType.College, CategoryType.Data, CategoryType.Summary],
+      [
+        CategoryType.College,
+        CategoryType.Data,
+        CategoryType.Summary,
+        CategoryType.Questions,
+      ],
       { message: "Invalid category choose from: College, Data, Summary" }
     ),
     type: z.enum(
