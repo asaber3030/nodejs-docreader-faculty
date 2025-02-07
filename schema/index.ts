@@ -258,10 +258,7 @@ export const linkSchema = {
     title: z
       .string()
       .min(1, { message: "Title cannot be less than 1 characters." }),
-    subTitle: z
-      .string()
-      .min(1, { message: "Sub Title cannot be less than 1 characters." })
-      .optional(),
+    subTitle: z.string().optional(),
     url: z.string().url(),
     category: z.enum(
       [CategoryType.College, CategoryType.Data, CategoryType.Summary],
@@ -278,10 +275,7 @@ export const linkSchema = {
       .string()
       .min(1, { message: "Title cannot be less than 1 characters." })
       .optional(),
-    subTitle: z
-      .string()
-      .min(1, { message: "Sub Title cannot be less than 1 characters." })
-      .optional(),
+    subTitle: z.string().optional(),
     url: z.string().url().optional(),
     category: z
       .enum(
