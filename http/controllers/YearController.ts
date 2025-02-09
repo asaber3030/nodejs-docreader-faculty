@@ -98,7 +98,7 @@ export default class YearController {
   async getNotifiableLinks(req: Request, res: Response) {
     try {
       const yearId = +req.params.yearId;
-      const links = await findLinkMany({
+      const links = await findLinkManyWithPath({
         lectureData: { subject: { module: { yearId } } },
         notifiable: true,
       });
