@@ -152,6 +152,7 @@ model Question {
   quizId             Int
   quiz               Quiz             @relation(fields: [quizId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   image              String?
+  explanation        String?
   text               String
   options            String[]
   correctOptionIndex Int
