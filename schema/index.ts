@@ -307,9 +307,11 @@ export const linkSchema = {
 export const notificationSchema = {
   notify: z.object({
     links: z.array(z.number()),
+    quizzes: z.array(z.number()),
   }),
   ignore: z.object({
     links: z.array(z.number()),
+    quizzes: z.array(z.number()),
   }),
 };
 

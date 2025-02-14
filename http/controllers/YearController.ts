@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import db, {
   findLinkMany,
   findLinkManyWithPath,
+  findQuizManyWithPath,
   findSubjectMany,
   LECTURE_INCLUDE,
   LECTURE_ORDER_BY,
@@ -102,7 +103,11 @@ export default class YearController {
         lectureData: { subject: { module: { yearId } } },
         notifiable: true,
       });
-      return send(res, "Year links", 200, links);
+      const quizzes = await findQuizManyWithPath({
+        lectureData: { subject: { module: { yearId } } },
+        notifiable: true,
+      });
+      return send(res, "Year links", 200, { links, quizzes });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
@@ -134,15 +139,25 @@ export default class YearController {
         });
       }
 
-      const query = {
+      const linkQuery = {
         AND: [
           { id: { in: data.links } },
           { lectureData: { subject: { module: { yearId } } } },
         ],
       };
+      const quizQuery = {
+        AND: [
+          { id: { in: data.quizzes } },
+          { lectureData: { subject: { module: { yearId } } } },
+        ],
+      };
 
       await db.lectureLink.updateMany({
-        where: query,
+        where: linkQuery,
+        data: { notifiable: false },
+      });
+      await db.quiz.updateMany({
+        where: quizQuery,
         data: { notifiable: false },
       });
 
@@ -150,9 +165,13 @@ export default class YearController {
         lectureData: { subject: { module: { yearId } } },
         id: { in: data.links },
       });
+      const quizzes: any[] = await findQuizManyWithPath({
+        lectureData: { subject: { module: { yearId } } },
+        id: { in: data.quizzes },
+      });
 
       const lectures = getUniqueObjectsById(
-        links.map(
+        [...links, ...quizzes].map(
           ({
             lectureId,
             lectureData: {
@@ -174,6 +193,7 @@ export default class YearController {
       ).map((lecture) => ({
         ...lecture,
         links: links.filter((link) => link.lectureId === lecture.id),
+        quizzes: quizzes.filter((quiz) => quiz.lectureId === lecture.id),
       }));
 
       let message = "";
@@ -193,7 +213,10 @@ export default class YearController {
             " موديول " +
             bolderizeWord(lecture.moduleName);
         else message += "في محاضرة " + bolderizeWord(lecture.title);
-        message += ` تم إضافة المصادر التالية:\n${lecture.links
+        message += ` تم إضافة المصادر التالية:\n${[
+          ...lecture.links,
+          ...lecture.quizzes,
+        ]
           .map(({ title }) => `💥 ${title}\n`)
           .join("")}`;
       }
@@ -251,6 +274,15 @@ export default class YearController {
         where: {
           AND: [
             { id: { in: data.links } },
+            { lectureData: { subject: { module: { yearId } } } },
+          ],
+        },
+        data: { notifiable: false },
+      });
+      await db.quiz.updateMany({
+        where: {
+          AND: [
+            { id: { in: data.quizzes } },
             { lectureData: { subject: { module: { yearId } } } },
           ],
         },

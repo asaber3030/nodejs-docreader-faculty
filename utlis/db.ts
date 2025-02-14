@@ -87,6 +87,14 @@ export async function findQuizMany(where?: any) {
   });
 }
 
+export async function findQuizManyWithPath(where?: any) {
+  return db.quiz.findMany({
+    where,
+    include: QUIZ_INCLUDE,
+    orderBy: QUIZ_ORDER_BY,
+  });
+}
+
 export function findQuizUnique(where?: any) {
   return db.quiz.findUnique({
     where,

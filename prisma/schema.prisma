@@ -143,6 +143,7 @@ model Quiz {
   lectureData Lecture    @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   title       String
   questions   Question[]
+  notifiable  Boolean      @default(true)
   createdAt   DateTime?  @db.Timestamp()
   updatedAt   DateTime?  @updatedAt @db.Timestamp()
 }
