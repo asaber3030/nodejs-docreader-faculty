@@ -226,7 +226,7 @@ export default class YearController {
           title: "تم إضافة مصادر جديدة 🔥",
           body: message,
         },
-        data: { id: lectures[0].id.toString() },
+        data: { id: lectures[0].id.toString(), title: lectures[0].title },
         webpush: {
           fcmOptions: {
             link: `${WEBAPP_URL}/lectures/${lectures[0].id}`,
