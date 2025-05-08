@@ -61,7 +61,7 @@ export default class QuizController {
       const data = quizSchema.quiz.update.parse(req.body);
       const updatedQuiz = await db.quiz.update({
         where: { id: quizId },
-        data,
+        data: { ...data, notifiable: true },
       });
       return res.status(200).json({
         data: updatedQuiz,
@@ -109,6 +109,10 @@ export default class QuizController {
           createdAt: currentDate(),
         })),
       });
+      await db.quiz.update({
+        where: { id: quizId },
+        data: { notifiable: true },
+      });
       return res.status(201).json({
         data: createdQuestions,
         message: "Question has been created.",
@@ -131,6 +135,10 @@ export default class QuizController {
         where: { id: questionId },
         data,
       });
+      await db.quiz.update({
+        where: { id: updatedQuestion.quizId },
+        data: { notifiable: true },
+      });
       return res.status(200).json({
         data: updatedQuestion,
         message: "Question has been updated.",
@@ -150,6 +158,10 @@ export default class QuizController {
       const questionId = +req.params.questionId;
       const question = await db.question.delete({
         where: { id: questionId },
+      });
+      await db.quiz.update({
+        where: { id: question.quizId },
+        data: { notifiable: true },
       });
       return res.status(200).json({
         data: question,
