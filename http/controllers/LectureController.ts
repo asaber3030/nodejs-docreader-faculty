@@ -7,6 +7,7 @@ import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers
 
 import db, { findLectureUnique, findLinkMany, findLinkUnique, findSubjectUnique,  LECTURE_INCLUDE, LINK_INCLUDE, findLectureMany, findQuizMany } from "../../utlis/db"
 import AuthController from "./AuthController"
+import { error } from "console"
 
 export default class LectureController {
   async getAllLectures(req: Request, res: Response) {
@@ -140,6 +141,7 @@ export default class LectureController {
   
       return send(res, `lectureId [${lectureId}] - Links`, 200, { links, quizzes })
     } catch (errorObject) {
+      console.log(errorObject)
       return res.status(500).json({
         errorObject,
         message: "Error - Something Went Wrong.",

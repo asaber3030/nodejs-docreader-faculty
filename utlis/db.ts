@@ -13,6 +13,9 @@ export const SUBJECT_ORDER_BY: any = { id: "asc" };
 export function findSubjectMany(where?: any) {
   return db.subject.findMany({
     where,
+    include: {
+      _count: { select: { lectures: { where: { type: "Normal" } } } },
+    },
     orderBy: SUBJECT_ORDER_BY,
   });
 }
