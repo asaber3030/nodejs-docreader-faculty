@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
 import db, {
   findLinkMany,
@@ -8,16 +8,16 @@ import db, {
   LECTURE_INCLUDE,
   LECTURE_ORDER_BY,
   MODULE_ORDER_BY,
-} from "../../utlis/db";
-import { send } from "../../utlis/responses";
-import { notificationSchema } from "../../schema";
+} from '../../utils/db';
+import { send } from '../../utils/responses';
+import { notificationSchema } from '../../schema';
 import {
   bolderizeWord,
   extractErrors,
   getUniqueObjectsById,
-} from "../../utlis/helpers";
-import { messaging } from "../../utlis/firebase";
-import { WEBAPP_URL } from "../../utlis/constants";
+} from '../../utils/helpers';
+import { messaging } from '../../utils/firebase';
+import { WEBAPP_URL } from '../../utils/constants';
 
 export default class YearController {
   async getModules(req: Request, res: Response) {
@@ -27,11 +27,11 @@ export default class YearController {
         where: { yearId },
         orderBy: MODULE_ORDER_BY,
       });
-      return send(res, "Year modules", 200, modules);
+      return send(res, 'Year modules', 200, modules);
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -41,11 +41,11 @@ export default class YearController {
     try {
       const yearId = +req.params.yearId;
       const subjects = await findSubjectMany({ module: { yearId: yearId } });
-      return send(res, "Year subjects", 200, subjects);
+      return send(res, 'Year subjects', 200, subjects);
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -63,18 +63,18 @@ export default class YearController {
       const lectures = await db.lecture.findMany({
         where: {
           subject: { module: { yearId } },
-          title: { contains: search?.toString(), mode: "insensitive" },
+          title: { contains: search?.toString(), mode: 'insensitive' },
         },
         include: LECTURE_INCLUDE,
         orderBy: LECTURE_ORDER_BY,
         take: limitNum,
         skip: offsetNum,
       });
-      return send(res, "Year lectures", 200, lectures);
+      return send(res, 'Year lectures', 200, lectures);
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -86,11 +86,11 @@ export default class YearController {
       const links = await findLinkMany({
         lectureData: { subject: { module: { yearId } } },
       });
-      return send(res, "Year links", 200, links);
+      return send(res, 'Year links', 200, links);
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -107,11 +107,11 @@ export default class YearController {
         lectureData: { subject: { module: { yearId } } },
         notifiable: true,
       });
-      return send(res, "Year links", 200, { links, quizzes });
+      return send(res, 'Year links', 200, { links, quizzes });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -127,7 +127,7 @@ export default class YearController {
         const errors = extractErrors(body);
         return res.status(400).json({
           errors,
-          message: "Form validation errors.",
+          message: 'Form validation errors.',
           status: 400,
         });
       }
@@ -188,42 +188,42 @@ export default class YearController {
             subjectId,
             subjectName,
             moduleName,
-          })
-        )
-      ).map((lecture) => ({
+          }),
+        ),
+      ).map(lecture => ({
         ...lecture,
-        links: links.filter((link) => link.lectureId === lecture.id),
-        quizzes: quizzes.filter((quiz) => quiz.lectureId === lecture.id),
+        links: links.filter(link => link.lectureId === lecture.id),
+        quizzes: quizzes.filter(quiz => quiz.lectureId === lecture.id),
       }));
 
-      let message = "";
+      let message = '';
 
       for (const lecture of lectures) {
-        message += "👈 ";
-        if (lecture.title === "Practical Data")
+        message += '👈 ';
+        if (lecture.title === 'Practical Data')
           message +=
-            "في عملي مادة " +
+            'في عملي مادة ' +
             bolderizeWord(lecture.subjectName) +
-            " موديول " +
+            ' موديول ' +
             bolderizeWord(lecture.moduleName);
-        else if (lecture.title === "Final Revision Data")
+        else if (lecture.title === 'Final Revision Data')
           message +=
-            "في المراجعة النهائية لمادة " +
+            'في المراجعة النهائية لمادة ' +
             bolderizeWord(lecture.subjectName) +
-            " موديول " +
+            ' موديول ' +
             bolderizeWord(lecture.moduleName);
-        else message += "في محاضرة " + bolderizeWord(lecture.title);
+        else message += 'في محاضرة ' + bolderizeWord(lecture.title);
         message += ` تم إضافة المصادر التالية:\n${[
           ...lecture.links,
           ...lecture.quizzes,
         ]
           .map(({ title }) => `💥 ${title}\n`)
-          .join("")}`;
+          .join('')}`;
       }
 
       await messaging.send({
         notification: {
-          title: "تم إضافة مصادر جديدة 🔥",
+          title: 'تم إضافة مصادر جديدة 🔥',
           body: message,
         },
         data: { id: lectures[0].id.toString(), title: lectures[0].title },
@@ -237,11 +237,11 @@ export default class YearController {
 
       return res
         .status(200)
-        .json({ message: "Notification was sent successfully", status: 200 });
+        .json({ message: 'Notification was sent successfully', status: 200 });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -257,7 +257,7 @@ export default class YearController {
         const errors = extractErrors(body);
         return res.status(400).json({
           errors,
-          message: "Form validation errors.",
+          message: 'Form validation errors.',
           status: 400,
         });
       }
@@ -290,11 +290,11 @@ export default class YearController {
 
       return res
         .status(200)
-        .json({ message: "Links where ignored successfully", status: 200 });
+        .json({ message: 'Links where ignored successfully', status: 200 });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
