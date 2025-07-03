@@ -11,6 +11,7 @@ declare global {
     interface Request {
       oauthJwtPayload: TokenPayload;
       oauthTokens: Credentials;
+      user: UserModel;
     }
   }
 }
@@ -27,7 +28,7 @@ export default class AuthController {
     redirectUri: this.GOOGLE_REDIRECT_URI,
   });
 
-  public static signup = catchAsync(async function (
+  public static continueWithGoogle = catchAsync(async function (
     req: Request,
     res: Response,
   ) {
@@ -40,7 +41,7 @@ export default class AuthController {
     res.redirect(authUrl);
   });
 
-  public static finishOAuth2Flow = async function (
+  public static extractOAuth2Tokens = catchAsync(async function (
     req: Request,
     res: Response,
     next: NextFunction,
@@ -75,13 +76,18 @@ export default class AuthController {
         ),
       );
 
-    // Write tokens to disk
-    // fs.writeFileSync('../access_token', tokens.access_token);
-    // fs.writeFileSync('../refresh_token', tokens.refresh_token);
+    req.oauthTokens = tokens;
+    next();
+  });
 
+  public static extractAndVerifyGoogleJWT = catchAsync(async function (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
     // Verify ID token (JWT) and get user info
     const ticket = await AuthController.oauth2Client.verifyIdToken({
-      idToken: String(tokens.id_token),
+      idToken: String(req.oauthTokens.id_token),
       audience: AuthController.GOOGLE_CLIENT_ID,
     });
 
@@ -94,9 +100,8 @@ export default class AuthController {
       );
 
     req.oauthJwtPayload = jwtPayload;
-    req.oauthTokens = tokens;
     next();
-  };
+  });
 
   public static createUser = catchAsync(async function (
     req: Request,
@@ -119,5 +124,31 @@ export default class AuthController {
     console.log(user);
 
     JWTService.createAndSendJWT(user.id, user.role, res, 201, {});
+  });
+
+  public static protect = catchAsync(async function (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    // 1) Check if a token exists and extract it if so
+    const jwt = JWTService.extractJWT(req);
+
+    // 2) Verify the token
+    const payload = JWTService.verifyJWT(jwt);
+
+    // 3) Verify the user exists
+    const user = await UserModel.findUserById(payload.id);
+
+    if (!(user && payload))
+      return next(
+        new AppError('The user owning this token no longer exists.', 401),
+      );
+
+    // GRANT ACCESS TO USER
+    req.user = user;
+    res.locals.user = user;
+
+    next();
   });
 }

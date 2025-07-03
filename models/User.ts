@@ -38,6 +38,18 @@ class UserModel {
 
     return new UserModel(userData);
   }
+
+  static async findUserById(id: number): Promise<UserModel> {
+    const userData = await db.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!userData) throw new AppError(`Couldn't find user with ID ${id}`, 404);
+
+    return new UserModel(userData);
+  }
 }
 
 export default UserModel;

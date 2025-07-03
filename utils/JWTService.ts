@@ -33,12 +33,6 @@ class JWTService {
 
     // 2) Set the cookie on the response
 
-    console.log(this.JWT_COOKIE_EXPIRES_IN_DAYS);
-
-    console.log(
-      Date.now() + this.JWT_COOKIE_EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000,
-    );
-
     const cookieOptions: CookieOptions = {
       maxAge:
         Date.now() + this.JWT_COOKIE_EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000,
@@ -71,7 +65,7 @@ class JWTService {
 
   static extractJWT(req: Request, enforce = true) {
     const authHeader = req.headers.authorization;
-    let token = req.cookies.jwt;
+    let token = req.cookies ? req.cookies.jwt : undefined;
 
     if (!token) {
       if (enforce && (!authHeader || !authHeader.startsWith('Bearer')))
