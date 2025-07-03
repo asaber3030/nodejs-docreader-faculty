@@ -1,15 +1,17 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import AuthController from "../http/controllers/AuthController";
-import { checkIsAuthenticated } from "../middlewares/isAuthenticated";
+import AuthController from '../controllers/AuthController';
 
 const authRouter = Router();
-const authController = new AuthController();
 
-authRouter.post("/create-admin", authController.createAdmin);
-authRouter.post("/login", authController.login);
-authRouter.post("/register", authController.register);
-authRouter.get("/is-authenticated", authController.isAuthenticated);
-authRouter.get("/user", checkIsAuthenticated, authController.getUserData);
+// authRouter.post('/create-admin', authController.createAdmin);
+authRouter.post('/signup', AuthController.signup);
+authRouter.get(
+  '/login/callback',
+  AuthController.finishOAuth2Flow,
+  AuthController.createUser,
+);
+// authRouter.get('/is-authenticated', authController.isAuthenticated);
+// authRouter.get('/user', checkIsAuthenticated, authController.getUserData);
 
 export default authRouter;

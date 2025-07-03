@@ -1,5 +1,7 @@
 import { FindByField } from '../../types';
-import db from '../../utils/db';
+import db from '../../prisma/db';
+import { SignupUserSchemaType, userSchema } from '../../schema/user.schema';
+import jwt from 'jsonwebtoken';
 
 export default class User {
   static dbSelectors = {
@@ -13,6 +15,23 @@ export default class User {
     createdAt: true,
     updatedAt: true,
   };
+
+  static async signup(user: Object) {
+    const parsedUser = userSchema.signup.safeParse(user);
+
+    if (parsedUser.error) throw new Error(parsedUser.error.message);
+
+    const now = Date.now().toString();
+
+    return await db.user.create({
+      data: {
+        ...parsedUser.data,
+        createdAt: now,
+        updatedAt: now,
+        status: true,
+      },
+    });
+  }
 
   static async findAll(
     search: string = '',

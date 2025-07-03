@@ -1,6 +1,7 @@
 {
   "name": "nodejs-code-snippets",
   "version": "1.0.0",
+  "module": "module",
   "description": "SaaS - For Creating code snippets and organize them for you.",
   "main": "src/index.js",
   "scripts": {
@@ -28,6 +29,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "firebase-admin": "^12.5.0",
+    "google-auth-library": "^10.1.0",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",

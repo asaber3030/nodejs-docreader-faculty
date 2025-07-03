@@ -18,7 +18,10 @@ export default class UserController {
     const token = extractToken(req.headers.authorization!);
     if (!token) return null;
     try {
-      const verifiedToken = jwt.verify(token, AuthController.secret!) as TUser;
+      const verifiedToken = jwt.verify(
+        token,
+        AuthController.JWT_SECRET!,
+      ) as TUser;
       if (!verifiedToken) return null;
       const realUser = await db.user.findFirst({
         where: { id: verifiedToken.id },
@@ -106,50 +109,6 @@ export default class UserController {
         message: 'User has been updated successfully.',
         status: 200,
         data: mainUser,
-      });
-    } catch (errorObject) {
-      return res.status(500).json({
-        errorObject,
-        message: 'Error - Something Went Wrong.',
-        status: 500,
-      });
-    }
-  }
-
-  async changePassword(req: Request, res: Response) {
-    try {
-      const body = userSchema.changePassword.safeParse(req.body);
-      if (!body.success)
-        return send(res, 'Validation errors', 400, extractErrors(body));
-
-      const data = body.data;
-      const user = await AuthController.user(req, res);
-      const userFull = await db.user.findUnique({
-        where: { id: user?.id },
-        select: { id: true, password: true },
-      });
-
-      if (!user || !userFull) return unauthorized(res);
-
-      const comparePasswords = await bcrypt.compare(
-        data.currentPassword,
-        userFull?.password,
-      );
-      if (!comparePasswords)
-        return unauthorized(res, 'Invalid password for current user.');
-
-      const newPassword = await bcrypt.hash(data.newPassword, 10);
-      const updatedUser = await db.user.update({
-        where: { id: user.id },
-        data: {
-          password: newPassword,
-        },
-        select: { id: true },
-      });
-
-      return res.status(200).json({
-        message: 'Password has been updated successfully.',
-        status: 200,
       });
     } catch (errorObject) {
       return res.status(500).json({

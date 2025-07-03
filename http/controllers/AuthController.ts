@@ -7,144 +7,86 @@ import {
   unauthorized,
 } from '../../utils/responses';
 import { currentDate, extractErrors, extractToken } from '../../utils/helpers';
-import { userSchema } from '../../schema';
+import { userSchema } from '../../schema/user.schema';
 
 import { User as TUser, UserRole } from '@prisma/client';
 
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import db from '../../utils/db';
+import db from '../../prisma/db';
 
 import User from '../models/User';
 import Faculty from '../models/Faculty';
-import dotenv from 'dotenv';
+
+import { OAuth2Client } from 'google-auth-library';
 
 export default class AuthController {
-  static secret: string;
+  private static JWT_SECRET: string = process.env.APP_USER_SECRET!;
 
-  static {
-    dotenv.config();
-    this.secret = process.env.APP_USER_SECRET!;
+  private static GOOGLE_CLIENT_ID: string = process.env.GOOGLE_CLIENT_ID!;
+  private static GOOGLE_CLIENT_SECRET: string =
+    process.env.GOOGLE_CLIENT_SECRET!;
+  private static GOOGLE_REDIRECT_URI: string = process.env.GOOGLE_REDIRECT_URI!;
+
+  private static oauth2Client: OAuth2Client = new OAuth2Client({
+    client_id: this.GOOGLE_CLIENT_ID,
+    client_secret: this.GOOGLE_CLIENT_SECRET,
+    redirectUri: this.GOOGLE_REDIRECT_URI,
+  });
+
+  async signup(req: Request, res: Response) {
+    const authUrl = AuthController.oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: ['profile', 'email', 'openid'],
+      prompt: 'consent', // Always ask for consent to get refresh_token
+    });
+
+    res.redirect(authUrl);
   }
 
-  async login(req: Request, res: Response) {
-    try {
-      const body = userSchema.login.safeParse(req.body);
-      const data = body.data;
+  async extractTokens(req: Request, res: Response) {
+    const code: string = String(req.query.code);
 
-      if (!body.success) {
-        const errors = extractErrors(body);
-        return res.status(400).json({
-          errors,
-          message: 'Form validation errors.',
-        });
-      }
-      if (!data) return send(res, 'No data was submitted.', 409);
-
-      const user = await User.findBy(data.email);
-      if (!user) return notFound(res, 'No User was found');
-
-      const comparePasswords = await bcrypt.compare(
-        data.password,
-        user.password,
-      );
-      if (!comparePasswords) {
-        return res.status(400).json({
-          message: 'Invalid email or password.',
-        });
-      }
-
-      const { password, ...mainUser } = user;
-
-      const token = jwt.sign(mainUser, AuthController.secret!);
-
-      return res.status(200).json({
-        message: 'Logged in successfully.',
-        status: 200,
-        data: { token, user: mainUser },
-      });
-    } catch (errorObject) {
-      return res.status(500).json({
-        message: 'Error - Something went wrong.',
-        status: 500,
-        errorObject,
-      });
+    if (!code) {
+      return res.status(400).send('Missing auth code.');
     }
-  }
 
-  async register(req: Request, res: Response) {
     try {
-      const body = userSchema.register.safeParse(req.body);
-      const data = body.data;
+      // Step 3: Exchange code for tokens
+      const { tokens } = await AuthController.oauth2Client.getToken(code);
+      AuthController.oauth2Client.setCredentials(tokens);
 
-      if (!body.success) {
-        const errors = extractErrors(body);
-        return res.status(400).json({
-          errors,
-          message: 'Form validation errors.',
-          status: 400,
-        });
-      }
-
-      if (!data) {
-        return res.status(400).json({
-          message: "Please check there's valid JSON data in the request body.",
-          status: 400,
-        });
-      }
-
-      const userByEmail = await User.findBy(data.email);
-      if (userByEmail) {
-        return res.status(409).json({
-          message: 'E-mail Already exists.',
-          status: 409,
-        });
-      }
-
-      const findFaculty = await Faculty.find(data.facultyId);
-      if (!findFaculty)
-        return notFound(
-          res,
-          "Faculty doesn't exist with provided Id: " + data.facultyId,
-        );
-
-      const hashedPassword = await bcrypt.hash(data.password, 10);
-
-      const { confirmationPassword, ...restData } = data;
-
-      const newUser = await db.user.create({
-        data: {
-          ...restData,
-          status: true,
-          password: hashedPassword,
-          createdAt: currentDate(),
-        },
+      // Step 4: Verify ID token (JWT) and get user info
+      const ticket = await AuthController.oauth2Client.verifyIdToken({
+        idToken: String(tokens.id_token),
+        audience: AuthController.GOOGLE_CLIENT_ID,
       });
 
-      const { password, ...mainUser } = newUser;
-      const token = jwt.sign(mainUser, AuthController.secret!);
+      const payload = ticket.getPayload();
 
-      return res.status(201).json({
-        message: 'User Registered successfully',
-        status: 201,
-        data: {
-          user: mainUser,
-          token,
-        },
+      if (!payload) throw new Error('Invalid JWT obtained from google server.');
+      User.signup({
+        id: Number.parseInt(payload.sub),
+        givenName: payload.given_name,
+        familyName: payload.family_name,
+        email: payload.email,
+        picture: payload.picture,
       });
-    } catch (errorObject) {
-      return res.status(500).json({
-        message: 'Server Crashed',
-        status: 500,
-        errorObject,
+
+      res.status(200).json({
+        status: 'success',
+        jwt: ticket,
       });
+    } catch (error) {
+      console.error('Error verifying Google login:', error);
+      res.status(500).send('Authentication failed.');
     }
   }
 
   async isAuthenticated(req: Request, res: Response) {
     const token = extractToken(req.headers.authorization!);
     try {
-      const userData = jwt.verify(token, AuthController.secret) as TUser;
+      const userData = jwt.verify(token, AuthController.JWT_SECRET) as TUser;
       if (!userData) return badRequest(res, 'Invalid token.');
       const findUser = await User.find(userData.id);
       if (!findUser)
@@ -176,7 +118,7 @@ export default class AuthController {
   static async user(req: Request, res: Response) {
     const token = extractToken(req.headers.authorization!);
     try {
-      const userData = jwt.verify(token, AuthController.secret) as TUser;
+      const userData = jwt.verify(token, AuthController.JWT_SECRET) as TUser;
       const user = await db.user.findUnique({
         where: { id: userData?.id },
         select: User.dbSelectors,
@@ -190,7 +132,7 @@ export default class AuthController {
   async getUserData(req: Request, res: Response) {
     const token = extractToken(req.headers.authorization!);
     try {
-      const tokenData = jwt.verify(token, AuthController.secret) as TUser;
+      const tokenData = jwt.verify(token, AuthController.JWT_SECRET) as TUser;
       const user = await db.user.findUnique({
         where: { id: tokenData?.id },
         include: {
@@ -269,7 +211,7 @@ export default class AuthController {
       });
 
       const { password, ...mainUser } = newUser;
-      const token = jwt.sign(mainUser, AuthController.secret!);
+      const token = jwt.sign(mainUser, AuthController.JWT_SECRET!);
 
       return res.status(201).json({
         message: 'Admin Registered successfully',
