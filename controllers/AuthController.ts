@@ -5,6 +5,7 @@ import { Credentials, OAuth2Client, TokenPayload } from 'google-auth-library';
 import AppError, { ErrorStatus } from '../utils/AppError';
 import catchAsync from '../utils/catchAsync';
 import JWTService from '../utils/JWTService';
+import { UserRole } from '@prisma/client';
 
 declare global {
   namespace Express {
@@ -138,7 +139,7 @@ export default class AuthController {
     const payload = JWTService.verifyJWT(jwt);
 
     // 3) Verify the user exists
-    const user = await UserModel.findUserById(payload.id);
+    const user = await UserModel.findById(payload.id);
 
     if (!(user && payload))
       return next(
@@ -151,4 +152,18 @@ export default class AuthController {
 
     next();
   });
+
+  static restrictTo = function (...roles: Array<UserRole>) {
+    return (req: Request, res: Response, next: NextFunction) => {
+      if (!roles.includes(req.user.role))
+        return next(
+          new AppError(
+            "You don't have enough permissions to do this action!",
+            403,
+          ),
+        );
+
+      next();
+    };
+  };
 }

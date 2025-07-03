@@ -2,11 +2,11 @@ import { Router } from 'express';
 
 import AuthController from '../controllers/AuthController';
 
-const authRouter = Router();
+const router = Router();
 
 // authRouter.post('/create-admin', authController.createAdmin);
-authRouter.post('/login', AuthController.continueWithGoogle);
-authRouter.get(
+router.post('/login', AuthController.continueWithGoogle);
+router.get(
   '/login/callback',
   AuthController.extractOAuth2Tokens,
   AuthController.extractAndVerifyGoogleJWT,
@@ -16,4 +16,4 @@ authRouter.get(
 // authRouter.get('/is-authenticated', authController.isAuthenticated);
 // authRouter.get('/user', checkIsAuthenticated, authController.getUserData);
 
-export default authRouter;
+export default router;

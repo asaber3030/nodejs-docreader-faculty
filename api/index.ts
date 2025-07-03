@@ -1,21 +1,10 @@
 import express, { Response } from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan = require('morgan');
 
-dotenv.config();
-
-import {
-  authRouter,
-  subjectRouter,
-  userRouter,
-  facultyRouter,
-  moduleRouter,
-  lecturesRouter,
-  yearRouter,
-  // quizRouter,
-} from '../routes';
 import globalErrorHandler from '../controllers/ErrorController';
+import authRouter from '../routes/authRouter';
+import userRouter from '../routes/userRouter';
 
 const app = express();
 const port = process.env.APP_PORT || 8080;
@@ -28,7 +17,8 @@ app.get('/', async (_, res: Response) => {
   res.json({ message: 'DocReader Guide - API', status: 'Running' });
 });
 
-app.use('/api/v1/auth', authRouter);
+app.use('/api/v2/auth', authRouter);
+app.use('/api/v2/user', userRouter);
 
 app.use(globalErrorHandler);
 
