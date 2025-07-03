@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import catchAsync from '../utils/catchAsync';
 import UserModel from '../models/User';
+import { userSchemaUpdate } from '../schema/user.schema';
 
 export default class UserController {
   public static getMe = catchAsync(async function (
@@ -21,7 +22,7 @@ export default class UserController {
     const id = Number(req.params.id);
     const user = await UserModel.findById(id);
 
-    res.status(201).json({
+    res.status(200).json({
       status: 'success',
       data: {
         user,
@@ -29,11 +30,22 @@ export default class UserController {
     });
   });
 
-  updateUser = catchAsync(async function (
+  public static updateUser = catchAsync(async function (
     req: Request,
     res: Response,
     next: NextFunction,
-  ) {});
+  ) {
+    const id = Number(req.params.id);
+
+    const updatedUser = await UserModel.update(id, req.body);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user: updatedUser,
+      },
+    });
+  });
 }
 
 /**

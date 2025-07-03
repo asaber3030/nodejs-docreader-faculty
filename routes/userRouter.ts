@@ -18,8 +18,10 @@ router.get('/me', UserController.getMe, UserController.getUser);
 //   .get(UserController.getAllUsers)
 //   .post(UserController.createUser);
 
-router.route('/:id').get(UserController.getUser);
-//   .patch(UserController.updateUser)
+router
+  .route('/:id')
+  .get(UserController.getUser)
+  .patch(UserController.updateUser);
 //   .delete(UserController.deleteUser);
 
 export default router;

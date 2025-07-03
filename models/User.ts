@@ -124,7 +124,7 @@ class UserModel implements Model {
       },
       select: parsedSelect,
       data: {
-        ...updateInput,
+        ...validated.data,
       },
     });
 
