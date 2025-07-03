@@ -104,7 +104,7 @@ export default class AuthController {
     next();
   });
 
-  public static createUser = catchAsync(async function (
+  public static createOrReturnUser = catchAsync(async function (
     req: Request,
     res: Response,
     next: NextFunction,
@@ -122,9 +122,7 @@ export default class AuthController {
       status: false,
     });
 
-    console.log(user);
-
-    JWTService.createAndSendJWT(user.id, user.role, res, 201, {});
+    JWTService.createAndSendJWT(user.id, user.role, res, 201, { user });
   });
 
   public static protect = catchAsync(async function (

@@ -10,7 +10,7 @@ router.get(
   '/login/callback',
   AuthController.extractOAuth2Tokens,
   AuthController.extractAndVerifyGoogleJWT,
-  AuthController.createUser,
+  AuthController.createOrReturnUser,
 );
 
 // authRouter.get('/is-authenticated', authController.isAuthenticated);

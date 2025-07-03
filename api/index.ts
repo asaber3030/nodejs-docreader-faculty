@@ -17,7 +17,7 @@ app.get('/', async (_, res: Response) => {
   res.json({ message: 'DocReader Guide - API', status: 'Running' });
 });
 
-app.use('/api/v2/auth', authRouter);
+app.use('/api/v2/', authRouter);
 app.use('/api/v2/user', userRouter);
 
 app.use(globalErrorHandler);
