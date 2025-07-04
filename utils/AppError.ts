@@ -1,4 +1,4 @@
-export enum ErrorStatus {
+enum ErrorStatus {
   'success',
   'fail',
   'error',
@@ -19,8 +19,8 @@ export default class AppError extends Error {
 
     this.statusCode = statusCode;
 
-    if (this.statusCode < 500) this.status = ErrorStatus.error.toString();
-    else this.status = ErrorStatus.fail.toString();
+    if (this.statusCode < 500) this.status = 'fail';
+    else this.status = 'error';
 
     this.isOperational = isOperational;
 

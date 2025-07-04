@@ -47,17 +47,17 @@ model Faculty {
 
 model User {
   id              Int              @id @default(autoincrement())
-  googleSubId       String
+  googleSubId     String           @unique
   givenName       String
   familyName      String
   email           String           
   picture         String
   status          Boolean          @default(false)
   role            UserRole         @default(User)
-  facultyId       Int              @default(-1)
-  yearId          Int              @default(-1)
-  faculty         Faculty          @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  year            StudyingYear     @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  facultyId       Int?             
+  yearId          Int?             
+  faculty         Faculty?         @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  year            StudyingYear?    @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   devices         Device[]
   createdAt       DateTime?        @default(now()) @db.Timestamp()
   updatedAt       DateTime?        @updatedAt @db.Timestamp()

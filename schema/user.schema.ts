@@ -36,9 +36,11 @@ export const userSchemaSignup = userSchema.omit({
 
 export type UserSignupInput = z.infer<typeof userSchemaSignup>;
 
-export const userSchemaWhere = userSchema.omit({
-  devices: true,
-});
+export const userSchemaWhere = userSchema
+  .omit({
+    devices: true,
+  })
+  .partial();
 
 export type UserWhereInput = z.infer<typeof userSchemaWhere>;
 
@@ -70,17 +72,15 @@ export const userSchemaFind = z.object({
 
 export type FindUsersInput = z.infer<typeof userSchemaFind>;
 
-export const userSchemaUpdate = userSchema
-  .omit({
-    id: true,
-    googleSubId: true,
-    role: true,
-    email: true,
-    createdAt: true,
-    givenName: true,
-    familyName: true,
-    picture: true,
-    devices: true, // TODO: We should be able to update devices
-  })
-  .partial();
+export const userSchemaUpdate = userSchema.partial().omit({
+  id: true,
+  googleSubId: true,
+  role: true,
+  email: true,
+  createdAt: true,
+  givenName: true,
+  familyName: true,
+  picture: true,
+  devices: true, // TODO: We should be able to update devices
+});
 export type UserUpdateInput = z.infer<typeof userSchemaUpdate>;

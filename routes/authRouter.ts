@@ -5,12 +5,12 @@ import AuthController from '../controllers/AuthController';
 const router = Router();
 
 // authRouter.post('/create-admin', authController.createAdmin);
-router.post('/login', AuthController.continueWithGoogle);
+router.post('/continueWithGoogle', AuthController.continueWithGoogle);
 router.get(
-  '/login/callback',
+  '/googleCallback',
   AuthController.extractOAuth2Tokens,
   AuthController.extractAndVerifyGoogleJWT,
-  AuthController.createOrReturnUser,
+  AuthController.createOrFetchUser,
 );
 
 // authRouter.get('/is-authenticated', authController.isAuthenticated);

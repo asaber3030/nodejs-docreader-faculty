@@ -19,7 +19,7 @@ export default class UserController {
     res: Response,
     next: NextFunction,
   ) {
-    const id = Number(req.params.id);
+    const id = Number.parseInt(req.params.id);
     const user = await UserModel.findById(id);
 
     res.status(200).json({
@@ -35,7 +35,7 @@ export default class UserController {
     res: Response,
     next: NextFunction,
   ) {
-    const id = Number(req.params.id);
+    const id = Number.parseInt(req.params.id);
 
     const updatedUser = await UserModel.update(id, req.body);
 

@@ -2,10 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 
 import UserModel from '../models/User';
 import { Credentials, OAuth2Client, TokenPayload } from 'google-auth-library';
-import AppError, { ErrorStatus } from '../utils/AppError';
+import AppError from '../utils/AppError';
 import catchAsync from '../utils/catchAsync';
 import JWTService from '../utils/JWTService';
-import { UserRole } from '@prisma/client';
+import { User as PrismaUser, UserRole } from '@prisma/client';
 
 declare global {
   namespace Express {
@@ -53,7 +53,7 @@ export default class AuthController {
       return next(
         new AppError(
           'Invalid authorization code obtained from Google authorization server.',
-          ErrorStatus.error,
+          500,
         ),
       );
 
@@ -104,7 +104,7 @@ export default class AuthController {
     next();
   });
 
-  public static createOrReturnUser = catchAsync(async function (
+  public static createOrFetchUser = catchAsync(async function (
     req: Request,
     res: Response,
     next: NextFunction,
@@ -112,15 +112,24 @@ export default class AuthController {
     const jwtPayload = req.oauthJwtPayload;
     const tokens = req.oauthTokens;
 
-    const user = await UserModel.create({
-      googleSubId: jwtPayload.sub,
-      givenName: jwtPayload.given_name || '',
-      familyName: jwtPayload.family_name || '',
-      email: jwtPayload.email || '',
-      picture: jwtPayload.picture || '',
-      role: 'User',
-      status: false,
-    });
+    const googleSubId = jwtPayload.sub;
+
+    let user: UserModel;
+
+    // If you don't find the user, it means that it is a new user account
+    try {
+      user = await UserModel.findByGoogleSubId(googleSubId);
+    } catch (error) {
+      user = await UserModel.create({
+        googleSubId: jwtPayload.sub,
+        givenName: jwtPayload.given_name || '',
+        familyName: jwtPayload.family_name || '',
+        email: jwtPayload.email || '',
+        picture: jwtPayload.picture || '',
+        role: 'User',
+        status: false,
+      });
+    }
 
     JWTService.createAndSendJWT(user.id, user.role, res, 201, { user });
   });

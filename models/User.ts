@@ -74,6 +74,22 @@ class UserModel implements Model {
     return new UserModel(userData);
   }
 
+  static async findByGoogleSubId(sub: string): Promise<UserModel> {
+    const userData = await db.user.findUnique({
+      where: {
+        googleSubId: sub,
+      },
+    });
+
+    if (!userData)
+      throw new AppError(
+        `Couldn't find user with google subject ID ${sub}`,
+        404,
+      );
+
+    return new UserModel(userData);
+  }
+
   static async findMany(queryObj: FindUsersInput): Promise<Array<UserModel>> {
     const query = userSchemaFind.safeParse(queryObj);
 
@@ -123,9 +139,7 @@ class UserModel implements Model {
         id,
       },
       select: parsedSelect,
-      data: {
-        ...validated.data,
-      },
+      data: validated.data,
     });
 
     if (!updatedUser) {

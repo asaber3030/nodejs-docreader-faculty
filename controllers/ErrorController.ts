@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import AppError from '../utils/AppError';
 import { NextFunction, Request, Response } from 'express';
 
@@ -28,6 +29,25 @@ class ErrorController {
     }
   }
 
+  static #handlePrismaClientKnownRequestError(
+    error: PrismaClientKnownRequestError,
+  ) {
+    switch (error.code) {
+      case 'P2003':
+        if (error?.meta?.constraint === 'User_yearId_fkey')
+          return new AppError(`Year with given ID not found.`, 404);
+        else if (error?.meta?.constraint === 'User_facultyId_fkey')
+          return new AppError(`Faculty with given ID not found.`, 404);
+        break;
+
+      case 'P2025':
+        return new AppError(`Database record not found for an update.`, 404);
+
+      default:
+        return error;
+    }
+  }
+
   static #sendAPIErrors(err: any, res: Response) {
     let error = { ...err };
 
@@ -39,7 +59,10 @@ class ErrorController {
     if (process.env.NODE_ENV === 'development') {
       ErrorController.#sendDevErrors(error, res);
     } else {
-      ErrorController.#sendProdErrors(error, res);
+      if (error.name === 'PrismaClientKnownRequestError')
+        error = this.#handlePrismaClientKnownRequestError(error);
+
+      error = ErrorController.#sendProdErrors(error, res);
     }
   }
 
