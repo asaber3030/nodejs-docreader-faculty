@@ -11,7 +11,7 @@ import {
   userSchemaUpdate,
   userSchemaSelect,
 } from '../schema/user.schema';
-import { User as PrismaUser } from '@prisma/client';
+import { User as PrismaUser, User } from '@prisma/client';
 import AppError from '../utils/AppError';
 import Model from './Model';
 import { parse } from 'path';
@@ -147,6 +147,16 @@ class UserModel implements Model {
     }
 
     return new UserModel(updatedUser);
+  }
+
+  static async delete(id: number): Promise<UserModel> {
+    const user = await db.user.delete({
+      where: {
+        id,
+      },
+    });
+
+    return new UserModel(user);
   }
 }
 
