@@ -5,6 +5,7 @@ import morgan = require('morgan');
 import globalErrorHandler from '../controllers/ErrorController';
 import authRouter from '../routes/authRouter';
 import userRouter from '../routes/userRouter';
+import RoleModel from '../models/Role';
 
 const app = express();
 const port = process.env.APP_PORT || 8080;
@@ -22,6 +23,8 @@ app.use('/api/v2/user', userRouter);
 
 app.use(globalErrorHandler);
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
+
+  await RoleModel.refreshPermissionCache();
 });

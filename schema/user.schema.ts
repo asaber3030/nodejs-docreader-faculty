@@ -10,9 +10,7 @@ export const userSchema = z.object({
   email: z.string().trim().email({ message: 'Invalid Email.' }),
   picture: z.string().url({ message: 'Invalid picture URL.' }),
   status: z.boolean({ message: 'Invalid status.' }).default(false),
-  role: z.enum(['Admin', 'User'], {
-    message: "Role must be either 'Admin' or 'User'.",
-  }),
+  roleId: z.number().int({ message: 'Role ID can only be an integer.' }).min(1),
   facultyId: z.number().gt(0),
   yearId: z.number().gt(0),
   devices: deviceSchema.array(),

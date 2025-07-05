@@ -14,27 +14,36 @@ import {
 import { User as PrismaUser, User } from '@prisma/client';
 import AppError from '../utils/AppError';
 import Model from './Model';
-import { parse } from 'path';
+import RoleModel from './Role';
 
 class UserModel implements Model {
   private data: Partial<PrismaUser>;
 
+  private roleModel: RoleModel;
+
   constructor(data: Partial<PrismaUser>) {
     this.data = data;
+
+    if (!this.data.id)
+      throw new AppError('Cannot create user without ID.', 500);
+
+    if (this.data.role) this.roleModel = new RoleModel(this.data.role);
+    // If not, it will be populated the first time role is accessed
   }
 
-  get id() {
-    if (this.data.id === undefined)
-      throw new AppError('User ID is not available in partial data.', 500);
-
-    return this.data.id;
+  get id(): number {
+    return this.data.id!;
   }
 
-  get role() {
-    if (this.data.role === undefined)
-      throw new AppError('User role is not available in partial data.', 500);
+  get roleId(): number {
+    return this.data.roleId!;
+  }
 
-    return this.data.role;
+  async role(): Promise<RoleModel> {
+    if (!this.roleModel)
+      this.roleModel = new RoleModel(await RoleModel.findById(this.roleId));
+
+    return this.roleModel;
   }
 
   toJSON() {
@@ -52,7 +61,7 @@ class UserModel implements Model {
         familyName: parsedUser.familyName,
         picture: parsedUser.picture,
         status: parsedUser.status,
-        role: parsedUser.role,
+        roleId: parsedUser.roleId,
         devices: {
           create: [],
         },
@@ -67,6 +76,15 @@ class UserModel implements Model {
       where: {
         id: id,
       },
+      include: {
+        role: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+      },
     });
 
     if (!userData) throw new AppError(`Couldn't find user with ID ${id}`, 404);
@@ -78,6 +96,15 @@ class UserModel implements Model {
     const userData = await db.user.findUnique({
       where: {
         googleSubId: sub,
+      },
+      include: {
+        role: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
       },
     });
 

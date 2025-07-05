@@ -27,12 +27,6 @@ enum LectureType {
   FinalRevision
 }
 
-enum UserRole {
-  Admin
-  User
-  Editor
-}
-
 model Faculty {
   id   Int    @id @default(autoincrement())
   name String
@@ -53,7 +47,8 @@ model User {
   email           String           
   picture         String
   status          Boolean          @default(false)
-  role            UserRole         @default(User)
+  role            Role             @relation(fields: [roleId], references: [id])
+  roleId          Int              @default(1)
   facultyId       Int?             
   yearId          Int?             
   faculty         Faculty?         @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -62,6 +57,31 @@ model User {
   createdAt       DateTime?        @default(now()) @db.Timestamp()
   updatedAt       DateTime?        @updatedAt @db.Timestamp()
   markedQuestions MarkedQuestion[]
+}
+
+model Role {
+  id          Int              @id @default(autoincrement()) // Role ID
+  name        String           @unique                      // e.g., "Admin", "Teacher"
+  description String?                                         // Optional description
+  users       User[]           
+  permissions RolePermission[] // Many permissions can be assigned to this role
+}
+
+model Permission {
+  id          Int              @id @default(autoincrement()) // Unique ID
+  name        String           @unique                      // e.g., "create_lecture"
+  description String?                                         // What this permission does
+  roles       RolePermission[] // Which roles allow this permission
+}
+
+model RolePermission {
+  id           Int         @id @default(autoincrement()) // Link record ID
+  role         Role        @relation(fields: [roleId], references: [id])
+  roleId       Int
+  permission   Permission  @relation(fields: [permissionId], references: [id])
+  permissionId Int
+
+  @@unique([roleId, permissionId]) // Prevent duplicates
 }
 
 model StudyingYear {
