@@ -90,7 +90,7 @@ export default class UserController {
   ) {
     const id = Number.parseInt(req.params.id);
 
-    const deletedUser = await UserModel.deleteOne(id);
+    await UserModel.deleteOne(id);
 
     res.status(204).json({
       status: 'success',

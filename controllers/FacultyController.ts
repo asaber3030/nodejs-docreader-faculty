@@ -50,4 +50,19 @@ export default class FacultyController {
       },
     });
   });
+
+  public static deleteFaculty = catchAsync(async function (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    const id = Number.parseInt(req.params.id);
+
+    await FacultyModel.deleteOne(id);
+
+    res.status(204).json({
+      status: 'success',
+      data: null,
+    });
+  });
 }
