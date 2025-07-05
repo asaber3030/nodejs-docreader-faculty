@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
-import db, { findQuizUnique, QUIZ_INCLUDE } from "../../utlis/db";
-import { quizSchema } from "../../schema";
-import { currentDate } from "../../utlis/helpers";
-import UserController from "./UserController";
-import { badRequest, notFound } from "../../utlis/responses";
+import { Request, Response } from 'express';
+import db, { findQuizUnique, QUIZ_INCLUDE } from '../../utils/db';
+import { quizSchema } from '../../schema';
+import { currentDate } from '../../utils/helpers';
+import UserController from './UserController';
+import { badRequest, notFound } from '../../utils/responses';
 
 export default class QuizController {
   async createQuiz(req: Request, res: Response) {
@@ -19,13 +19,13 @@ export default class QuizController {
       });
       return res.status(201).json({
         data: createdQuiz,
-        message: "Quiz has been created.",
+        message: 'Quiz has been created.',
         status: 201,
       });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -43,13 +43,13 @@ export default class QuizController {
       }
       return res.status(200).json({
         data: quiz,
-        message: "Quiz",
+        message: 'Quiz',
         status: 200,
       });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -65,13 +65,13 @@ export default class QuizController {
       });
       return res.status(200).json({
         data: updatedQuiz,
-        message: "Quiz has been updated.",
+        message: 'Quiz has been updated.',
         status: 200,
       });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -86,13 +86,13 @@ export default class QuizController {
       });
       return res.status(200).json({
         data: quiz,
-        message: "Quiz has been deleted.",
+        message: 'Quiz has been deleted.',
         status: 200,
       });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -103,7 +103,7 @@ export default class QuizController {
       const quizId = +req.params.quizId;
       const data = quizSchema.question.create.parse(req.body);
       const createdQuestions = await db.question.createMany({
-        data: data.map((question) => ({
+        data: data.map(question => ({
           ...question,
           quizId,
           createdAt: currentDate(),
@@ -115,13 +115,13 @@ export default class QuizController {
       });
       return res.status(201).json({
         data: createdQuestions,
-        message: "Question has been created.",
+        message: 'Question has been created.',
         status: 201,
       });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -141,13 +141,13 @@ export default class QuizController {
       });
       return res.status(200).json({
         data: updatedQuestion,
-        message: "Question has been updated.",
+        message: 'Question has been updated.',
         status: 200,
       });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -165,13 +165,13 @@ export default class QuizController {
       });
       return res.status(200).json({
         data: question,
-        message: "Question has been deleted.",
+        message: 'Question has been deleted.',
         status: 200,
       });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -181,13 +181,13 @@ export default class QuizController {
     try {
       const questionId = +req.params.questionId;
       const user = await UserController.user(req);
-      if (!user) return notFound(res, "No User was found");
+      if (!user) return notFound(res, 'No User was found');
       if (
         await db.markedQuestion.findFirst({
           where: { questionId, userId: user.id },
         })
       )
-        return badRequest(res, "Question already marked");
+        return badRequest(res, 'Question already marked');
 
       await db.markedQuestion.create({
         data: {
@@ -197,13 +197,13 @@ export default class QuizController {
         },
       });
       return res.status(201).json({
-        message: "Question has been marked.",
+        message: 'Question has been marked.',
         status: 201,
       });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }
@@ -213,19 +213,19 @@ export default class QuizController {
     try {
       const questionId = +req.params;
       const user = await UserController.user(req);
-      if (!user) return notFound(res, "No User was found");
+      if (!user) return notFound(res, 'No User was found');
       const markedQuestion = await db.markedQuestion.deleteMany({
         where: { questionId, userId: user.id },
       });
       return res.status(200).json({
         data: markedQuestion,
-        message: "Question has been unmarked.",
+        message: 'Question has been unmarked.',
         status: 200,
       });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
-        message: "Error - Something Went Wrong.",
+        message: 'Error - Something Went Wrong.',
         status: 500,
       });
     }

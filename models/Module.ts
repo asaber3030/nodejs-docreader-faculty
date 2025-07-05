@@ -1,6 +1,6 @@
-import db, { findSubjectMany } from '../../utils/db';
+import db, { findSubjectMany } from '../utils/db';
 
-import { moduleSchema } from '../../schema';
+import { moduleSchema } from '../schema';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 

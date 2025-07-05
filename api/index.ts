@@ -1,23 +1,32 @@
-import express, { Response } from "express"
-import dotenv from "dotenv"
-import cors from "cors"
+import express, { Response } from 'express';
+import cors from 'cors';
+import morgan = require('morgan');
 
-dotenv.config()
+import globalErrorHandler from '../controllers/ErrorController';
+import authRouter from '../routes/authRouter';
+import userRouter from '../routes/userRouter';
+import facultyRouter from '../routes/facultyRouter';
+import RoleModel from '../models/Role';
 
-import { authRouter, subjectRouter, userRouter, facultyRouter, moduleRouter, lecturesRouter, yearRouter, quizRouter } from "../routes"
+const app = express();
+const port = process.env.APP_PORT || 8080;
 
-const app = express()
-const port = process.env.APP_PORT || 8080
+app.use(morgan('dev')); // logs to console in development
+app.use(cors());
+app.use(express.json());
 
-app.use(cors())
-app.use(express.json())
+app.get('/', async (_, res: Response) => {
+  res.json({ message: 'DocReader Guide - API', status: 'Running' });
+});
 
-app.get("/", async (_, res: Response) => {
-  res.json({ message: "DocReader Guide - API", status: "Running" })
-})
+app.use('/api/v2/', authRouter);
+app.use('/api/v2/user', userRouter);
+app.use('/api/v2/faculty', facultyRouter);
 
-app.use("/api/v1", [authRouter, userRouter, facultyRouter, moduleRouter, subjectRouter, lecturesRouter, yearRouter, quizRouter])
+app.use(globalErrorHandler);
 
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`)
-})
+app.listen(port, async () => {
+  console.log(`[server]: Server is running at http://localhost:${port}`);
+
+  await RoleModel.refreshPermissionCache();
+});
