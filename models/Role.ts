@@ -1,9 +1,8 @@
 import db from '../prisma/db';
-import Model from './Model';
 import { Role as PrismaRole } from '@prisma/client';
 import AppError from '../utils/AppError';
 
-export default class RoleModel implements Model {
+export default class RoleModel {
   private data: Partial<PrismaRole>;
 
   public static rolePermissionMap: Record<string, Set<string>> =

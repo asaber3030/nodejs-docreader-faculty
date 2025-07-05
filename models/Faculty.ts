@@ -1,7 +1,11 @@
-import facultySchema, { FacultyFindInput } from '../schema/faculty.schema';
+import facultySchema, {
+  FacultyFindInput,
+  FacultyUpdateInput,
+} from '../schema/faculty.schema';
 import { Faculty as PrismaFaculty } from '@prisma/client';
 import db from '../prisma/db';
 import AppError from '../utils/AppError';
+import { ModelFactory } from './ModelFactory';
 
 export default class FacultyModel {
   private data: Partial<PrismaFaculty>;
@@ -47,7 +51,7 @@ export default class FacultyModel {
     return faculties.map(faculty => new FacultyModel(faculty));
   }
 
-  static async findById(id: number): Promise<FacultyModel> {
+  static async findOneById(id: number): Promise<FacultyModel> {
     const facultyData = await db.faculty.findUnique({
       where: {
         id,
@@ -59,6 +63,17 @@ export default class FacultyModel {
 
     return new FacultyModel(facultyData);
   }
+
+  static updateOne = ModelFactory.updateOne<
+    FacultyUpdateInput,
+    any,
+    FacultyModel
+  >(db.faculty, facultySchema, data => new FacultyModel(data));
+
+  static deleteOne = ModelFactory.deleteOne<any, FacultyModel>(
+    db.faculty,
+    data => new FacultyModel(data),
+  );
 
   static async paginate(
     search: string = '',

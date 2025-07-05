@@ -13,14 +13,13 @@ import {
 } from '../schema/user.schema';
 import { User as PrismaUser, Role as PrismaRole } from '@prisma/client';
 import AppError from '../utils/AppError';
-import Model from './Model';
 import RoleModel from './Role';
 
 type PartialUserWithRole = Partial<PrismaUser> & {
   role?: PrismaRole;
 };
 
-class UserModel implements Model {
+class UserModel {
   private data: Partial<PartialUserWithRole>;
 
   private roleModel?: RoleModel;
@@ -76,7 +75,7 @@ class UserModel implements Model {
     return new UserModel(userData);
   }
 
-  static async findById(id: number): Promise<UserModel> {
+  static async findOneById(id: number): Promise<UserModel> {
     const userData = await db.user.findUnique({
       where: {
         id: id,
@@ -97,7 +96,7 @@ class UserModel implements Model {
     return new UserModel(userData);
   }
 
-  static async findByGoogleSubId(sub: string): Promise<UserModel> {
+  static async findOneByGoogleSubId(sub: string): Promise<UserModel> {
     const userData = await db.user.findUnique({
       where: {
         googleSubId: sub,
@@ -148,7 +147,7 @@ class UserModel implements Model {
     return users.map(user => new UserModel(user));
   }
 
-  static async update(
+  static async updateOne(
     id: number,
     updateInput: UserUpdateInput,
     select?: UserSelectInput,
@@ -194,7 +193,7 @@ class UserModel implements Model {
     return new UserModel(updatedUser);
   }
 
-  static async delete(id: number): Promise<UserModel> {
+  static async deleteOne(id: number): Promise<UserModel> {
     const user = await db.user.delete({
       where: {
         id,

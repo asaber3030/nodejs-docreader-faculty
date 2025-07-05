@@ -117,7 +117,7 @@ export default class AuthController {
 
     // If you don't find the user, it means that it is a new user account
     try {
-      user = await UserModel.findByGoogleSubId(googleSubId);
+      user = await UserModel.findOneByGoogleSubId(googleSubId);
     } catch (error) {
       user = await UserModel.create({
         googleSubId: jwtPayload.sub,
@@ -145,7 +145,7 @@ export default class AuthController {
     const payload = JWTService.verifyJWT(jwt);
 
     // 3) Verify the user exists
-    const user = await UserModel.findById(payload.id);
+    const user = await UserModel.findOneById(payload.id);
 
     if (!(user && payload))
       return next(

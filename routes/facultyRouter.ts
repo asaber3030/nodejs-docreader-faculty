@@ -17,6 +17,10 @@ router
   .get(
     AuthController.requirePermissions('faculty:view'),
     FacultyController.getFaculty,
+  )
+  .patch(
+    AuthController.requirePermissions('faculty:update'),
+    FacultyController.updateFaculty,
   );
 
 export default router;
