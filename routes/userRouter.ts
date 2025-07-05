@@ -18,10 +18,12 @@ router.patch(
 router.delete('/deleteMe', UserController.getMe, UserController.deleteUser); // Deletion doesn't require a permission to not lock the user in the app
 
 // USER ROUTES
-// router
-//   .route('/')
-//   .get(UserController.getAllUsers)
-//   .post(UserController.createUser);
+router
+  .route('/')
+  .get(
+    AuthController.requirePermissions('user:view'),
+    UserController.getAllUsers,
+  );
 
 router
   .route('/:id')
@@ -33,6 +35,13 @@ router
   .delete(
     AuthController.requirePermissions('user:delete_any'),
     UserController.deleteUser,
+  );
+
+router
+  .route('/:id/assignRole')
+  .patch(
+    AuthController.requirePermissions('user:assign_role'),
+    UserController.assignRole,
   );
 
 export default router;

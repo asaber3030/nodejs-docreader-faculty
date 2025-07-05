@@ -176,6 +176,19 @@ class UserModel implements Model {
     return new UserModel(updatedUser);
   }
 
+  static async updateRole(userId: number, roleId: number): Promise<UserModel> {
+    const updatedUser = await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        roleId: roleId,
+      },
+    }); // Do not fetch role: if needed, the user will be able to fetch it automatically on first use of role()
+
+    return new UserModel(updatedUser);
+  }
+
   static async delete(id: number): Promise<UserModel> {
     const user = await db.user.delete({
       where: {

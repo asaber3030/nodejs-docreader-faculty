@@ -73,7 +73,7 @@ export type FindUsersInput = z.infer<typeof userSchemaFind>;
 export const userSchemaUpdate = userSchema.partial().omit({
   id: true,
   googleSubId: true,
-  role: true,
+  roleId: true, // Cannot take it for security reasons
   email: true,
   createdAt: true,
   givenName: true,

@@ -1,6 +1,6 @@
 import db from '../utils/db';
 
-export default class Faculty {
+export default class FacultyModel {
   static dbSelectors = {
     id: true,
     name: true,
