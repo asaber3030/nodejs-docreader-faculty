@@ -11,24 +11,29 @@ import {
   userSchemaUpdate,
   userSchemaSelect,
 } from '../schema/user.schema';
-import { User as PrismaUser, User } from '@prisma/client';
+import { User as PrismaUser, Role as PrismaRole } from '@prisma/client';
 import AppError from '../utils/AppError';
 import Model from './Model';
 import RoleModel from './Role';
 
+type PartialUserWithRole = Partial<PrismaUser> & {
+  role?: PrismaRole;
+};
+
 class UserModel implements Model {
-  private data: Partial<PrismaUser>;
+  private data: Partial<PartialUserWithRole>;
 
-  private roleModel: RoleModel;
+  private roleModel?: RoleModel;
 
-  constructor(data: Partial<PrismaUser>) {
+  constructor(data: PartialUserWithRole) {
     this.data = data;
 
     if (!this.data.id)
-      throw new AppError('Cannot create user without ID.', 500);
+      throw new AppError('Cannot create user without ID.', 400);
 
-    if (this.data.role) this.roleModel = new RoleModel(this.data.role);
-    // If not, it will be populated the first time role is accessed
+    if (this.data.role) {
+      this.roleModel = new RoleModel(this.data.role);
+    } // else left undefined, to be lazily fetched
   }
 
   get id(): number {
@@ -134,7 +139,7 @@ class UserModel implements Model {
       take: query.data.pagination?.take,
     });
 
-    if (!users)
+    if (users.length === 0)
       throw new AppError(
         `Couldn't find any users based on provided criteria.`,
         404,

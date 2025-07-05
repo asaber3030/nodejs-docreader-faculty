@@ -1,39 +1,63 @@
-import db from '../utils/db';
+import facultySchema, { FacultyFindInput } from '../schema/faculty.schema';
+import { Faculty as PrismaFaculty } from '@prisma/client';
+import db from '../prisma/db';
+import AppError from '../utils/AppError';
 
 export default class FacultyModel {
-  static dbSelectors = {
-    id: true,
-    name: true,
-    city: true,
-    createdAt: true,
-    updatedAt: true,
-  };
+  private data: Partial<PrismaFaculty>;
 
-  static async findAll(
-    search: string = '',
-    orderBy: string = 'id',
-    orderType: string = 'asc',
-  ) {
-    try {
-      return await db.faculty.findMany({
-        where: {
-          OR: [{ name: { contains: search } }],
-        },
-        include: { years: true },
-        orderBy: {
-          [orderBy]: orderType,
-        },
-      });
-    } catch (error) {
-      return [];
-    }
+  constructor(data: Partial<PrismaFaculty>) {
+    this.data = data;
+
+    if (!this.data.id)
+      throw new AppError('Cannot create faculty without ID.', 400);
   }
 
-  static async find(id: number, select: any = null) {
-    return await db.faculty.findUnique({
-      where: { id },
-      select: select ? select : Faculty.dbSelectors,
+  toJSON() {
+    return this.data;
+  }
+
+  static async findMany(findObj: FacultyFindInput) {
+    const validatedFind = facultySchema.find.safeParse(findObj);
+
+    if (!validatedFind.success)
+      throw new AppError(
+        `Invalid query object: ${JSON.stringify(
+          validatedFind.error.issues,
+          null,
+          2,
+        )}`,
+        400,
+      );
+
+    const faculties = await db.faculty.findMany({
+      where: validatedFind.data.where,
+      select: validatedFind.data.select,
+      orderBy: validatedFind.data.orderBy,
+      skip: validatedFind.data.pagination?.skip,
+      take: validatedFind.data.pagination?.take,
     });
+
+    if (faculties.length === 0)
+      throw new AppError(
+        `Couldn't find any faculty based on provided criteria.`,
+        404,
+      );
+
+    return faculties.map(faculty => new FacultyModel(faculty));
+  }
+
+  static async findById(id: number): Promise<FacultyModel> {
+    const facultyData = await db.faculty.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!facultyData)
+      throw new AppError(`Couldn't find faculty with ID ${id}.`, 404);
+
+    return new FacultyModel(facultyData);
   }
 
   static async paginate(

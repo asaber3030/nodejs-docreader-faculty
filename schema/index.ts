@@ -30,37 +30,6 @@ export const categorySchema = {
   }),
 };
 
-export const facultySchema = {
-  update: z.object({
-    name: z
-      .string()
-      .trim()
-      .min(1, { message: 'Name is required' })
-      .min(1, { message: 'Title is required' })
-      .max(255, { message: 'Cannot be greater than 255 characters' })
-      .optional(),
-    city: z
-      .string()
-      .min(1, { message: 'City is required' })
-      .min(1, { message: 'Title is required' })
-      .max(255, { message: 'Cannot be greater than 255 characters' })
-      .optional(),
-  }),
-
-  create: z.object({
-    name: z
-      .string()
-      .min(1, { message: 'Name is required' })
-      .min(1, { message: 'Title is required' })
-      .max(255, { message: 'Cannot be greater than 255 characters' }),
-    city: z
-      .string()
-      .min(1, { message: 'City is required' })
-      .min(1, { message: 'Title is required' })
-      .max(255, { message: 'Cannot be greater than 255 characters' }),
-  }),
-};
-
 export const studyingYearSchema = {
   update: z.object({
     title: z
