@@ -130,7 +130,9 @@ export default class AuthController {
       });
     }
 
-    JWTService.createAndSendJWT(user.id, user.role, res, 201, { user });
+    JWTService.createAndSendJWT(user.id, (await user.role()).name, res, 201, {
+      user,
+    });
   });
 
   public static protect = catchAsync(async function (
