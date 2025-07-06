@@ -166,8 +166,6 @@ export default class AuthController {
       async (req: Request, res: Response, next: NextFunction) => {
         const role = await req.user.role();
 
-        console.log(role);
-
         for (const permission of permissions)
           if (role.hasPermission(permission)) return next();
 

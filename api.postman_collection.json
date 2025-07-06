@@ -1,0 +1,633 @@
+{
+  "info": {
+    "_postman_id": "5dbba3de-2692-4863-b2fb-362379f3df87",
+    "name": "DRG Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37635789"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Continue With Google",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenRequestParams",
+                  "value": [
+                    {
+                      "key": "token",
+                      "value": "",
+                      "enabled": true,
+                      "send_as": "request_body"
+                    }
+                  ],
+                  "type": "any"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "http://localhost:3030",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://oauth2.googleapis.com/token",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "https://accounts.google.com/o/oauth2/v2/auth",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "profile email openid",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{GOOGLE_CLIENT_SECRET}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{GOOGLE_CLIENT_ID}}",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code",
+                  "type": "string"
+                },
+                {
+                  "key": "tokenName",
+                  "value": "Test Token",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/continueWithGoogle",
+              "host": ["{{url}}"],
+              "path": ["continueWithGoogle"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/user/me",
+              "host": ["{{url}}"],
+              "path": ["user", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User [ID]",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "dsfsd",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{url}}/user/3",
+              "host": ["{{url}}"],
+              "path": ["user", "3"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/user",
+              "host": ["{{url}}"],
+              "path": ["user"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Current User",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"facultyId\": 1,\n    \"yearId\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/user/updateMe",
+              "host": ["{{url}}"],
+              "path": ["user", "updateMe"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User [ID]",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": true,\n    \"facultyId\": 1,\n    \"yearId\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/user/20",
+              "host": ["{{url}}"],
+              "path": ["user", "20"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Role",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"roleId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/user/5/assignRole",
+              "host": ["{{url}}"],
+              "path": ["user", "5", "assignRole"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Current User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/user/deleteMe",
+              "host": ["{{url}}"],
+              "path": ["user", "deleteMe"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User [ID]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/user/4",
+              "host": ["{{url}}"],
+              "path": ["user", "4"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Role",
+      "item": [
+        {
+          "name": "Role",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Faculties",
+      "item": [
+        {
+          "name": "All Faculties",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/faculty",
+              "host": ["{{url}}"],
+              "path": ["faculty"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Faculty [ID]",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT_USER}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/faculty/4",
+              "host": ["{{url}}"],
+              "path": ["faculty", "4"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Faculty",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Fala7 College\",\n    \"city\": \"Fala7 City\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/faculty",
+              "host": ["{{url}}"],
+              "path": ["faculty"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Faculty [ID]",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": \"Telegram\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/faculty/18",
+              "host": ["{{url}}"],
+              "path": ["faculty", "18"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Faculty [ID]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/faculty/30",
+              "host": ["{{url}}"],
+              "path": ["faculty", "30"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Studying Year",
+      "item": [
+        {
+          "name": "All Years",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/year",
+              "host": ["{{url}}"],
+              "path": ["year"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Year [ID]",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/year/3",
+              "host": ["{{url}}"],
+              "path": ["year", "3"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Year",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 50,\n    \"title\": \"Fala7 year\",\n    \"facultyId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/year",
+              "host": ["{{url}}"],
+              "path": ["year"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Year [ID]",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Fala7 year patched\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/year/1",
+              "host": ["{{url}}"],
+              "path": ["year", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Year [ID]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/year/50",
+              "host": ["{{url}}"],
+              "path": ["year", "50"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "### `{{url}}/module/:yearId/:moduleId`"
+    },
+    {
+      "name": "Module",
+      "item": [
+        {
+          "name": "All Modules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/module",
+              "host": ["{{url}}"],
+              "path": ["module"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Module [ID]",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/module/1",
+              "host": ["{{url}}"],
+              "path": ["module", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Module",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"yearId\": 2,\n    \"name\": \"Fala7 Module\",\n    \"semesterName\": 4,\n    \"icon\": \"https://www.fala7.com/icon.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/module",
+              "host": ["{{url}}"],
+              "path": ["module"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Module [ID]",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"yearId\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/module/2",
+              "host": ["{{url}}"],
+              "path": ["module", "2"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Module [ID]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/module/1",
+              "host": ["{{url}}"],
+              "path": ["module", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{JWT}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:8080/api/v2",
+      "type": "string"
+    },
+    {
+      "key": "JWT",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "JWT_USER",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "GOOGLE_CLIENT_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "GOOGLE_CLIENT_SECRET",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "GOOGLE_API_ACCESS_TOKEN",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}

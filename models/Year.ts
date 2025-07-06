@@ -59,6 +59,9 @@ export default class YearModel {
       where: {
         id,
       },
+      include: {
+        modules: true, // Whenever you fetch a year, you will almost always need its modules
+      },
     });
 
     if (!year)
