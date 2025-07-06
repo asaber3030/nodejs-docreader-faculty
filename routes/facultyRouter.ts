@@ -10,6 +10,10 @@ router
   .get(
     AuthController.requirePermissions('faculty:view'),
     FacultyController.getAllFaculties,
+  )
+  .post(
+    AuthController.requirePermissions('faculty:create'),
+    FacultyController.createFaculty,
   );
 
 router

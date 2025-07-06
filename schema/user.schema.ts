@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { deviceSchema } from './device.schema';
 import { paginationSchema } from './pagination.schema';
+import createModelSchema from './schema';
 
-export const userSchema = z.object({
+const fullSchema = z.object({
   id: z.number().optional(),
   googleSubId: z.string({ message: 'Invalid Google subject identifier.' }),
   givenName: z.string({ message: 'First name not provided.' }),
@@ -13,7 +14,7 @@ export const userSchema = z.object({
   roleId: z.number().int({ message: 'Role ID can only be an integer.' }).min(1),
   facultyId: z.number().gt(0),
   yearId: z.number().gt(0),
-  devices: deviceSchema.array(),
+  // devices: deviceSchema.array(),
   createdAt: z
     .date({ message: 'Invalid creation date.' })
     .default(new Date(Date.now())),
@@ -22,63 +23,26 @@ export const userSchema = z.object({
     .default(new Date(Date.now())),
 });
 
-export type User = z.infer<typeof userSchema>;
-
-export const userSchemaSignup = userSchema.omit({
-  createdAt: true,
-  updatedAt: true,
-  devices: true,
-  facultyId: true,
-  yearId: true,
-});
-
-export type UserSignupInput = z.infer<typeof userSchemaSignup>;
-
-export const userSchemaWhere = userSchema
-  .omit({
-    devices: true,
-  })
-  .partial();
-
-export type UserWhereInput = z.infer<typeof userSchemaWhere>;
-
-export const userSchemaSelect = z.object(
-  Object.fromEntries(
-    Object.keys(userSchema.shape).map(key => [key, z.boolean().optional()]),
-  ),
+const userSchema = createModelSchema(
+  fullSchema,
+  [
+    'googleSubId',
+    'familyName',
+    'givenName',
+    'email',
+    'picture',
+    'status',
+    'roleId',
+  ],
+  ['status', 'facultyId', 'yearId'],
 );
 
-export type UserSelectInput = z.infer<typeof userSchemaSelect>;
+// --- Type Exports ---
+export type UserWhereInput = z.infer<typeof userSchema.where>;
+export type UserSelectInput = z.infer<typeof userSchema.select>;
+export type UserOrderByInput = z.infer<typeof userSchema.orderBy>;
+export type UserFindInput = z.infer<typeof userSchema.find>;
+export type UserUpdateInput = z.infer<typeof userSchema.update>;
+export type UserCreateInput = z.infer<typeof userSchema.create>;
 
-export const userSchemaOrderBy = z.object(
-  Object.fromEntries(
-    Object.keys(userSchema.shape).map(key => [
-      key,
-      z.enum(['asc', 'desc']).optional(),
-    ]),
-  ),
-);
-
-export type UserOrderByInput = z.infer<typeof userSchemaOrderBy>;
-
-export const userSchemaFind = z.object({
-  where: userSchemaWhere.optional(),
-  select: userSchemaSelect.optional(),
-  orderBy: userSchemaOrderBy.optional(),
-  pagination: paginationSchema.optional(),
-});
-
-export type FindUsersInput = z.infer<typeof userSchemaFind>;
-
-export const userSchemaUpdate = userSchema.partial().omit({
-  id: true,
-  googleSubId: true,
-  roleId: true, // Cannot take it for security reasons
-  email: true,
-  createdAt: true,
-  givenName: true,
-  familyName: true,
-  picture: true,
-  devices: true, // TODO: We should be able to update devices
-});
-export type UserUpdateInput = z.infer<typeof userSchemaUpdate>;
+export default userSchema;

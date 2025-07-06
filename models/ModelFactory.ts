@@ -8,6 +8,8 @@ import {
 } from '../types/Factory.types';
 
 export class ModelFactory {
+  static findOneById();
+
   static updateOne<TUpdateInput, TUpdateResult, TInstance>(
     prismaModel: PrismaUpdateModel<TUpdateResult>,
     schema: FactorySchema<TUpdateInput>,

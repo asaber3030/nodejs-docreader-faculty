@@ -2,6 +2,12 @@ import catchAsync from '../utils/catchAsync';
 import { Request, Response, NextFunction } from 'express';
 import FacultyModel from '../models/Faculty';
 export default class FacultyController {
+  public static createFaculty = catchAsync(async function (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {});
+
   public static getAllFaculties = catchAsync(async function (
     req: Request,
     res: Response,

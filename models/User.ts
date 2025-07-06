@@ -1,15 +1,9 @@
 import db from '../prisma/db';
-import {
-  UserWhereInput,
-  userSchemaWhere,
-  userSchemaSignup,
-  UserSignupInput,
-  FindUsersInput,
-  userSchemaFind,
+import userSchema, {
+  UserCreateInput,
+  UserFindInput,
   UserSelectInput,
   UserUpdateInput,
-  userSchemaUpdate,
-  userSchemaSelect,
 } from '../schema/user.schema';
 import { User as PrismaUser, Role as PrismaRole } from '@prisma/client';
 import AppError from '../utils/AppError';
@@ -54,8 +48,8 @@ class UserModel {
     return this.data;
   }
 
-  static async create(user: UserSignupInput): Promise<UserModel> {
-    const parsedUser = userSchemaSignup.parse(user);
+  static async create(user: UserCreateInput): Promise<UserModel> {
+    const parsedUser = userSchema.create.parse(user);
 
     const userData = await db.user.create({
       data: {
@@ -121,8 +115,8 @@ class UserModel {
     return new UserModel(userData);
   }
 
-  static async findMany(queryObj: FindUsersInput): Promise<Array<UserModel>> {
-    const query = userSchemaFind.safeParse(queryObj);
+  static async findMany(queryObj: UserFindInput): Promise<Array<UserModel>> {
+    const query = userSchema.find.safeParse(queryObj);
 
     if (!query.success)
       throw new AppError(
@@ -152,8 +146,8 @@ class UserModel {
     updateInput: UserUpdateInput,
     select?: UserSelectInput,
   ) {
-    const validated = userSchemaUpdate.safeParse(updateInput);
-    const parsedSelect = select ? userSchemaSelect.parse(select) : undefined;
+    const validated = userSchema.update.safeParse(updateInput);
+    const parsedSelect = select ? userSchema.update.parse(select) : undefined;
 
     if (!validated.success)
       throw new AppError(

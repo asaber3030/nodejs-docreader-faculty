@@ -1,4 +1,5 @@
 import facultySchema, {
+  FacultyCreateInput,
   FacultyFindInput,
   FacultyUpdateInput,
 } from '../schema/faculty.schema';
@@ -19,6 +20,12 @@ export default class FacultyModel {
 
   toJSON() {
     return this.data;
+  }
+
+  static async create(faculty: FacultyCreateInput) {
+    db.faculty.create({
+      data: faculty,
+    });
   }
 
   static async findMany(findObj: FacultyFindInput) {
