@@ -22,11 +22,11 @@ export default class FacultyModel {
     return this.data;
   }
 
-  static async create(faculty: FacultyCreateInput) {
-    db.faculty.create({
-      data: faculty,
-    });
-  }
+  static createOne = ModelFactory.createOne(
+    db.faculty,
+    facultySchema,
+    data => new FacultyModel(data),
+  );
 
   static async findMany(findObj: FacultyFindInput) {
     const validatedFind = facultySchema.find.safeParse(findObj);
@@ -71,38 +71,14 @@ export default class FacultyModel {
     return new FacultyModel(facultyData);
   }
 
-  static updateOne = ModelFactory.updateOne<
-    FacultyUpdateInput,
-    any,
-    FacultyModel
-  >(db.faculty, facultySchema, data => new FacultyModel(data));
-
-  static deleteOne = ModelFactory.deleteOne<any, FacultyModel>(
+  static updateOne = ModelFactory.updateOne(
     db.faculty,
+    facultySchema,
     data => new FacultyModel(data),
   );
 
-  static async paginate(
-    search: string = '',
-    skip: number = 0,
-    take: number = 10,
-    orderBy: string = 'id',
-    orderType: string = 'desc',
-  ) {
-    try {
-      return await db.faculty.findMany({
-        where: {
-          OR: [{ name: { contains: search } }],
-        },
-        select: Faculty.dbSelectors,
-        skip,
-        take,
-        orderBy: {
-          [orderBy]: orderType,
-        },
-      });
-    } catch (error) {
-      return [];
-    }
-  }
+  static deleteOne = ModelFactory.deleteOne(
+    db.faculty,
+    data => new FacultyModel(data),
+  );
 }

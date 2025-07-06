@@ -1,72 +1,79 @@
-import db, { findSubjectMany } from '../utils/db';
+import moduleSchema, { ModuleFindInput } from '../schema/module.schema';
+import { Module as PrismaModule } from '@prisma/client';
+import db from '../prisma/db';
+import AppError from '../utils/AppError';
+import { ModelFactory } from './ModelFactory';
 
-import { moduleSchema } from '../schema';
-import { z } from 'zod';
-import { Prisma } from '@prisma/client';
+export default class ModuleModel {
+  private data: Partial<PrismaModule>;
 
-export default class Module {
-  static dbSelectors = {
-    id: true,
-    name: true,
-    icon: true,
-    yearId: true,
-    createdAt: true,
-    updatedAt: true,
-  };
+  constructor(data: Partial<PrismaModule>) {
+    this.data = data;
 
-  static async create(data: Prisma.ModuleCreateInput) {
-    await db.module.create({
-      data,
+    if (!this.data.id)
+      throw new AppError('Cannot create module without ID.', 400);
+  }
+
+  toJSON() {
+    return this.data;
+  }
+
+  static createOne = ModelFactory.createOne(
+    db.module,
+    moduleSchema,
+    data => new ModuleModel(data),
+  );
+
+  static async findMany(findObj: ModuleFindInput) {
+    const validatedFind = moduleSchema.find.safeParse(findObj);
+
+    if (!validatedFind.success)
+      throw new AppError(
+        `Invalid query object: ${JSON.stringify(
+          validatedFind.error.issues,
+          null,
+          2,
+        )}`,
+        400,
+      );
+
+    const modules = await db.module.findMany({
+      where: validatedFind.data.where,
+      select: validatedFind.data.select,
+      orderBy: validatedFind.data.orderBy,
+      skip: validatedFind.data.pagination?.skip,
+      take: validatedFind.data.pagination?.take,
     });
+
+    if (modules.length === 0)
+      throw new AppError(
+        `Couldn't find any module based on provided criteria.`,
+        404,
+      );
+
+    return modules.map(faculty => new ModuleModel(faculty));
   }
 
-  static async findAll(
-    search: string = '',
-    orderBy: string = 'id',
-    orderType: string = 'desc',
-  ) {
-    try {
-      return await db.module.findMany({
-        where: {
-          OR: [{ name: { contains: search } }],
-        },
-        select: Module.dbSelectors,
-        orderBy: {
-          [orderBy]: orderType,
-        },
-      });
-    } catch (error) {
-      return [];
-    }
-  }
-
-  static async find(id: number, select: any = null) {
-    return await db.module.findUnique({
-      where: { id },
+  static async findOneById(id: number): Promise<ModuleModel> {
+    const module = await db.module.findUnique({
+      where: {
+        id,
+      },
     });
+
+    if (!module) throw new AppError(`Couldn't find module with ID ${id}.`, 404);
+
+    return new ModuleModel(module);
   }
 
-  static async paginate(
-    search: string = '',
-    skip: number = 0,
-    take: number = 10,
-    orderBy: string = 'id',
-    orderType: string = 'desc',
-  ) {
-    try {
-      return await db.module.findMany({
-        where: {
-          OR: [{ name: { contains: search } }],
-        },
-        select: Module.dbSelectors,
-        skip,
-        take,
-        orderBy: {
-          [orderBy]: orderType,
-        },
-      });
-    } catch (error) {
-      return [];
-    }
-  }
+  static updateOne = ModelFactory.updateOne(
+    db.module,
+    moduleSchema,
+    data => new ModuleModel(data),
+  );
+
+  static deleteOne = ModelFactory.deleteOne(
+    db.module,
+    data => new ModuleModel(data),
+  );
 }

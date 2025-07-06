@@ -5,9 +5,18 @@ import { ZodObject, ZodSchema } from 'zod';
 /**
  * Schema container that holds validation schemas used by factory functions.
  */
-export interface FactorySchema<TUpdate = any, TSelect = any> {
+export interface FactorySchema<
+  TWhere = any,
+  TSelect = any,
+  TOrderBy = any,
+  TUpdate = any,
+  TCreate = any,
+> {
+  where?: ZodSchema<TWhere>;
+  select?: ZodSchema<TSelect>;
+  orderBy?: ZodSchema<TOrderBy>;
   update: ZodSchema<TUpdate>;
-  select?: ZodObject<TSelect>;
+  create: ZodSchema<TCreate>;
 }
 
 /**

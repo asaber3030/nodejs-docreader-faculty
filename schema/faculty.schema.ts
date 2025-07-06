@@ -19,45 +19,9 @@ const fullSchema = z
   })
   .strict();
 
-// Create Zod schemas for select and orderBy
-// const selectSchema = z
-//   .object(
-//     Object.fromEntries(
-//       Object.keys(fullSchema.shape).map(key => [key, z.boolean().optional()]),
-//     ),
-//   )
-//   .strict();
-
-// const orderBySchema = z
-//   .object(
-//     Object.fromEntries(
-//       Object.keys(fullSchema.shape).map(key => [
-//         key,
-//         z.enum(['asc', 'desc']).optional(),
-//       ]),
-//     ),
-//   )
-//   .strict();
-
-// const facultySchema = {
-//   where: fullSchema.partial().strict(),
-//   select: selectSchema,
-//   orderBy: orderBySchema,
-//   find: z
-//     .object({
-//       where: fullSchema.partial().optional(),
-//       select: selectSchema.optional(),
-//       orderBy: orderBySchema.optional(),
-//       pagination: paginationSchema.optional(),
-//     })
-//     .strict(),
-//   update: fullSchema.pick({ name: true, city: true }).partial().strict(),
-//   create: fullSchema.pick({ name: true, city: true }).required().strict(),
-// };
-
 const facultySchema = createModelSchema(
   fullSchema,
-  ['name', 'city'],
+  ['id', 'name', 'city'],
   ['name', 'city'],
 );
 

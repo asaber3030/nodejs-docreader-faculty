@@ -1,5 +1,3 @@
-import db from '../prisma/db';
-import { PrismaClient } from '@prisma/client';
 import AppError from '../utils/AppError';
 import {
   FactorySchema,
@@ -8,7 +6,34 @@ import {
 } from '../types/Factory.types';
 
 export class ModelFactory {
-  static findOneById();
+  static createOne<TCreateInput, TCreateResult, TInstance>(
+    prismaModel: {
+      create(args: { data: TCreateInput }): Promise<TCreateResult>;
+    },
+    schema: FactorySchema<any, any, any, any, TCreateInput>,
+    wrap?: (data: TCreateResult) => TInstance,
+  ) {
+    return async (data: TCreateInput): Promise<TInstance | TCreateResult> => {
+      const validated = schema.create.safeParse(data);
+
+      if (!validated.success) {
+        throw new AppError(
+          `Invalid create input: ${JSON.stringify(
+            validated.error.issues,
+            null,
+            2,
+          )}`,
+          400,
+        );
+      }
+
+      const created = await prismaModel.create({
+        data: validated.data,
+      });
+
+      return wrap ? wrap(created) : created;
+    };
+  }
 
   static updateOne<TUpdateInput, TUpdateResult, TInstance>(
     prismaModel: PrismaUpdateModel<TUpdateResult>,

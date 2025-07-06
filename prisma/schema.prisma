@@ -32,7 +32,7 @@ model Faculty {
   name String
   city String
 
-  createdAt DateTime? @db.Timestamp()
+  createdAt DateTime? @default(now()) @db.Timestamp()
   updatedAt DateTime? @updatedAt @db.Timestamp()
 
   users User[]
@@ -65,6 +65,9 @@ model Role {
   description String?                                         // Optional description
   users       User[]           
   permissions RolePermission[] // Many permissions can be assigned to this role
+
+  createdAt DateTime? @default(now()) @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model Permission {
@@ -72,6 +75,9 @@ model Permission {
   name        String           @unique                      // e.g., "create_lecture"
   description String?                                         // What this permission does
   roles       RolePermission[] // Which roles allow this permission
+
+  createdAt DateTime? @default(now()) @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model RolePermission {
@@ -81,6 +87,9 @@ model RolePermission {
   permission   Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   permissionId Int
 
+  createdAt DateTime? @default(now()) @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
+
   @@unique([roleId, permissionId]) // Prevent duplicates
 }
 
@@ -89,7 +98,7 @@ model StudyingYear {
   title     String
   facultyId Int
   faculty   Faculty   @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt DateTime? @db.Timestamp()
+  createdAt DateTime? @default(now()) @db.Timestamp()
   updatedAt DateTime? @updatedAt @db.Timestamp()
   modules   Module[]
   users     User[]
@@ -105,7 +114,7 @@ model Module {
   year     StudyingYear @relation(fields: [yearId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   subjects Subject[]
 
-  createdAt DateTime? @db.Timestamp()
+  createdAt DateTime? @default(now()) @db.Timestamp()
   updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
@@ -119,7 +128,7 @@ model Subject {
 
   lectures Lecture[]
 
-  createdAt DateTime? @db.Timestamp()
+  createdAt DateTime? @default(now()) @db.Timestamp()
   updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
@@ -132,8 +141,8 @@ model Lecture {
   subject   Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   date      DateTime?   @db.Date
 
-  createdAt DateTime?     @db.Timestamp()
-  updatedAt DateTime?     @updatedAt @db.Timestamp()
+  createdAt DateTime? @default(now()) @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
   links     LectureLink[]
   quizzes   Quiz[]
 }
@@ -148,8 +157,8 @@ model LectureLink {
   lectureId   Int
   lectureData Lecture      @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   notifiable  Boolean      @default(true)
-  createdAt   DateTime?    @db.Timestamp()
-  updatedAt   DateTime?    @updatedAt @db.Timestamp()
+  createdAt DateTime? @default(now()) @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model Device {
@@ -157,6 +166,9 @@ model Device {
   token  String @unique
   userId Int
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime? @default(now()) @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model Quiz {
@@ -166,8 +178,9 @@ model Quiz {
   title       String
   questions   Question[]
   notifiable  Boolean      @default(true)
-  createdAt   DateTime?  @db.Timestamp()
-  updatedAt   DateTime?  @updatedAt @db.Timestamp()
+
+  createdAt DateTime? @default(now()) @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model Question {
@@ -179,9 +192,10 @@ model Question {
   text               String
   options            String[]
   correctOptionIndex Int
-  createdAt          DateTime?        @db.Timestamp()
-  updatedAt          DateTime?        @updatedAt @db.Timestamp()
   markedBy           MarkedQuestion[]
+
+  createdAt DateTime? @default(now()) @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
 
 model MarkedQuestion {
@@ -190,6 +204,7 @@ model MarkedQuestion {
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   questionId Int
   question   Question  @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt  DateTime? @db.Timestamp()
-  updatedAt  DateTime? @updatedAt @db.Timestamp()
+  
+  createdAt DateTime? @default(now()) @db.Timestamp()
+  updatedAt DateTime? @updatedAt @db.Timestamp()
 }
