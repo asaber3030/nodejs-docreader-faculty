@@ -13,7 +13,7 @@ export default class ModuleController {
     res.status(201).json({
       status: 'success',
       data: {
-        faculty: module,
+        module,
       },
     });
   });

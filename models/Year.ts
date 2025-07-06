@@ -1,13 +1,13 @@
-import moduleSchema, { ModuleFindInput } from '../schema/module.schema';
-import { Module as PrismaModule } from '@prisma/client';
+import yearSchema, { YearFindInput } from '../schema/year.schema';
+import { StudyingYear as PrismaYear } from '@prisma/client';
 import db from '../prisma/db';
 import AppError from '../utils/AppError';
 import { ModelFactory } from './ModelFactory';
 
-export default class ModuleModel {
-  private data: Partial<PrismaModule>;
+export default class YearModel {
+  private data: Partial<PrismaYear>;
 
-  constructor(data: Partial<PrismaModule>) {
+  constructor(data: Partial<PrismaYear>) {
     this.data = data;
 
     if (!this.data.id)
@@ -19,13 +19,13 @@ export default class ModuleModel {
   }
 
   static createOne = ModelFactory.createOne(
-    db.module,
-    moduleSchema,
-    data => new ModuleModel(data),
+    db.studyingYear,
+    yearSchema,
+    data => new YearModel(data),
   );
 
-  static async findMany(findObj: ModuleFindInput) {
-    const validatedFind = moduleSchema.find.safeParse(findObj);
+  static async findMany(findObj: YearFindInput) {
+    const validatedFind = yearSchema.find.safeParse(findObj);
 
     if (!validatedFind.success)
       throw new AppError(
@@ -37,7 +37,7 @@ export default class ModuleModel {
         400,
       );
 
-    const modules = await db.module.findMany({
+    const years = await db.studyingYear.findMany({
       where: validatedFind.data.where,
       select: validatedFind.data.select,
       orderBy: validatedFind.data.orderBy,
@@ -45,35 +45,36 @@ export default class ModuleModel {
       take: validatedFind.data.pagination?.take,
     });
 
-    if (modules.length === 0)
+    if (years.length === 0)
       throw new AppError(
         `Couldn't find any module based on provided criteria.`,
         404,
       );
 
-    return modules.map(module => new ModuleModel(module));
+    return years.map(year => new YearModel(year));
   }
 
-  static async findOneById(id: number): Promise<ModuleModel> {
-    const module = await db.module.findUnique({
+  static async findOneById(id: number): Promise<YearModel> {
+    const year = await db.studyingYear.findUnique({
       where: {
         id,
       },
     });
 
-    if (!module) throw new AppError(`Couldn't find module with ID ${id}.`, 404);
+    if (!year)
+      throw new AppError(`Couldn't find studying year with ID ${id}.`, 404);
 
-    return new ModuleModel(module);
+    return new YearModel(year);
   }
 
   static updateOne = ModelFactory.updateOne(
-    db.module,
-    moduleSchema,
-    data => new ModuleModel(data),
+    db.studyingYear,
+    yearSchema,
+    data => new YearModel(data),
   );
 
   static deleteOne = ModelFactory.deleteOne(
-    db.module,
-    data => new ModuleModel(data),
+    db.studyingYear,
+    data => new YearModel(data),
   );
 }

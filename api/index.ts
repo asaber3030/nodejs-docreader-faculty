@@ -7,6 +7,7 @@ import authRouter from '../routes/authRouter';
 import userRouter from '../routes/userRouter';
 import facultyRouter from '../routes/facultyRouter';
 import moduleRouter from '../routes/moduleRouter';
+import yearRouter from '../routes/yearRouter';
 import RoleModel from '../models/Role';
 
 const app = express();
@@ -23,6 +24,7 @@ app.get('/', async (_, res: Response) => {
 app.use('/api/v2/', authRouter);
 app.use('/api/v2/user', userRouter);
 app.use('/api/v2/faculty', facultyRouter);
+app.use('/api/v2/year', yearRouter);
 app.use('/api/v2/module', moduleRouter);
 
 app.use(globalErrorHandler);
