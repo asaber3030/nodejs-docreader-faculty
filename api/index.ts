@@ -1,3 +1,6 @@
+import https from 'node:https';
+import fs from 'node:fs';
+
 import express, { Response } from 'express';
 import cors from 'cors';
 import morgan = require('morgan');
@@ -11,7 +14,7 @@ import yearRouter from '../routes/yearRouter';
 import RoleModel from '../models/Role';
 
 const app = express();
-const port = process.env.APP_PORT || 8080;
+const port = process.env.PORT || 8080;
 
 app.use(morgan('dev')); // logs to console in development
 app.use(cors());
@@ -22,15 +25,34 @@ app.get('/', async (_, res: Response) => {
 });
 
 app.use('/api/v2/', authRouter);
-app.use('/api/v2/user', userRouter);
-app.use('/api/v2/faculty', facultyRouter);
-app.use('/api/v2/year', yearRouter);
-app.use('/api/v2/module', moduleRouter);
+app.use('/api/v2/users', userRouter);
+app.use('/api/v2/faculties', facultyRouter);
+app.use('/api/v2/years', yearRouter);
+app.use('/api/v2/modules', moduleRouter);
 
 app.use(globalErrorHandler);
 
-app.listen(port, async () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+const usesTLS = process.env.TLS_ENABLED === 'True';
 
-  await RoleModel.refreshPermissionCache();
-});
+if (!usesTLS)
+  app.listen(port, async () => {
+    console.log(`[server]: HTTP server is running at http://localhost:${port}`);
+
+    await RoleModel.refreshPermissionCache();
+  });
+else {
+  const options = {
+    key: fs.readFileSync(process.env.TLS_KEY_PATH!),
+    cert: fs.readFileSync(process.env.TLS_CERT_PATH!),
+  };
+
+  const server = https.createServer(options, app);
+
+  server.listen(port, async () => {
+    console.log(
+      `[server]: HTTPS server is running at http://localhost:${port}`,
+    );
+
+    await RoleModel.refreshPermissionCache();
+  });
+}
