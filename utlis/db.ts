@@ -104,3 +104,40 @@ export function findQuizUnique(where?: any) {
     include: QUIZ_INCLUDE,
   });
 }
+
+export const PRACTICAL_QUIZ_INCLUDE: any = {
+  questions: {
+    include: {
+      masks: true,
+      tapes: true,
+      writtenQuestions: {
+        orderBy: { id: "asc" },
+      },
+    },
+    orderBy: { id: "asc" },
+  },
+  lectureData: { select: { id: true, title: true, ...LECTURE_INCLUDE } },
+};
+export const PRACTICAL_QUIZ_ORDER_BY: any = { createdAt: "asc" };
+
+export async function findPracticalQuizMany(where?: any) {
+  return db.practicalQuiz.findMany({
+    where,
+    orderBy: PRACTICAL_QUIZ_ORDER_BY,
+  });
+}
+
+export async function findPracticalQuizManyWithPath(where?: any) {
+  return db.practicalQuiz.findMany({
+    where,
+    include: PRACTICAL_QUIZ_INCLUDE,
+    orderBy: PRACTICAL_QUIZ_ORDER_BY,
+  });
+}
+
+export function findPracticalQuizUnique(where?: any) {
+  return db.practicalQuiz.findUnique({
+    where,
+    include: PRACTICAL_QUIZ_INCLUDE,
+  });
+}

@@ -6,6 +6,7 @@ import subjectRouter from "./subjects";
 import lecturesRouter from "./lectures";
 import yearRouter from "./years";
 import quizRouter from "./quizzes";
+import practicalQuizRouter from "./practical-quizzes";
 
 export {
   authRouter,
@@ -16,4 +17,5 @@ export {
   lecturesRouter,
   yearRouter,
   quizRouter,
+  practicalQuizRouter,
 };

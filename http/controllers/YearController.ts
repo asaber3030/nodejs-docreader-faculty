@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import db, {
   findLinkMany,
   findLinkManyWithPath,
+  findPracticalQuizManyWithPath,
   findQuizManyWithPath,
   findSubjectMany,
   LECTURE_INCLUDE,
@@ -107,7 +108,11 @@ export default class YearController {
         lectureData: { subject: { module: { yearId } } },
         notifiable: true,
       });
-      return send(res, "Year links", 200, { links, quizzes });
+      const practicalQuizzes = await findPracticalQuizManyWithPath({
+        lectureData: { subject: { module: { yearId } } },
+        notifiable: true,
+      });
+      return send(res, "Year links", 200, { links, quizzes, practicalQuizzes });
     } catch (errorObject) {
       return res.status(500).json({
         errorObject,
@@ -151,6 +156,12 @@ export default class YearController {
           { lectureData: { subject: { module: { yearId } } } },
         ],
       };
+      const practicalQuizQuery = {
+        AND: [
+          { id: { in: data.practicalQuizzes } },
+          { lectureData: { subject: { module: { yearId } } } },
+        ],
+      };
 
       await db.lectureLink.updateMany({
         where: linkQuery,
@@ -158,6 +169,10 @@ export default class YearController {
       });
       await db.quiz.updateMany({
         where: quizQuery,
+        data: { notifiable: false },
+      });
+      await db.practicalQuiz.updateMany({
+        where: practicalQuizQuery,
         data: { notifiable: false },
       });
 
@@ -169,9 +184,13 @@ export default class YearController {
         lectureData: { subject: { module: { yearId } } },
         id: { in: data.quizzes },
       });
+      const practicalQuizzes: any[] = await findPracticalQuizManyWithPath({
+        lectureData: { subject: { module: { yearId } } },
+        id: { in: data.practicalQuizzes },
+      });
 
       const lectures = getUniqueObjectsById(
-        [...links, ...quizzes].map(
+        [...links, ...quizzes, ...practicalQuizzes].map(
           ({
             lectureId,
             lectureData: {
@@ -194,6 +213,9 @@ export default class YearController {
         ...lecture,
         links: links.filter((link) => link.lectureId === lecture.id),
         quizzes: quizzes.filter((quiz) => quiz.lectureId === lecture.id),
+        practicalQuizzes: practicalQuizzes.filter(
+          (quiz) => quiz.lectureId === lecture.id
+        ),
       }));
 
       let message = "";
@@ -216,6 +238,7 @@ export default class YearController {
         message += ` تم إضافة المصادر التالية:\n${[
           ...lecture.links,
           ...lecture.quizzes,
+          ...lecture.practicalQuizzes,
         ]
           .map(({ title }) => `💥 ${title}\n`)
           .join("")}`;
@@ -239,6 +262,7 @@ export default class YearController {
         .status(200)
         .json({ message: "Notification was sent successfully", status: 200 });
     } catch (errorObject) {
+      console.log(errorObject);
       return res.status(500).json({
         errorObject,
         message: "Error - Something Went Wrong.",
@@ -282,6 +306,15 @@ export default class YearController {
         where: {
           AND: [
             { id: { in: data.quizzes } },
+            { lectureData: { subject: { module: { yearId } } } },
+          ],
+        },
+        data: { notifiable: false },
+      });
+      await db.practicalQuiz.updateMany({
+        where: {
+          AND: [
+            { id: { in: data.practicalQuizzes } },
             { lectureData: { subject: { module: { yearId } } } },
           ],
         },

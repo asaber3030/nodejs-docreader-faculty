@@ -308,10 +308,12 @@ export const notificationSchema = {
   notify: z.object({
     links: z.array(z.number()),
     quizzes: z.array(z.number()),
+    practicalQuizzes: z.array(z.number()),
   }),
   ignore: z.object({
     links: z.array(z.number()),
     quizzes: z.array(z.number()),
+    practicalQuizzes: z.array(z.number()),
   }),
 };
 
@@ -340,6 +342,70 @@ export const quizSchema = {
       text: z.string().min(1, { message: "Text is required" }).optional(),
       options: z.array(z.string()).optional(),
       correctOptionIndex: z.number().min(0).optional(),
+    }),
+  },
+};
+
+export const practicalQuizSchema = {
+  quiz: {
+    create: z.object({
+      title: z.string().min(1, { message: "Title is required" }),
+    }),
+    update: z.object({
+      title: z.string().min(1, { message: "Title is required" }),
+    }),
+  },
+  question: {
+    create: z.object({
+      tapes: z.array(
+        z.object({
+          x: z.number(),
+          y: z.number(),
+          w: z.number(),
+          h: z.number(),
+        })
+      ),
+      masks: z.array(
+        z.object({
+          x: z.number(),
+          y: z.number(),
+          w: z.number(),
+          h: z.number(),
+        })
+      ),
+      writtenQuestions: z.array(
+        z.object({
+          text: z.string(),
+          answer: z.string(),
+        })
+      ),
+    }),
+    update: z.object({
+      tapes: z.array(
+        z.object({
+          id: z.number().optional(),
+          x: z.number(),
+          y: z.number(),
+          w: z.number(),
+          h: z.number(),
+        })
+      ),
+      masks: z.array(
+        z.object({
+          id: z.number().optional(),
+          x: z.number(),
+          y: z.number(),
+          w: z.number(),
+          h: z.number(),
+        })
+      ),
+      writtenQuestions: z.array(
+        z.object({
+          id: z.number().optional(),
+          text: z.string(),
+          answer: z.string(),
+        })
+      ),
     }),
   },
 };

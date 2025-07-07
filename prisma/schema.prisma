@@ -110,10 +110,11 @@ model Lecture {
   subject   Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   date      DateTime?   @db.Date
 
-  createdAt DateTime?     @db.Timestamp()
-  updatedAt DateTime?     @updatedAt @db.Timestamp()
-  links     LectureLink[]
-  quizzes   Quiz[]
+  createdAt        DateTime?       @db.Timestamp()
+  updatedAt        DateTime?       @updatedAt @db.Timestamp()
+  links            LectureLink[]
+  quizzes          Quiz[]
+  practicalQuizzes PracticalQuiz[]
 }
 
 model LectureLink {
@@ -143,7 +144,7 @@ model Quiz {
   lectureData Lecture    @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   title       String
   questions   Question[]
-  notifiable  Boolean      @default(true)
+  notifiable  Boolean    @default(true)
   createdAt   DateTime?  @db.Timestamp()
   updatedAt   DateTime?  @updatedAt @db.Timestamp()
 }
@@ -160,6 +161,55 @@ model Question {
   createdAt          DateTime?        @db.Timestamp()
   updatedAt          DateTime?        @updatedAt @db.Timestamp()
   markedBy           MarkedQuestion[]
+}
+
+model PracticalQuiz {
+  id          Int                 @id @default(autoincrement())
+  lectureId   Int
+  lectureData Lecture             @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  title       String
+  questions   PracticalQuestion[]
+  notifiable  Boolean             @default(true)
+  createdAt   DateTime?           @db.Timestamp()
+  updatedAt   DateTime?           @updatedAt @db.Timestamp()
+}
+
+model PracticalQuestion {
+  id        Int           @id @default(autoincrement())
+  quizId    Int
+  quiz      PracticalQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  image     String
+  width Int
+  height Int
+  tapes     Rect[]        @relation("Tapes")
+  masks     Rect[]        @relation("Masks")
+  writtenQuestions WrittenQuestion[]
+  createdAt DateTime?     @db.Timestamp()
+  updatedAt DateTime?     @updatedAt @db.Timestamp()
+}
+
+model Rect {
+  id             Int                @id @default(autoincrement())
+  tapeQuestion   PracticalQuestion? @relation("Tapes", fields: [tapeQuestionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tapeQuestionId Int?               @map("tapeQuestionId")
+  maskQuestion   PracticalQuestion? @relation("Masks", fields: [maskQuestionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  maskQuestionId Int?               @map("maskQuestionId")
+  x              Float
+  y              Float
+  w              Float
+  h              Float
+  createdAt DateTime?     @db.Timestamp()
+  updatedAt DateTime?     @updatedAt @db.Timestamp()
+}
+
+model WrittenQuestion {
+  id Int @id @default(autoincrement())
+  questionId Int
+  question PracticalQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  text String
+  answer String
+  createdAt DateTime?     @db.Timestamp()
+  updatedAt DateTime?     @updatedAt @db.Timestamp()
 }
 
 model MarkedQuestion {

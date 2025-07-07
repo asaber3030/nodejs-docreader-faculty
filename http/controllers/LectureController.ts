@@ -5,7 +5,7 @@ import { linkSchema, subjectLecture } from "../../schema"
 import { badRequest, notFound, send, unauthorized, validationErrors } from "../../utlis/responses"
 import { currentDate, extractErrors, parameterExists } from "../../utlis/helpers"
 
-import db, { findLectureUnique, findLinkMany, findLinkUnique, findSubjectUnique,  LECTURE_INCLUDE, LINK_INCLUDE, findLectureMany, findQuizMany } from "../../utlis/db"
+import db, { findLectureUnique, findLinkMany, findLinkUnique, findSubjectUnique,  LECTURE_INCLUDE, LINK_INCLUDE, findLectureMany, findQuizMany, findPracticalQuizMany } from "../../utlis/db"
 import AuthController from "./AuthController"
 import { error } from "console"
 
@@ -138,8 +138,9 @@ export default class LectureController {
       
       const links = await findLinkMany({ lectureData: { id: lectureId } })
       const quizzes = await findQuizMany({ lectureId })
+      const practicalQuizzes = await findPracticalQuizMany({ lectureId })
   
-      return send(res, `lectureId [${lectureId}] - Links`, 200, { links, quizzes })
+      return send(res, `lectureId [${lectureId}] - Links`, 200, { links, quizzes, practicalQuizzes })
     } catch (errorObject) {
       console.log(errorObject)
       return res.status(500).json({
