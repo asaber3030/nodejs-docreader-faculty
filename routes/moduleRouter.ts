@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import AuthController from '../controllers/AuthController';
 import ModuleController from '../controllers/ModuleController';
+import subjectRouter from '../routes/subjectRouter';
 
 const router = Router();
+
+router.use('/:moduleId/subjects', subjectRouter);
 
 router.use(AuthController.protect);
 router

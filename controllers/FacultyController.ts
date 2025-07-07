@@ -22,12 +22,12 @@ export default class FacultyController {
     res: Response,
     next: NextFunction,
   ) {
-    const modules = await FacultyModel.findMany({});
+    const faculties = await FacultyModel.findMany({});
 
     res.status(200).json({
       status: 'success',
       data: {
-        faculties: modules,
+        faculties,
       },
     });
   });

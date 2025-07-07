@@ -19,7 +19,7 @@ const fullSchema = z
 
 const subjectSchema = createModelSchema(
   fullSchema,
-  ['name', 'icon'],
+  ['name', 'icon', 'moduleId'],
   ['name', 'icon', 'moduleId'],
 );
 

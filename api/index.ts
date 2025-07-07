@@ -11,6 +11,7 @@ import userRouter from '../routes/userRouter';
 import facultyRouter from '../routes/facultyRouter';
 import moduleRouter from '../routes/moduleRouter';
 import yearRouter from '../routes/yearRouter';
+
 import RoleModel from '../models/Role';
 
 const app = express();
