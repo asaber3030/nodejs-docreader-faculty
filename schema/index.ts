@@ -30,62 +30,6 @@ export const categorySchema = {
   }),
 };
 
-export const subjectSchema = {
-  create: z.object({
-    name: z.string().min(1, { message: 'Name is required' }),
-    icon: z.string(),
-  }),
-
-  update: z.object({
-    name: z.string().min(1, { message: 'Name is required' }).optional(),
-    icon: z.any().optional(),
-    moduleId: z.number().optional(),
-  }),
-};
-
-export const subjectLecture = {
-  create: z.object({
-    title: z
-      .string()
-      .min(1, { message: 'Title must be at least 1 character.' }),
-    subTitle: z
-      .string()
-      .min(1, { message: 'Sub title must be at least 1 character.' })
-      .optional(),
-    date: z.coerce.date({ message: 'Please provide a date' }),
-    type: z.enum(
-      [LectureType.Normal, LectureType.Practical, LectureType.FinalRevision],
-      {
-        message:
-          "Only support this types: 'Normal', 'Practical', 'FinalRevision'",
-      },
-    ),
-    subjectId: z.number(),
-  }),
-
-  update: z.object({
-    title: z
-      .string()
-      .min(1, { message: 'Title must be at least 1 character.' })
-      .optional(),
-    subTitle: z
-      .string()
-      .min(1, { message: 'Sub title must be at least 1 character.' })
-      .optional(),
-    date: z.coerce.date({ message: 'Please provide a date' }).optional(),
-    type: z
-      .enum(
-        [LectureType.Normal, LectureType.Practical, LectureType.FinalRevision],
-        {
-          message:
-            "Only support this types: 'Normal', 'Practical', 'FinalRevision'",
-        },
-      )
-      .optional(),
-    subjectId: z.number().optional(),
-  }),
-};
-
 export const linkSchema = {
   create: z.object({
     title: z
