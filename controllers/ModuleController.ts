@@ -4,14 +4,18 @@ import ModuleModel from '../models/Module';
 import AppError from '../utils/AppError';
 
 export default class ModuleController {
-  private static extractYearID(req: Request, next: NextFunction): number {
+  private static extractYearID(req: Request): number {
+    if (req.body.yearId)
+      throw new AppError(
+        "Body cannot contain 'yearId' field as its value comes from the path.",
+        400,
+      );
+
     // This will always exist as it is used in nested routes only
     const yearId = Number.parseInt(req.params.yearId);
 
     if (Number.isNaN(yearId))
-      return next(
-        new AppError('Invalid year ID: year ID must be an integer.', 400),
-      )!;
+      throw new AppError('Invalid year ID: year ID must be an integer.', 400);
 
     return yearId;
   }
@@ -20,9 +24,10 @@ export default class ModuleController {
     const id = Number.parseInt(req.params.id);
 
     if (Number.isNaN(id))
-      return next(
-        new AppError('Invalid module ID: module ID must be an integer.', 400),
-      )!;
+      throw new AppError(
+        'Invalid module ID: module ID must be an integer.',
+        400,
+      );
 
     return id;
   }
@@ -32,7 +37,7 @@ export default class ModuleController {
     res: Response,
     next: NextFunction,
   ) {
-    const yearId = ModuleController.extractYearID(req, next);
+    const yearId = ModuleController.extractYearID(req);
     req.body.yearId = yearId;
 
     const module = await ModuleModel.createOne(req.body);
@@ -50,7 +55,7 @@ export default class ModuleController {
     res: Response,
     next: NextFunction,
   ) {
-    const yearId = ModuleController.extractYearID(req, next);
+    const yearId = ModuleController.extractYearID(req);
 
     const modules = await ModuleModel.findMany({
       where: {
@@ -71,7 +76,7 @@ export default class ModuleController {
     res: Response,
     next: NextFunction,
   ) {
-    const id = ModuleController.extractModuleID(req, next);
+    const id = ModuleController.extractModuleID(req);
 
     const module = await ModuleModel.findOneById(id);
 
@@ -88,7 +93,7 @@ export default class ModuleController {
     res: Response,
     next: NextFunction,
   ) {
-    const id = ModuleController.extractModuleID(req, next);
+    const id = ModuleController.extractModuleID(req);
 
     const updateModule = await ModuleModel.updateOne(id, req.body);
 
@@ -105,7 +110,7 @@ export default class ModuleController {
     res: Response,
     next: NextFunction,
   ) {
-    const id = ModuleController.extractModuleID(req, next);
+    const id = ModuleController.extractModuleID(req);
 
     await ModuleModel.deleteOne(id);
 

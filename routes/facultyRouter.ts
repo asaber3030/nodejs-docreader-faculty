@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import AuthController from '../controllers/AuthController';
 import FacultyController from '../controllers/FacultyController';
+import YearController from '../controllers/YearController';
 
 const router = Router();
 
@@ -29,6 +30,18 @@ router
   .delete(
     AuthController.requirePermissions('faculty:delete'),
     FacultyController.deleteFaculty,
+  );
+
+// Nested years route
+router
+  .route('/:facultyId/years')
+  .get(
+    AuthController.requirePermissions('year:view'),
+    YearController.getAllYears,
+  )
+  .post(
+    AuthController.requirePermissions('year:create'),
+    YearController.createYear,
   );
 
 export default router;

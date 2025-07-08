@@ -4,25 +4,33 @@ import SubjectModel from '../models/Subject';
 import AppError from '../utils/AppError';
 
 export default class SubjectController {
-  private static extractModuleID(req: Request, next: NextFunction): number {
+  private static extractModuleID(req: Request): number {
+    if (req.body.facultyId)
+      throw new AppError(
+        "Body cannot contain 'moduleId' field as its value comes from the path.",
+        400,
+      );
+
     // This will always exist as it is used in nested routes only
     const moduleId = Number.parseInt(req.params.moduleId);
 
     if (Number.isNaN(moduleId))
-      return next(
-        new AppError('Invalid module ID: module ID must be an integer.', 400),
-      )!;
+      throw new AppError(
+        'Invalid module ID: module ID must be an integer.',
+        400,
+      );
 
     return moduleId;
   }
 
-  private static extractSubjectID(req: Request, next: NextFunction): number {
+  private static extractSubjectID(req: Request): number {
     const id = Number.parseInt(req.params.id);
 
     if (Number.isNaN(id))
-      return next(
-        new AppError('Invalid subject ID: subject ID must be an integer.', 400),
-      )!;
+      throw new AppError(
+        'Invalid subject ID: subject ID must be an integer.',
+        400,
+      );
 
     return id;
   }
@@ -32,7 +40,7 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const moduleId = SubjectController.extractModuleID(req, next);
+    const moduleId = SubjectController.extractModuleID(req);
 
     req.body.moduleId = moduleId;
 
@@ -51,7 +59,7 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const moduleId = SubjectController.extractModuleID(req, next);
+    const moduleId = SubjectController.extractModuleID(req);
 
     const subjects = await SubjectModel.findMany({
       where: {
@@ -72,7 +80,7 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const id = SubjectController.extractSubjectID(req, next);
+    const id = SubjectController.extractSubjectID(req);
 
     const subject = await SubjectModel.findOneById(id!);
 
@@ -89,7 +97,7 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const id = SubjectController.extractSubjectID(req, next);
+    const id = SubjectController.extractSubjectID(req);
 
     const updatedSubject = await SubjectModel.updateOne(id, req.body);
 
@@ -106,7 +114,7 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const id = SubjectController.extractSubjectID(req, next);
+    const id = SubjectController.extractSubjectID(req);
 
     await SubjectModel.deleteOne(id);
 

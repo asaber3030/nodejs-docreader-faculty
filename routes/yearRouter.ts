@@ -6,16 +6,6 @@ import ModuleController from '../controllers/ModuleController';
 const router = Router();
 
 router.use(AuthController.protect);
-router
-  .route('/')
-  .get(
-    AuthController.requirePermissions('year:view'),
-    YearController.getAllYears,
-  )
-  .post(
-    AuthController.requirePermissions('year:create'),
-    YearController.createYear,
-  );
 
 router
   .route('/:id')
