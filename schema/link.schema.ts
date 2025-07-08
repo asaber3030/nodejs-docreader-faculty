@@ -45,20 +45,9 @@ const fullSchema = z
 
 const linkSchema = createModelSchema(
   fullSchema,
-  ['title', 'url', 'category', 'type'],
+  { required: ['title', 'url', 'category', 'type'], optional: [] },
   ['title', 'subTitle', 'url', 'category', 'type', 'lectureId'],
 );
-
-// Subtitle should be optional and thus this is the only way to add it
-linkSchema.create = z.object({
-  ...linkSchema.create.shape,
-  subTitle: z
-    .string()
-    .trim()
-    .min(1, { message: 'Subtitle is required.' })
-    .max(255, 'Cannot be greater than 255 characters.')
-    .optional(),
-}) as any;
 
 // --- Type Exports ---
 export type LinkWhereInput = z.infer<typeof linkSchema.where>;

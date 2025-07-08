@@ -32,20 +32,9 @@ const fullSchema = z
 
 const lectureSchema = createModelSchema(
   fullSchema,
-  ['title', 'subjectId', 'date', 'type'],
+  { required: ['title', 'subjectId', 'date', 'type'], optional: ['subTitle'] },
   ['title', 'subTitle', 'subjectId', 'date', 'type'],
 );
-
-// Subtitle should be optional and thus this is the only way to add it
-lectureSchema.create = z.object({
-  ...lectureSchema.create.shape,
-  subTitle: z
-    .string()
-    .trim()
-    .min(1, { message: 'Subtitle is required.' })
-    .max(255, 'Cannot be greater than 255 characters.')
-    .optional(),
-}) as any;
 
 // --- Type Exports ---
 export type LectureWhereInput = z.infer<typeof lectureSchema.where>;

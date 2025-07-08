@@ -17,7 +17,7 @@ const fullSchema = z
 
 const yearSchema = createModelSchema(
   fullSchema,
-  ['id', 'title', 'facultyId'],
+  { required: ['id', 'title', 'facultyId'], optional: [] },
   ['title', 'facultyId'],
 );
 

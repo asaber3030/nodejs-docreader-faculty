@@ -25,15 +25,18 @@ const fullSchema = z.object({
 
 const userSchema = createModelSchema(
   fullSchema,
-  [
-    'googleSubId',
-    'familyName',
-    'givenName',
-    'email',
-    'picture',
-    'status',
-    'roleId',
-  ],
+  {
+    required: [
+      'googleSubId',
+      'familyName',
+      'givenName',
+      'email',
+      'picture',
+      'status',
+      'roleId',
+    ],
+    optional: [],
+  },
   ['status', 'facultyId', 'yearId'],
 );
 

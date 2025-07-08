@@ -1,35 +1,6 @@
 import { CategoryType, DataType, LectureType } from '@prisma/client';
 import { z } from 'zod';
 
-export const categorySchema = {
-  update: z.object({
-    name: z
-      .string()
-      .trim()
-      .min(1, { message: 'Name is required' })
-      .max(255, { message: 'Cannot be greater than 255 characters' })
-      .optional(),
-    keywords: z
-      .string()
-      .trim()
-      .min(1, { message: "Keywords is required. Separate them with ',' " })
-      .max(255, { message: 'Cannot be greater than 255 characters' })
-      .optional(),
-    icon: z.string().url({ message: 'Icon must be a URL.' }).optional(),
-  }),
-
-  create: z.object({
-    name: z
-      .string()
-      .trim()
-      .max(255, { message: 'Cannot be greater than 255 characters' }),
-    keywords: z
-      .string()
-      .max(255, { message: 'Cannot be greater than 255 characters' }),
-    icon: z.string().url({ message: 'Icon must be a URL.' }).optional(),
-  }),
-};
-
 export const linkSchema = {
   create: z.object({
     title: z

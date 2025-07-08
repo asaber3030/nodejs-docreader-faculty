@@ -23,7 +23,7 @@ const fullSchema = z
 
 const moduleSchema = createModelSchema(
   fullSchema,
-  ['name', 'semesterName', 'yearId', 'icon'],
+  { required: ['name', 'semesterName', 'yearId', 'icon'], optional: [] },
   ['name', 'semesterName', 'yearId', 'icon'],
 );
 

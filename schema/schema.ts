@@ -1,13 +1,24 @@
-import { z, ZodObject, ZodRawShape } from 'zod';
+import { z, ZodObject, ZodRawShape, ZodOptional, ZodTypeAny } from 'zod';
 import { paginationSchema } from './pagination.schema';
 
 export default function createModelSchema<
   T extends ZodRawShape,
   Create extends readonly (keyof T)[],
+  OptionalCreate extends readonly (keyof T)[],
   Update extends readonly (keyof T)[],
->(fullSchema: ZodObject<T>, createKeys: Create, updateKeys: Update) {
-  type CreateShape = Pick<T, Create[number]>;
-  type UpdateShape = Pick<T, Update[number]>;
+>(
+  fullSchema: ZodObject<T>,
+  create: {
+    required: Create;
+    optional: OptionalCreate;
+  },
+  updateKeys: Update,
+) {
+  type CreateShape = { [K in Create[number]]: T[K] };
+  type OptionalCreateShape = {
+    [K in OptionalCreate[number]]: ZodOptional<T[K]>;
+  };
+  type UpdateShape = { [K in Update[number]]: T[K] };
 
   const keys = Object.keys(fullSchema.shape) as (keyof T)[];
 
@@ -29,13 +40,27 @@ export default function createModelSchema<
     )
     .strict();
 
-  const createShape = Object.fromEntries(
-    createKeys.map(k => [k, fullSchema.shape[k]]),
-  ) as CreateShape;
+  // Strongly typed helper for required fields
+  const requiredCreateShape = create.required.reduce((acc, key) => {
+    acc[key] = fullSchema.shape[key];
+    return acc;
+  }, {} as CreateShape);
 
-  const updateShape = Object.fromEntries(
-    updateKeys.map(k => [k, fullSchema.shape[k]]),
-  ) as UpdateShape;
+  // Strongly typed helper for optional fields
+  const optionalCreateShape = create.optional.reduce((acc, key) => {
+    acc[key] = fullSchema.shape[key].optional();
+    return acc;
+  }, {} as OptionalCreateShape);
+
+  const mergedCreateShape: CreateShape & OptionalCreateShape = {
+    ...requiredCreateShape,
+    ...optionalCreateShape,
+  };
+
+  const updateShape = updateKeys.reduce((acc, key) => {
+    acc[key] = fullSchema.shape[key];
+    return acc;
+  }, {} as UpdateShape);
 
   return {
     where: fullSchema.partial().strict(),
@@ -49,7 +74,7 @@ export default function createModelSchema<
         pagination: paginationSchema.optional(),
       })
       .strict(),
-    create: z.object(createShape).required().strict(),
+    create: z.object(mergedCreateShape).strict(),
     update: z.object(updateShape).partial().strict(),
   };
 }

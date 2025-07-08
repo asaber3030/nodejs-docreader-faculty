@@ -7,12 +7,12 @@ const fullSchema = z
     name: z
       .string()
       .trim()
-      .min(1, { message: 'Name is required' })
-      .max(255, { message: 'Cannot be greater than 255 characters' }),
+      .min(1, { message: 'Name is required.' })
+      .max(255, { message: 'Cannot be greater than 255 characters.' }),
     city: z
       .string()
-      .min(1, { message: 'City is required' })
-      .max(255, { message: 'Cannot be greater than 255 characters' })
+      .min(1, { message: 'City is required.' })
+      .max(255, { message: 'Cannot be greater than 255 characters.' })
       .optional(),
     createdAt: z.date(),
     updatedAt: z.date(),
@@ -21,7 +21,7 @@ const fullSchema = z
 
 const facultySchema = createModelSchema(
   fullSchema,
-  ['id', 'name', 'city'],
+  { required: ['id', 'name', 'city'], optional: [] },
   ['name', 'city'],
 );
 
