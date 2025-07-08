@@ -42,7 +42,7 @@ app.use("/api/v1", [
   practicalQuizRouter,
 ]);
 
-if (process.env.USE_TLS === "False")
+if (process.env.USE_TLS === "False" || !process.env.USE_TLS)
   app.listen(port, () => {
     console.log(
       `[server]: HTTP server is running at https://localhost:${port}`
