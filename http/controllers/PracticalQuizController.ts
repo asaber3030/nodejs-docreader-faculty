@@ -235,6 +235,12 @@ export default class QuizController {
           createdAt: currentDate(),
         })),
       });
+      await db.writtenQuestion.deleteMany({
+        where: {
+          questionId: questionId,
+          id: { notIn: oldWrittenQuestions.map(({ id }) => id) },
+        },
+      });
       await db.writtenQuestion.createMany({
         data: newWrittenQuestions.map((question) => ({
           ...question,
