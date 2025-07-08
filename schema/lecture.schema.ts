@@ -14,15 +14,13 @@ const fullSchema = z
       .string()
       .trim()
       .min(1, { message: 'Subtitle is required.' })
-      .max(255, 'Cannot be greater than 255 characters.'),
+      .max(255, 'Cannot be greater than 255 characters.')
+      .optional(),
     subjectId: z.number().int({ message: 'Subject ID must be an integer.' }),
-    type: z.enum(
-      [LectureType.Normal, LectureType.Practical, LectureType.FinalRevision],
-      {
-        message:
-          "Lecture type can only be: 'Normal', 'Practical', or 'FinalRevision'",
-      },
-    ),
+    type: z.nativeEnum(LectureType, {
+      message:
+        "Lecture type can only be: 'Normal', 'Practical', or 'FinalRevision'",
+    }),
     date: z.date({ message: 'Lecture date is required.' }),
 
     createdAt: z.date(),

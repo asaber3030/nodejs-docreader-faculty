@@ -1,8 +1,4 @@
-import facultySchema, {
-  FacultyCreateInput,
-  FacultyFindInput,
-  FacultyUpdateInput,
-} from '../schema/faculty.schema';
+import facultySchema, { FacultyFindInput } from '../schema/faculty.schema';
 import { Faculty as PrismaFaculty } from '@prisma/client';
 import db from '../prisma/db';
 import AppError from '../utils/AppError';

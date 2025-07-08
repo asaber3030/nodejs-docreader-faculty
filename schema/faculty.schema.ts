@@ -21,7 +21,7 @@ const fullSchema = z
 
 const facultySchema = createModelSchema(
   fullSchema,
-  { required: ['id', 'name', 'city'], optional: [] },
+  { required: ['id', 'name', 'city'] },
   ['name', 'city'],
 );
 

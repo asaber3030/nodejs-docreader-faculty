@@ -4,7 +4,7 @@ import db from '../prisma/db';
 import AppError from '../utils/AppError';
 import { ModelFactory } from './ModelFactory';
 
-export default class FacultyModel {
+export default class LectureModel {
   private data: Partial<PrismaLecture>;
 
   constructor(data: Partial<PrismaLecture>) {
@@ -21,10 +21,10 @@ export default class FacultyModel {
   static createOne = ModelFactory.createOne(
     db.lecture,
     lectureSchema,
-    data => new FacultyModel(data),
+    data => new LectureModel(data),
   );
 
-  static async findMany(findObj: FacultyFindInput) {
+  static async findMany(findObj: LectureFindInput) {
     const validatedFind = lectureSchema.find.safeParse(findObj);
 
     if (!validatedFind.success)
@@ -37,7 +37,7 @@ export default class FacultyModel {
         400,
       );
 
-    const faculties = await db.lecture.findMany({
+    const lectures = await db.lecture.findMany({
       where: validatedFind.data.where,
       select: validatedFind.data.select,
       orderBy: validatedFind.data.orderBy,
@@ -45,36 +45,36 @@ export default class FacultyModel {
       take: validatedFind.data.pagination?.take,
     });
 
-    if (faculties.length === 0)
+    if (lectures.length === 0)
       throw new AppError(
         `Couldn't find any faculty based on provided criteria.`,
         404,
       );
 
-    return faculties.map(faculty => new FacultyModel(faculty));
+    return lectures.map(lecture => new LectureModel(lecture));
   }
 
-  static async findOneById(id: number): Promise<FacultyModel> {
-    const facultyData = await db.lecture.findUnique({
+  static async findOneById(id: number): Promise<LectureModel> {
+    const lecture = await db.lecture.findUnique({
       where: {
         id,
       },
     });
 
-    if (!facultyData)
-      throw new AppError(`Couldn't find faculty with ID ${id}.`, 404);
+    if (!lecture)
+      throw new AppError(`Couldn't find lecture with ID ${id}.`, 404);
 
-    return new FacultyModel(facultyData);
+    return new LectureModel(lecture);
   }
 
   static updateOne = ModelFactory.updateOne(
     db.lecture,
     lectureSchema,
-    data => new FacultyModel(data),
+    data => new LectureModel(data),
   );
 
   static deleteOne = ModelFactory.deleteOne(
     db.lecture,
-    data => new FacultyModel(data),
+    data => new LectureModel(data),
   );
 }
