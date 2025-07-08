@@ -74,7 +74,6 @@ export default class SubjectController {
   ) {
     const id = SubjectController.extractSubjectID(req, next);
 
-    // TODO: This has a bug: it can work with subjects outside this module
     const subject = await SubjectModel.findOneById(id!);
 
     res.status(200).json({
@@ -92,7 +91,6 @@ export default class SubjectController {
   ) {
     const id = SubjectController.extractSubjectID(req, next);
 
-    // TODO: This has a bug: it can work with subjects outside this module
     const updatedSubject = await SubjectModel.updateOne(id, req.body);
 
     res.status(200).json({
@@ -110,7 +108,6 @@ export default class SubjectController {
   ) {
     const id = SubjectController.extractSubjectID(req, next);
 
-    // TODO: This has a bug: it can work with subjects outside this module
     await SubjectModel.deleteOne(id);
 
     res.status(204).json({

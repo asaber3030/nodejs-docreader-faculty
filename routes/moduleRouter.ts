@@ -6,16 +6,6 @@ import SubjectController from '../controllers/SubjectController';
 const router = Router();
 
 router.use(AuthController.protect);
-router
-  .route('/')
-  .get(
-    AuthController.requirePermissions('module:view'),
-    ModuleController.getAllModules,
-  )
-  .post(
-    AuthController.requirePermissions('module:create'),
-    ModuleController.createModule,
-  );
 
 router
   .route('/:id')

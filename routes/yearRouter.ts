@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import AuthController from '../controllers/AuthController';
 import YearController from '../controllers/YearController';
+import ModuleController from '../controllers/ModuleController';
 
 const router = Router();
 
@@ -26,6 +27,18 @@ router
   .delete(
     AuthController.requirePermissions('year:delete'),
     YearController.deleteYear,
+  );
+
+// Nested module routes
+router
+  .route('/:yearId/modules/')
+  .get(
+    AuthController.requirePermissions('module:view'),
+    ModuleController.getAllModules,
+  )
+  .post(
+    AuthController.requirePermissions('module:create'),
+    ModuleController.createModule,
   );
 
 export default router;
