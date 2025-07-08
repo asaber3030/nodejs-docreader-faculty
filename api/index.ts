@@ -11,6 +11,7 @@ import userRouter from '../routes/userRouter';
 import facultyRouter from '../routes/facultyRouter';
 import moduleRouter from '../routes/moduleRouter';
 import yearRouter from '../routes/yearRouter';
+import subjectRouter from '../routes/subjectRouter';
 
 import RoleModel from '../models/Role';
 
@@ -30,6 +31,7 @@ app.use('/api/v2/users', userRouter);
 app.use('/api/v2/faculties', facultyRouter);
 app.use('/api/v2/years', yearRouter);
 app.use('/api/v2/modules', moduleRouter);
+app.use('/api/v2/subjects', subjectRouter);
 
 app.use(globalErrorHandler);
 

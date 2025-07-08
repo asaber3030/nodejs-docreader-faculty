@@ -5,16 +5,6 @@ import SubjectController from '../controllers/SubjectController';
 const router = Router({ mergeParams: true });
 
 router.use(AuthController.protect);
-router
-  .route('/')
-  .get(
-    AuthController.requirePermissions('subject:view'),
-    SubjectController.getAllSubjects,
-  )
-  .post(
-    AuthController.requirePermissions('subject:create'),
-    SubjectController.createSubject,
-  );
 
 router
   .route('/:id')
@@ -23,11 +13,11 @@ router
     SubjectController.getSubject,
   )
   .patch(
-    AuthController.requirePermissions('subject:update'),
+    AuthController.requirePermissions('subject:update_any'),
     SubjectController.updateSubject,
   )
   .delete(
-    AuthController.requirePermissions('subject:delete'),
+    AuthController.requirePermissions('subject:delete_any'),
     SubjectController.deleteSubject,
   );
 

@@ -1,11 +1,9 @@
 import { Router } from 'express';
 import AuthController from '../controllers/AuthController';
 import ModuleController from '../controllers/ModuleController';
-import subjectRouter from '../routes/subjectRouter';
+import SubjectController from '../controllers/SubjectController';
 
 const router = Router();
-
-router.use('/:moduleId/subjects', subjectRouter);
 
 router.use(AuthController.protect);
 router
@@ -32,6 +30,18 @@ router
   .delete(
     AuthController.requirePermissions('module:delete'),
     ModuleController.deleteModule,
+  );
+
+// Nested Subject Routes
+router
+  .route('/:moduleId/subjects')
+  .get(
+    AuthController.requirePermissions('subject:view'),
+    SubjectController.getAllSubjects,
+  )
+  .post(
+    AuthController.requirePermissions('subject:create'),
+    SubjectController.createSubject,
   );
 
 export default router;

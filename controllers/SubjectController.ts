@@ -4,33 +4,27 @@ import SubjectModel from '../models/Subject';
 import AppError from '../utils/AppError';
 
 export default class SubjectController {
-  private static checkAndExtractIDs(
-    req: Request,
-    next: NextFunction,
-  ): { id: number | undefined; moduleId: number } {
-    // This will always exist as the route is a nested route
+  private static extractModuleID(req: Request, next: NextFunction): number {
+    // This will always exist as it is used in nested routes only
     const moduleId = Number.parseInt(req.params.moduleId);
 
     if (Number.isNaN(moduleId))
       return next(
         new AppError('Invalid module ID: module ID must be an integer.', 400),
-      );
+      )!;
 
-    let id = undefined;
+    return moduleId;
+  }
 
-    if (req.params.id !== undefined) {
-      id = Number.parseInt(req.params.id);
+  private static extractSubjectID(req: Request, next: NextFunction): number {
+    const id = Number.parseInt(req.params.id);
 
-      if (Number.isNaN(id))
-        return next(
-          new AppError(
-            'Invalid subject ID: subject ID must be an integer.',
-            400,
-          ),
-        );
-    }
+    if (Number.isNaN(id))
+      return next(
+        new AppError('Invalid subject ID: subject ID must be an integer.', 400),
+      )!;
 
-    return { id, moduleId };
+    return id;
   }
 
   public static createSubject = catchAsync(async function (
@@ -38,7 +32,7 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const { moduleId } = SubjectController.checkAndExtractIDs(req, next);
+    const moduleId = SubjectController.extractModuleID(req, next);
 
     req.body.moduleId = moduleId;
 
@@ -57,7 +51,7 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const { moduleId } = SubjectController.checkAndExtractIDs(req, next);
+    const moduleId = SubjectController.extractModuleID(req, next);
 
     const subjects = await SubjectModel.findMany({
       where: {
@@ -78,8 +72,9 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const { id } = SubjectController.checkAndExtractIDs(req, next);
+    const id = SubjectController.extractSubjectID(req, next);
 
+    // TODO: This has a bug: it can work with subjects outside this module
     const subject = await SubjectModel.findOneById(id!);
 
     res.status(200).json({
@@ -95,9 +90,10 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const { id } = SubjectController.checkAndExtractIDs(req, next);
+    const id = SubjectController.extractSubjectID(req, next);
 
-    const updatedSubject = await SubjectModel.updateOne(id!, req.body);
+    // TODO: This has a bug: it can work with subjects outside this module
+    const updatedSubject = await SubjectModel.updateOne(id, req.body);
 
     res.status(200).json({
       status: 'success',
@@ -112,9 +108,10 @@ export default class SubjectController {
     res: Response,
     next: NextFunction,
   ) {
-    const { id } = SubjectController.checkAndExtractIDs(req, next);
+    const id = SubjectController.extractSubjectID(req, next);
 
-    await SubjectModel.deleteOne(id!);
+    // TODO: This has a bug: it can work with subjects outside this module
+    await SubjectModel.deleteOne(id);
 
     res.status(204).json({
       status: 'success',
