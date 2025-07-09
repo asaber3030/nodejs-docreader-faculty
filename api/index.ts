@@ -13,6 +13,7 @@ import moduleRouter from '../routes/moduleRouter';
 import yearRouter from '../routes/yearRouter';
 import subjectRouter from '../routes/subjectRouter';
 import lectureRouter from '../routes/lectureRouter';
+import quizRouter from '../routes/quizRouter';
 
 import RoleModel from '../models/Role';
 
@@ -34,6 +35,7 @@ app.use('/api/v2/years', yearRouter);
 app.use('/api/v2/modules', moduleRouter);
 app.use('/api/v2/subjects', subjectRouter);
 app.use('/api/v2/lectures', lectureRouter);
+app.use('/api/v2/quizzes', quizRouter);
 
 app.use(globalErrorHandler);
 

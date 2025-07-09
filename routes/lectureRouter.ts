@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import AuthController from '../controllers/AuthController';
 import LectureController from '../controllers/LectureController';
+import QuizController from '../controllers/QuizController';
 
 const router = Router();
 
@@ -18,6 +19,19 @@ router
   .delete(
     AuthController.requirePermissions('lecture:delete'),
     LectureController.deleteLecture,
+  );
+
+// Nested quiz routes
+
+router
+  .route('/:lectureId/quizzes')
+  .get(
+    AuthController.requirePermissions('quiz:view'),
+    QuizController.getAllQuizzes,
+  )
+  .post(
+    AuthController.requirePermissions('quiz:create'),
+    QuizController.createQuiz,
   );
 
 export default router;

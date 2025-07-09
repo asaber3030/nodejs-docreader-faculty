@@ -18,7 +18,7 @@ const fullSchema = z
 
 const quizSchema = createModelSchema(
   fullSchema,
-  { required: ['id', 'lectureId', 'title'], optional: [] },
+  { required: ['lectureId', 'title'], optional: [] },
   ['lectureId', 'title', 'notifiable'],
 );
 
