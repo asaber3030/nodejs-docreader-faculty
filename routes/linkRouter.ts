@@ -2,7 +2,6 @@ import { Router } from 'express';
 import AuthController from '../controllers/AuthController';
 import LectureController from '../controllers/LectureController';
 import QuizController from '../controllers/QuizController';
-import LinkController from '../controllers/LinkController';
 
 const router = Router();
 
@@ -33,17 +32,6 @@ router
   .post(
     AuthController.requirePermissions('quiz:create'),
     QuizController.createQuiz,
-  );
-
-router
-  .route('/:lectureId/links')
-  .get(
-    AuthController.requirePermissions('link:view'),
-    LinkController.getAllLinks,
-  )
-  .post(
-    AuthController.requirePermissions('link:create'),
-    LinkController.createLink,
   );
 
 export default router;

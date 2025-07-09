@@ -16,25 +16,14 @@ const fullSchema = z
       .min(1, { message: 'Subtitle is required.' })
       .max(255, 'Cannot be greater than 255 characters.'),
     url: z.string().url({ message: 'Link URL is not a valid URL.' }),
-    type: z.enum(
-      [DataType.Data, DataType.PDF, DataType.Record, DataType.Video],
-      {
-        message:
-          "Invalid link type. Link type must be one of these: 'Data', 'PDF', 'Record', 'Video'",
-      },
-    ),
-    category: z.enum(
-      [
-        CategoryType.College,
-        CategoryType.Data,
-        CategoryType.Summary,
-        CategoryType.Questions,
-      ],
-      {
-        message:
-          "Invalid category. Category must be one of these: 'College', 'Data', 'Summary', 'Questions'.",
-      },
-    ),
+    type: z.nativeEnum(DataType, {
+      message:
+        "Invalid link type. Link type must be one of these: 'Data', 'PDF', 'Record', 'Video'",
+    }),
+    category: z.nativeEnum(CategoryType, {
+      message:
+        "Invalid category. Category must be one of these: 'College', 'Data', 'Summary', 'Questions'.",
+    }),
     lectureId: z.number().int({ message: 'Lecture ID must be an integer.' }),
     notifiable: z.boolean(),
 
@@ -45,7 +34,7 @@ const fullSchema = z
 
 const linkSchema = createModelSchema(
   fullSchema,
-  { required: ['title', 'url', 'category', 'type'], optional: [] },
+  { required: ['title', 'url', 'category', 'type', 'lectureId'], optional: [] },
   ['title', 'subTitle', 'url', 'category', 'type', 'lectureId'],
 );
 
