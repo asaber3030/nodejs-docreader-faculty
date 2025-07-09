@@ -21,7 +21,7 @@ const fullSchema = z
       message:
         "Lecture type can only be: 'Normal', 'Practical', or 'FinalRevision'",
     }),
-    date: z.date({ message: 'Lecture date is required.' }),
+    date: z.date({ message: 'Lecture date is required.', coerce: true }),
 
     createdAt: z.date(),
     updatedAt: z.date(),

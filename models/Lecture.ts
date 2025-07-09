@@ -47,7 +47,7 @@ export default class LectureModel {
 
     if (lectures.length === 0)
       throw new AppError(
-        `Couldn't find any faculty based on provided criteria.`,
+        `Couldn't find any lecture based on provided criteria.`,
         404,
       );
 
