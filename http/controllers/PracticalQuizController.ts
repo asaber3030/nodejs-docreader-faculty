@@ -199,7 +199,6 @@ export default class QuizController {
       const questionId = +req.params.questionId;
       const { masks, tapes, writtenQuestions } =
         practicalQuizSchema.question.update.parse(req.body);
-      console.log(questionId, masks, tapes, writtenQuestions);
       const newMasks: NewRect[] = [];
       const oldMasks: OldRect[] = [];
       const newTapes: NewRect[] = [];
@@ -221,6 +220,26 @@ export default class QuizController {
           ? oldWrittenQuestions.push(writtenQuestions as OldWrittenQuestion)
           : newWrittenQuestions.push(writtenQuestions as NewWrittenQuestion)
       );
+
+      await db.rect.deleteMany({
+        where: {
+          tapeQuestionId: questionId,
+          id: { notIn: oldTapes.map(({ id }) => id) },
+        },
+      });
+      await db.rect.deleteMany({
+        where: {
+          maskQuestionId: questionId,
+          id: { notIn: oldMasks.map(({ id }) => id) },
+        },
+      });
+      await db.writtenQuestion.deleteMany({
+        where: {
+          questionId: questionId,
+          id: { notIn: oldWrittenQuestions.map(({ id }) => id) },
+        },
+      });
+
       await db.rect.createMany({
         data: newMasks.map((mask) => ({
           ...mask,
@@ -234,12 +253,6 @@ export default class QuizController {
           tapeQuestionId: questionId,
           createdAt: currentDate(),
         })),
-      });
-      await db.writtenQuestion.deleteMany({
-        where: {
-          questionId: questionId,
-          id: { notIn: oldWrittenQuestions.map(({ id }) => id) },
-        },
       });
       await db.writtenQuestion.createMany({
         data: newWrittenQuestions.map((question) => ({
