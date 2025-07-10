@@ -106,7 +106,8 @@ export default class QuizController {
       });
       for (const question of quiz.questions) {
         try {
-          unlink(path.join(__dirname, "../../public/image", question.image));
+          if (question.image)
+            unlink(path.join(__dirname, "../../public/image", question.image));
         } catch (err) {
           console.error(err);
         }
@@ -127,20 +128,19 @@ export default class QuizController {
 
   async createQuestion(req: Request, res: Response) {
     try {
-      if (!req.file) {
-        return res.status(400).json({
-          message: "No file has been uploaded.",
-          status: 400,
-        });
+      let filename, width, height;
+      if (req.file) {
+        filename = `${
+          path.parse(req.file.originalname).name
+        }-${Date.now()}.jpeg`;
+        const outputPath = path.join(__dirname, "../../public/image", filename);
+        const compressed = await sharp(req.file.buffer)
+          .toFormat("jpeg")
+          .jpeg({ quality: 80 })
+          .toFile(outputPath);
+        width = compressed.width;
+        height = compressed.height;
       }
-      const filename = `${
-        path.parse(req.file.originalname).name
-      }-${Date.now()}.jpeg`;
-      const outputPath = path.join(__dirname, "../../public/image", filename);
-      const { width, height } = await sharp(req.file.buffer)
-        .toFormat("jpeg")
-        .jpeg({ quality: 80 })
-        .toFile(outputPath);
 
       const quizId = +req.params.quizId;
       const { masks, tapes, writtenQuestions } =
@@ -313,7 +313,8 @@ export default class QuizController {
         data: { notifiable: true },
       });
       try {
-        unlink(path.join(__dirname, "../../public/image", question.image));
+        if (question.image)
+          unlink(path.join(__dirname, "../../public/image", question.image));
       } catch (err) {
         console.error(err);
       }

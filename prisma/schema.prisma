@@ -178,9 +178,9 @@ model PracticalQuestion {
   id        Int           @id @default(autoincrement())
   quizId    Int
   quiz      PracticalQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  image     String
-  width Int
-  height Int
+  image     String?
+  width Int?
+  height Int?
   tapes     Rect[]        @relation("Tapes")
   masks     Rect[]        @relation("Masks")
   writtenQuestions WrittenQuestion[]
