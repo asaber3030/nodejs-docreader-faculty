@@ -118,17 +118,18 @@ model Lecture {
 }
 
 model LectureLink {
-  id          Int          @id @default(autoincrement())
-  title       String
-  subTitle    String
-  url         String
-  type        DataType     @default(PDF)
-  category    CategoryType @default(Data)
-  lectureId   Int
-  lectureData Lecture      @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  notifiable  Boolean      @default(true)
-  createdAt   DateTime?    @db.Timestamp()
-  updatedAt   DateTime?    @updatedAt @db.Timestamp()
+  id             Int          @id @default(autoincrement())
+  title          String
+  subTitle       String
+  url            String
+  additionalUrls String[]     @default([])
+  type           DataType     @default(PDF)
+  category       CategoryType @default(Data)
+  lectureId      Int
+  lectureData    Lecture      @relation(fields: [lectureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  notifiable     Boolean      @default(true)
+  createdAt      DateTime?    @db.Timestamp()
+  updatedAt      DateTime?    @updatedAt @db.Timestamp()
 }
 
 model Device {
@@ -175,17 +176,17 @@ model PracticalQuiz {
 }
 
 model PracticalQuestion {
-  id        Int           @id @default(autoincrement())
-  quizId    Int
-  quiz      PracticalQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  image     String?
-  width Int?
-  height Int?
-  tapes     Rect[]        @relation("Tapes")
-  masks     Rect[]        @relation("Masks")
+  id               Int               @id @default(autoincrement())
+  quizId           Int
+  quiz             PracticalQuiz     @relation(fields: [quizId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  image            String?
+  width            Int?
+  height           Int?
+  tapes            Rect[]            @relation("Tapes")
+  masks            Rect[]            @relation("Masks")
   writtenQuestions WrittenQuestion[]
-  createdAt DateTime?     @db.Timestamp()
-  updatedAt DateTime?     @updatedAt @db.Timestamp()
+  createdAt        DateTime?         @db.Timestamp()
+  updatedAt        DateTime?         @updatedAt @db.Timestamp()
 }
 
 model Rect {
@@ -198,18 +199,18 @@ model Rect {
   y              Float
   w              Float
   h              Float
-  createdAt DateTime?     @db.Timestamp()
-  updatedAt DateTime?     @updatedAt @db.Timestamp()
+  createdAt      DateTime?          @db.Timestamp()
+  updatedAt      DateTime?          @updatedAt @db.Timestamp()
 }
 
 model WrittenQuestion {
-  id Int @id @default(autoincrement())
+  id         Int               @id @default(autoincrement())
   questionId Int
-  question PracticalQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  text String
-  answer String
-  createdAt DateTime?     @db.Timestamp()
-  updatedAt DateTime?     @updatedAt @db.Timestamp()
+  question   PracticalQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  text       String
+  answer     String
+  createdAt  DateTime?         @db.Timestamp()
+  updatedAt  DateTime?         @updatedAt @db.Timestamp()
 }
 
 model MarkedQuestion {
