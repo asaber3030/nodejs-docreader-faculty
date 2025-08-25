@@ -45,7 +45,7 @@ export default class LectureModel {
     delete query?.endDate;
     delete where?.yearId;
     delete where?.facultyId;
-    const subjectFilterForDateBoundQueries = startDate
+    const facultyAndYearFilter = startDate
       ? {
           module: { year: { id: yearId, facultyId } },
         }
@@ -67,11 +67,13 @@ export default class LectureModel {
         contains: search,
         mode: 'insensitive',
       },
-      date: {
-        gte: new Date(startDate).toISOString(),
-        lte: new Date(endDate).toISOString(),
-      },
-      subject: subjectFilterForDateBoundQueries,
+      date: startDate
+        ? {
+            gte: new Date(startDate).toISOString(),
+            lte: new Date(endDate).toISOString(),
+          }
+        : undefined,
+      subject: facultyAndYearFilter,
       ...where,
     };
 
