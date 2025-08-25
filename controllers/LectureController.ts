@@ -163,7 +163,7 @@ export default class LectureController {
     const oldLecture = await LectureModel.findOneById(id, {});
 
     if (typeof req.body.note === 'undefined') {
-      req.body.note = oldLecture.note;
+      req.body.note = oldLecture.note || '';
     }
 
     req.body.note = await ImageUtils.processHtmlImages(req.body.note);
