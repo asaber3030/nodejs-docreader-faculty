@@ -64,7 +64,7 @@ export default class AuthController {
   ) {
     if (!resourceName && !resourceId)
       throw new AppError(
-        'Invalid resource ID and name for single resource restriction checks.',
+        'Invalid resource ID or name for single resource restriction checks.',
         400,
       );
 
@@ -318,7 +318,7 @@ export default class AuthController {
 
       if (!resourceId && !resourceName)
         throw new AppError(
-          'Invalid resource ID and name for permissions check.',
+          'Invalid resource ID or name for permissions check.',
           400,
         );
 

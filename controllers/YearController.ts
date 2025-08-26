@@ -66,10 +66,12 @@ export default class YearController {
     req.body.creatorId = req.user.id;
 
     // Make sure these fields are retrieved (important for creating year topic)
-    req.query.fields = QueryParamsService.addFieldsToList(req.query, 'fields', [
-      'id',
-      'title',
-    ]);
+    req.query.fields = QueryParamsService.addElementsToList(
+      req.query,
+      'fields',
+      ['id', 'title'],
+      ['id', 'title', 'currentSemester', 'facultyId', 'topicId', 'creatorId'],
+    );
 
     const year = (await YearModel.createOne(req.body, req.query)) as YearModel;
     const { topic, year: updatedYear } =

@@ -77,26 +77,29 @@ export class QueryParamsService {
     return parsed.data as ReturnT;
   }
 
-  static addFieldsToList(
+  static addElementsToList(
     queryObj: any,
     listName: string,
-    fields: string[],
+    elements: string[],
+    defaultElements: string[],
   ): string {
-    if (!fields || fields.length === 0) return queryObj[listName] ?? '';
+    // Ensure arrays are not null
+    elements = elements ?? [];
+    defaultElements = defaultElements ?? [];
 
-    if (queryObj[listName] === undefined) {
-      queryObj[listName] = fields.join(',');
-      return queryObj[listName];
+    // Get existing list or default
+    let existing: string[] = [];
+    if (queryObj[listName] === undefined || queryObj[listName].trim() === '') {
+      existing = [...defaultElements];
+    } else {
+      existing = queryObj[listName]
+        .split(',')
+        .map((f: string) => f.trim())
+        .filter((f: string) => f.length > 0);
     }
 
-    // Split existing fields into an array
-    const existing = queryObj[listName]
-      .split(',')
-      .map((f: string) => f.trim())
-      .filter((f: string) => f.length > 0);
-
-    // Merge and deduplicate
-    const merged = Array.from(new Set([...existing, ...fields]));
+    // Merge default (if needed) + existing + required elements
+    const merged = Array.from(new Set([...existing, ...elements]));
 
     queryObj[listName] = merged.join(',');
     return queryObj[listName];

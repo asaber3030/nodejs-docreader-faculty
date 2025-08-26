@@ -360,29 +360,10 @@ class NotificationService {
   };
 
   public static deleteDevice = async function (id: number) {
-    // 1. Get info about the device and all of its subscribed topics
-    const deviceTopicInfo = await db.deviceTopic.findMany({
-      where: { deviceId: id },
-      include: { topic: true, device: true },
-    });
+    // IMPORTANT: This only deletes the device (and its associated deviceTopic entries) from the database.
+    // The frontend has the responsibility of unregistering the device with FCM.
+    // Unsubscribing from topics at FCM level happens automatically when FCM deletes the device.
 
-    const topicNames = deviceTopicInfo.map(
-      deviceTopic => deviceTopic.topic.name,
-    );
-    const deviceInfo = deviceTopicInfo[0].device;
-
-    // 2. Unsubscribe the device token from all topics
-    await Promise.all(
-      topicNames.map(topicName =>
-        NotificationService.unsubscribeDevicesFromTopic(
-          [deviceInfo.token],
-          new Map([[deviceInfo.token, deviceInfo.id]]),
-          topicName,
-        ),
-      ),
-    );
-
-    // 3. Delete the device from the database
     return await DeviceModel.deleteOne(id);
   };
 

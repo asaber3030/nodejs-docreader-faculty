@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import DeviceModel from '../models/Device';
 import AppError from '../utils/AppError';
 import NotificationService from '../utils/NotificationService';
+import { QueryParamsService } from '../utils/QueryParamsService';
 
 export default class DeviceController {
   private static extractDeviceId(req: Request): number {
@@ -24,10 +25,22 @@ export default class DeviceController {
   ) {
     req.body.userId = req.user.id;
 
+    req.query.fields = QueryParamsService.addElementsToList(
+      req.query,
+      'fields',
+      ['id', 'token'],
+      ['id', 'token', 'userId'],
+    );
+
     const device = (await NotificationService.createDevice(
       req.body,
       req.query,
     )) as DeviceModel;
+    await NotificationService.subscribeDevicesToTopic(
+      [device.token],
+      new Map([[device.token, device.id]]),
+      req.user.yearId?.toString()!,
+    );
 
     res.status(201).json({
       status: 'success',
