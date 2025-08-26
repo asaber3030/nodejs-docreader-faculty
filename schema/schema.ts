@@ -131,7 +131,10 @@ export default function createModelSchema<
         )
         .optional(),
     })
-    .strict({ message: 'Unrecognized ' })
+    .strict({
+      message:
+        "Unrecognized query parameter. Only accepted ones are: 'page', 'size', 'fields', 'sort', and 'include'. Note that different routes can prohibit some of these.",
+    })
     .transform(({ page, size, fields, sort, include }, ctx) => {
       if (include && fields)
         return ctx.addIssue({

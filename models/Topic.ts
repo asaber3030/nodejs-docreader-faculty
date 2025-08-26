@@ -70,17 +70,25 @@ export default class TopicModel {
     TopicModel.wrapper,
   );
 
-  static async findManyByDeviceIds(deviceIds: number[]) {
+  static async findManyByDeviceIds(deviceIds: number[], queryParams: any) {
+    const validatedQueryParams: any = QueryParamsService.parse(
+      topicSchema,
+      queryParams,
+      { projection: true },
+    );
+
     const deviceTopics = await db.deviceTopic.findMany({
       where: {
         deviceId: { in: deviceIds },
       },
       include: {
-        topic: true,
+        topic: {
+          select: validatedQueryParams.select,
+        },
       },
     });
 
-    return deviceTopics.map(topic => new TopicModel(topic));
+    return deviceTopics.map(deviceTopic => new TopicModel(deviceTopic.topic));
   }
 
   static async findOneByName(name: string, queryParams: any) {

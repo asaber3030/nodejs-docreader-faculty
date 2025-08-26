@@ -110,6 +110,7 @@ export default class TopicController {
     const userDevices = await DeviceModel.findMany({ userId }, {});
     const topics = await TopicModel.findManyByDeviceIds(
       userDevices.map(device => device.id),
+      req.query,
     );
 
     res.status(200).json({
