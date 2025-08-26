@@ -113,8 +113,8 @@ export default class DeviceController {
   ) {
     const id = DeviceController.extractDeviceId(req);
 
-    await NotificationService.deleteDevice(id);
+    const device = await NotificationService.deleteDevice(id);
 
-    res.status(204).send();
+    res.status(200).send({ status: 'success', data: { device } });
   });
 }
