@@ -25,9 +25,9 @@ const yearSchema = createModelSchema(
   fullSchema,
   {
     required: ['title', 'facultyId', 'creatorId'],
-    optional: ['currentSemester'],
+    optional: ['currentSemester', 'topicId'],
   },
-  ['currentSemester'],
+  ['currentSemester', 'topicId'],
   {
     defaultPage: 1,
     defaultSize: 10,

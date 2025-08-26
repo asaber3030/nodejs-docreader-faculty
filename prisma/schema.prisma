@@ -164,7 +164,7 @@ model RolePermission {
 model StudyingYear {
   id        Int       @id @default(autoincrement())
   title     String
-  currentSemester Int @default(-1)
+  currentSemester Int @default(-1) // Should be null by default, but -1 for some bug (No one remembers which bug)
   facultyId Int
   faculty   Faculty   @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -172,7 +172,7 @@ model StudyingYear {
   creatorId Int?
 
   topicId   Int?
-  topic     Topic?    @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topic     Topic?    @relation(fields: [topicId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   createdAt DateTime? @default(now()) @db.Timestamp()
   updatedAt DateTime? @updatedAt @db.Timestamp()

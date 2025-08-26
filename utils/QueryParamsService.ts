@@ -90,7 +90,7 @@ export class QueryParamsService {
     }
 
     // Split existing fields into an array
-    const existing = queryObj.select
+    const existing = queryObj[listName]
       .split(',')
       .map((f: string) => f.trim())
       .filter((f: string) => f.length > 0);

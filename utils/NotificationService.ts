@@ -391,6 +391,14 @@ class NotificationService {
     tokenToDeviceId: Map<string, number>,
     topicName: string,
   ): Promise<SubscriptionResult> {
+    // Short-circuit. Required, as fcmService would give an error otherwise.
+    if (deviceTokens.length === 0)
+      return {
+        successfulTokens: [],
+        failedTokens: [],
+        removedInvalidTokensCount: 0,
+      };
+
     // 1. Make sure the topic exists first
     const topic = await TopicModel.findOneByName(topicName, {});
 
@@ -422,6 +430,14 @@ class NotificationService {
     tokenToDeviceId: Map<string, number>,
     topicName: string,
   ): Promise<SubscriptionResult> {
+    // Short-circuit. Required, as fcmService would give an error otherwise.
+    if (deviceTokens.length === 0)
+      return {
+        successfulTokens: [],
+        failedTokens: [],
+        removedInvalidTokensCount: 0,
+      };
+
     // 1. Group response into successes and failures
     const { failedTokens, successfulTokens } =
       await fcmService.unsubscribeDevicesFromTopic(deviceTokens, topicName);

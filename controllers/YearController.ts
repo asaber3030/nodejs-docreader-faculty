@@ -39,7 +39,7 @@ export default class YearController {
     req: Request,
     year: YearModel,
   ): Promise<{ topic: TopicModel; year: YearModel }> {
-    const topic = (await TopicModel.createOne(
+    const topic = (await NotificationService.createTopic(
       {
         name: year.id.toString(),
         description: `Topic for notifications of year ${year.title}.`,
@@ -66,7 +66,7 @@ export default class YearController {
     req.body.creatorId = req.user.id;
 
     // Make sure these fields are retrieved (important for creating year topic)
-    req.query.select = QueryParamsService.addFieldsToList(req.query, 'select', [
+    req.query.fields = QueryParamsService.addFieldsToList(req.query, 'fields', [
       'id',
       'title',
     ]);
@@ -149,7 +149,13 @@ export default class YearController {
   ) {
     const id = YearController.extractYearID(req);
 
-    await YearModel.deleteOne(id);
+    await Promise.all([
+      // 1. Delete the year
+      YearModel.deleteOne(id),
+
+      // 2. Delete topic associated with year
+      NotificationService.deleteTopic(id.toString()),
+    ]);
 
     res.status(204).send();
   });
