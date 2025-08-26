@@ -2,16 +2,8 @@ import catchAsync from '../utils/catchAsync';
 import { Request, Response, NextFunction } from 'express';
 import TopicModel from '../models/Topic';
 import AppError from '../utils/AppError';
-import fcmService from '../utils/FCMService';
 import DeviceModel from '../models/Device';
-import db from '../prisma/db';
 import NotificationService from '../utils/NotificationService';
-
-interface FailedTokenDetails {
-  token: string | null;
-  message: string;
-  errorCode?: string;
-}
 
 export default class TopicController {
   private static extractTopicName(req: Request): string {
@@ -51,7 +43,7 @@ export default class TopicController {
   ) {
     req.body.creatorId = req.user.id;
 
-    const topic = (await TopicModel.createOne(
+    const topic = (await NotificationService.createTopic(
       req.body,
       req.query,
     )) as TopicModel;
@@ -146,7 +138,8 @@ export default class TopicController {
   ) {
     const name = TopicController.extractTopicName(req);
 
-    const { failedTokens, successfulTokens } = await TopicModel.deleteOne(name);
+    const { failedTokens, successfulTokens } =
+      await NotificationService.deleteTopic(name);
 
     res.status(207).json({
       status: 'partial',

@@ -4,32 +4,12 @@ import db from '../prisma/db';
 import { ModelFactory } from './ModelFactory';
 import AppError from '../utils/AppError';
 import { QueryParamsService } from '../utils/QueryParamsService';
-import fcmService from '../utils/FCMService';
 
 export default class TopicModel {
   private data: Partial<PrismaTopic>;
 
   private static wrapper(data: PrismaTopic): TopicModel {
     return new TopicModel(data);
-  }
-
-  private static async unsubscribeAllDevicesFromTopic(name: string) {
-    const devicesSubscribedToTopic = await db.deviceTopic.findMany({
-      where: { topic: { name } },
-      include: { device: { select: { token: true } } },
-    });
-
-    if (devicesSubscribedToTopic.length === 0)
-      return {
-        failedTokens: [],
-        successfulTokens: [],
-      };
-
-    const deviceTokens = devicesSubscribedToTopic.map(
-      device => device.device.token,
-    );
-
-    return await fcmService.unsubscribeDevicesFromTopic(deviceTokens, name);
   }
 
   constructor(data: Partial<PrismaTopic>) {
@@ -159,37 +139,12 @@ export default class TopicModel {
   }
 
   static async deleteOne(name: string) {
-    const { failedTokens, successfulTokens } =
-      await TopicModel.unsubscribeAllDevicesFromTopic(name);
-
     const result = await db.topic.delete({
       where: { name },
     });
 
     return {
       deletedTopic: new TopicModel(result),
-      failedTokens,
-      successfulTokens,
     };
-  }
-
-  static async deleteAllFacultyTopics(facultyId: number) {
-    const where = { name: { startsWith: `faculty_${facultyId}` } };
-
-    const topics = await db.topic.findMany({
-      where,
-    });
-
-    const result = await Promise.all(
-      topics.map(topic =>
-        TopicModel.unsubscribeAllDevicesFromTopic(topic.name),
-      ),
-    );
-
-    await db.topic.deleteMany({
-      where,
-    });
-
-    return result;
   }
 }

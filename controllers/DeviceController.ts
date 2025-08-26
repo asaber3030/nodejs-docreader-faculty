@@ -2,6 +2,7 @@ import catchAsync from '../utils/catchAsync';
 import { Request, Response, NextFunction } from 'express';
 import DeviceModel from '../models/Device';
 import AppError from '../utils/AppError';
+import NotificationService from '../utils/NotificationService';
 
 export default class DeviceController {
   private static extractDeviceId(req: Request): number {
@@ -23,7 +24,7 @@ export default class DeviceController {
   ) {
     req.body.userId = req.user.id;
 
-    const device = (await DeviceModel.createOne(
+    const device = (await NotificationService.createDevice(
       req.body,
       req.query,
     )) as DeviceModel;
@@ -99,7 +100,7 @@ export default class DeviceController {
   ) {
     const id = DeviceController.extractDeviceId(req);
 
-    await DeviceModel.deleteOne(id);
+    await NotificationService.deleteDevice(id);
 
     res.status(204).send();
   });
