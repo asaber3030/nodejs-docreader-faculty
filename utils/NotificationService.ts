@@ -90,16 +90,16 @@ class NotificationService {
       resourceIds.writtenQuizzes,
     );
 
-    return { links, mcqQuizzes, practicalQuizzes: writtenQuizzes };
+    return { links, mcqQuizzes, writtenQuizzes };
   }
 
   private static buildLecturesWithResources(
     links: any[],
     mcqQuizzes: any[],
-    practicalQuizzes: any[],
+    writtenQuizzes: any[],
   ) {
     return NotificationService.removeDuplicateResources(
-      [...links, ...mcqQuizzes, ...practicalQuizzes].map(
+      [...links, ...mcqQuizzes, ...writtenQuizzes].map(
         ({
           lectureId,
           lectureData: {
@@ -122,7 +122,7 @@ class NotificationService {
       ...lecture,
       links: links.filter(link => link.lectureId === lecture.id),
       mcqQuizzes: mcqQuizzes.filter(quiz => quiz.lectureId === lecture.id),
-      practicalQuizzes: practicalQuizzes.filter(
+      writtenQuizzes: writtenQuizzes.filter(
         quiz => quiz.lectureId === lecture.id,
       ),
     }));
@@ -181,14 +181,14 @@ class NotificationService {
     resourceIds: ResourceIds,
   ): Promise<NotificationBody> {
     // Step 1: Fetch resources
-    const { links, mcqQuizzes, practicalQuizzes } =
+    const { links, mcqQuizzes, writtenQuizzes } =
       await NotificationService.fetchResources(yearId, resourceIds);
 
     // Step 2: Group lectures and attach resources
     const lectures = NotificationService.buildLecturesWithResources(
       links,
       mcqQuizzes,
-      practicalQuizzes,
+      writtenQuizzes,
     );
 
     // Step 3: Build message
