@@ -5,7 +5,6 @@ import AppError from '../utils/AppError';
 import userSchema, { UserQueryParamInput } from '../schema/user.schema';
 import { QueryParamsService } from '../utils/QueryParamsService';
 import NotificationService from '../utils/NotificationService';
-import DeviceModel from '../models/Device';
 
 export default class UserController {
   private static extractAndValidateId(req: Request): number {
@@ -80,18 +79,27 @@ export default class UserController {
     const { deviceTokens, tokenToDeviceId } =
       await UserController.extractDataForTokenOperation(oldUser);
 
-    await Promise.all([
-      NotificationService.unsubscribeDevicesFromTopic(
-        deviceTokens,
-        tokenToDeviceId,
-        oldUser.yearId.toString(),
-      ),
+    const operations: any[] = [];
+
+    // This happens when the user is newly created, a very troublemaking edge case
+    if (oldUser.yearId)
+      operations.push(
+        NotificationService.unsubscribeDevicesFromTopic(
+          deviceTokens,
+          tokenToDeviceId,
+          oldUser.yearId.toString(),
+        ),
+      );
+
+    operations.push(
       NotificationService.subscribeDevicesToTopic(
         deviceTokens,
         tokenToDeviceId,
         newYearId.toString(),
       ),
-    ]);
+    );
+
+    await Promise.all(operations);
   }
 
   private static checkUserIsNotUpdatingTheirOwnRole(

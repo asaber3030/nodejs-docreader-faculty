@@ -40,10 +40,7 @@ class UserModel {
     return this.data.roleId;
   }
 
-  get yearId(): number {
-    if (this.data.yearId === undefined || this.data.yearId === null)
-      throw new AppError('User yearId field undefined.', 500);
-
+  get yearId(): number | null | undefined {
     return this.data.yearId;
   }
 

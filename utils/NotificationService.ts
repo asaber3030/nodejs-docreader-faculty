@@ -1,3 +1,4 @@
+import { fail } from 'node:assert';
 import LinkModel from '../models/Link';
 import McqQuizModel from '../models/McqQuiz';
 import TopicModel from '../models/Topic';
