@@ -147,7 +147,7 @@ class NotificationService {
       message += ` تم إضافة المصادر التالية:\n${[
         ...lecture.links,
         ...lecture.mcqQuizzes,
-        ...lecture.practicalQuizzes,
+        ...lecture.writtenQuizzes,
       ]
         .map(({ title }) => `💥 ${title}\n`)
         .join('')}`;

@@ -133,8 +133,7 @@ class FCMService {
   ) {
     const messageId = await this.#messaging.send({
       topic: topicName,
-      notification: notification.notification,
-      data: notification.data,
+      ...notification,
     });
 
     return messageId;
