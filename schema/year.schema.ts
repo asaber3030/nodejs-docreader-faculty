@@ -35,7 +35,7 @@ const yearSchema = createModelSchema(
     projectableFields: [
       'id',
       'title',
-
+      'currentSemester',
       'facultyId',
       'topicId',
       'creatorId',
