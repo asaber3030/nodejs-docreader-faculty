@@ -4,6 +4,9 @@ import db from '../prisma/db';
 import { ModelFactory } from './ModelFactory';
 
 export default class ModuleModel {
+  public static modelName: string = 'module';
+  public static capitalizedModelName: string = 'Module';
+
   private data: Partial<PrismaModule>;
 
   private static wrapper(data: PrismaModule): ModuleModel {

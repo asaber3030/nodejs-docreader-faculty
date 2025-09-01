@@ -5,6 +5,8 @@ import { ModelFactory } from './ModelFactory';
 import AppError from '../utils/AppError';
 
 export default class YearModel {
+  public static modelName: string = 'year';
+  public static capitalizedModelName: string = 'Year';
   private data: Partial<PrismaYear>;
 
   private static wrapper(data: PrismaYear): YearModel {

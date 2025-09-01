@@ -11,6 +11,8 @@ type PartialUserWithRole = Partial<PrismaUser> & {
 };
 
 class UserModel {
+  public static modelName: string = 'user';
+  public static capitalizedModelName: string = 'User';
   private data: Partial<PartialUserWithRole>;
 
   private roleModel?: RoleModel;
@@ -99,7 +101,7 @@ class UserModel {
 
     if (!userData)
       throw new AppError(
-        `Couldn't find user with google subject ID ${sub}`,
+        `${this.capitalizedModelName} with google sub ID ${sub} was not found.`,
         404,
       );
 

@@ -7,6 +7,8 @@ import AppError from '../utils/AppError';
 import { QueryParamsService } from '../utils/QueryParamsService';
 
 export default class McqQuestionModel {
+  public static modelName: string = 'MCQ question';
+  public static capitalizedModelName: string = 'MCQ question';
   private data: Partial<PrismaQuestion>;
 
   private static wrapper(data: PrismaQuestion): McqQuestionModel {
@@ -23,7 +25,7 @@ export default class McqQuestionModel {
 
   get quizId(): number {
     if (this.data.quizId === undefined)
-      throw new AppError('Written quiz id field is undefined.', 500);
+      throw new AppError('MCQ quiz id field is undefined.', 500);
 
     return this.data.quizId;
   }
@@ -42,7 +44,7 @@ export default class McqQuestionModel {
       throw new AppError(
         `Invalid create input: [ ${validatedCreationBody.error.issues.map(
           issue => issue.message,
-        )} ]}`,
+        )} ]`,
         400,
       );
     }

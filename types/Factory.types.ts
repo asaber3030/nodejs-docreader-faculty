@@ -23,6 +23,11 @@ export interface FactorySchema<
   create: ZodSchema<TCreate>;
 }
 
+export interface CommonModel {
+  modelName: string;
+  capitalizedModelName: string;
+}
+
 export interface PrismaCreateModel<TCreateResult> {
   create(args: { data: any; select?: any }): Promise<TCreateResult>;
 }

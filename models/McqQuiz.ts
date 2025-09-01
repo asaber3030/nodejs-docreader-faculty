@@ -1,8 +1,5 @@
 import quizSchema from '../schema/mcqQuiz.schema';
-import {
-  McqQuiz as PrismaQuiz,
-  McqQuestion as PrismaQuestion,
-} from '@prisma/client';
+import { McqQuiz as PrismaQuiz } from '@prisma/client';
 import db from '../prisma/db';
 import { ModelFactory } from './ModelFactory';
 import buildInclude from '../utils/buildInclude';
@@ -10,6 +7,8 @@ import AppError from '../utils/AppError';
 import { QueryParamsService } from '../utils/QueryParamsService';
 
 export default class McqQuizModel {
+  public static modelName: string = 'MCQ quiz';
+  public static capitalizedModelName: string = 'MCQ quiz';
   public static PATH_INCLUDE =
     'lectureData.id,lectureData.type,lectureData.title,lectureData.subject.id,lectureData.subject.name,lectureData.subject.module.id,lectureData.subject.module.name,lectureData.subject.module.semesterName,lectureData.subject.module.year.faculty';
   private data: Partial<PrismaQuiz>;
@@ -40,7 +39,10 @@ export default class McqQuizModel {
 
   static async findOneById(id: number, queryParams: any) {
     if (Number.isNaN(id))
-      throw new AppError('Invalid resource ID. Must be an integer.', 400);
+      throw new AppError(
+        `Invalid ID for ${this.modelName}. ID must be a valid integer.`,
+        400,
+      );
 
     QueryParamsService.parse<typeof quizSchema.query>(
       quizSchema,
@@ -59,7 +61,10 @@ export default class McqQuizModel {
     });
 
     if (!mcqQuiz)
-      throw new AppError(`Couldn't find resource with ID ${id}.`, 404);
+      throw new AppError(
+        `${this.capitalizedModelName} with ID ${id} was not found.`,
+        404,
+      );
 
     return new McqQuizModel(mcqQuiz);
   }
