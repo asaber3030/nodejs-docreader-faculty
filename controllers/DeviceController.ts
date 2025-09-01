@@ -32,6 +32,19 @@ export default class DeviceController {
       ['id', 'token', 'userId'],
     );
 
+    if (!req.user.yearId) {
+      console.log('Headers:', req.headers);
+      console.log('Path:', req.originalUrl);
+      console.log('Body:', req.body);
+      console.log('User:', req.user.toJSON());
+    }
+
+    if (!req.user.yearId)
+      throw new AppError(
+        "Topic subscription failed. You're not in any faculty year yet. Try logging out and then logging in again.",
+        400,
+      );
+
     const device = (await NotificationService.createDevice(
       req.body,
       req.query,
@@ -39,7 +52,7 @@ export default class DeviceController {
     await NotificationService.subscribeDevicesToTopic(
       [device.token],
       new Map([[device.token, device.id]]),
-      req.user.yearId?.toString()!,
+      req.user.yearId.toString(),
     );
 
     res.status(201).json({

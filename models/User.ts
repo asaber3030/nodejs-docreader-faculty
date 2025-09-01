@@ -70,7 +70,7 @@ class UserModel {
     return copy;
   }
 
-  static create = ModelFactory.createOne(
+  static createOne = ModelFactory.createOne(
     db.user,
     userSchema,
     UserModel.wrapper,

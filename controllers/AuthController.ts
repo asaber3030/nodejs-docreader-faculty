@@ -215,7 +215,10 @@ export default class AuthController {
         req.query.fields = arr.join(',');
       }
 
-      user = (await UserModel.create(createInput.data, req.query)) as UserModel;
+      user = (await UserModel.createOne(
+        createInput.data,
+        req.query,
+      )) as UserModel;
     }
 
     JWTService.createAndSendJWT(user.id, user.roleId, res, 201, {
