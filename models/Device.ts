@@ -5,6 +5,9 @@ import { ModelFactory } from './ModelFactory';
 import AppError from '../utils/AppError';
 
 export default class DeviceModel {
+  public static modelName: string = 'device';
+  public static capitalizedModelName: string = 'Device';
+
   private data: Partial<PrismaDevice>;
 
   private static wrapper(data: PrismaDevice): DeviceModel {
@@ -53,7 +56,10 @@ export default class DeviceModel {
 
   static async findCreatorIdById(id: number): Promise<number> {
     if (!Number.isInteger(id))
-      throw new AppError('Invalid ID. Must be an integer.', 400);
+      throw new AppError(
+        `Invalid ID for ${this.modelName}. ID must be a valid integer.`,
+        400,
+      );
 
     const object = await db.device.findUnique({
       where: { id },
@@ -61,7 +67,10 @@ export default class DeviceModel {
     });
 
     if (!object)
-      throw new AppError(`Couldn't find resource with ID ${id}`, 404);
+      throw new AppError(
+        `${this.capitalizedModelName} with ID ${id} was not found.`,
+        404,
+      );
 
     return object.userId;
   }

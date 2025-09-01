@@ -6,27 +6,33 @@ import {
   PrismaFindManyModel,
   PrismaFindUniqueModel,
   PrismaCreateModel,
+  CommonModel,
 } from '../types/Factory.types';
 import { QueryParamsService } from '../utils/QueryParamsService';
-import db from '../prisma/db';
 
 export class ModelFactory {
-  static createOne<TCreateInput, TCreateResult, TInstance>(
+  static createOne<
+    TCreateInput,
+    TCreateResult,
+    TInstance,
+    TClass extends CommonModel,
+  >(
     prismaModel: PrismaCreateModel<TCreateResult>,
     schema: FactorySchema<any, any, any, TCreateInput>,
     wrap?: (data: TCreateResult) => TInstance,
   ) {
-    return async (
+    return async function (
+      this: TClass,
       data: TCreateInput,
       queryParams: any,
-    ): Promise<TInstance | TCreateResult> => {
+    ): Promise<TInstance | TCreateResult> {
       const validatedCreationBody = schema.create.safeParse(data);
 
       if (!validatedCreationBody.success) {
         throw new AppError(
           `Invalid create input: [ ${validatedCreationBody.error.issues.map(
             issue => issue.message,
-          )} ]}`,
+          )} ]`,
           400,
         );
       }
@@ -46,12 +52,18 @@ export class ModelFactory {
     };
   }
 
-  static findMany<TFindInput, TFindResult, TInstance>(
+  static findMany<
+    TFindInput,
+    TFindResult,
+    TInstance,
+    TClass extends CommonModel,
+  >(
     prismaModel: PrismaFindManyModel<TFindResult>,
     schema: FactorySchema<TFindInput>,
     wrap?: (data: TFindResult) => TInstance,
   ) {
     return async function (
+      this: TClass,
       where: TFindInput,
       queryParams: any,
     ): Promise<Array<TInstance> | Array<TFindResult>> {
@@ -97,17 +109,26 @@ export class ModelFactory {
     };
   }
 
-  static findOneById<TFindInput, TFindResult, TInstance>(
+  static findOneById<
+    TFindInput,
+    TFindResult,
+    TInstance,
+    TClass extends CommonModel,
+  >(
     prismaModel: PrismaFindUniqueModel<TFindResult>,
     schema: FactorySchema<TFindInput>,
     wrap: (data: TFindResult) => TInstance,
   ) {
     return async function (
+      this: TClass,
       id: number,
       queryParams: any,
     ): Promise<TFindResult | TInstance> {
       if (Number.isNaN(id))
-        throw new AppError('Invalid resource ID. Must be an integer.', 400);
+        throw new AppError(
+          `Invalid ID for ${this.modelName}. ID must be a valid integer.`,
+          400,
+        );
 
       const validatedQueryParams: any = QueryParamsService.parse<
         typeof schema.query
@@ -131,21 +152,27 @@ export class ModelFactory {
         });
 
       if (!object)
-        throw new AppError(`Couldn't find resource with ID ${id}.`, 404);
+        throw new AppError(
+          `${this.capitalizedModelName} with ID ${id} was not found.`,
+          404,
+        );
 
       return wrap ? wrap(object) : object;
     };
   }
 
-  static findCreatorIdById(prismaModel: {
+  static findCreatorIdById<TClass extends CommonModel>(prismaModel: {
     findUnique: (args: {
       where: { id: number };
       select: { creatorId: true };
     }) => Promise<{ creatorId: number | null } | null>;
   }) {
-    return async function (id: number): Promise<number> {
+    return async function (this: TClass, id: number): Promise<number> {
       if (!Number.isInteger(id))
-        throw new AppError('Invalid ID. Must be an integer.', 400);
+        throw new AppError(
+          `Invalid ID for ${this.modelName}. ID must be a valid integer.`,
+          400,
+        );
 
       const object = await prismaModel.findUnique({
         where: {
@@ -155,7 +182,10 @@ export class ModelFactory {
       });
 
       if (!object)
-        throw new AppError(`Couldn't find resource with ID ${id}`, 404);
+        throw new AppError(
+          `${this.capitalizedModelName} with ID ${id} was not found.`,
+          404,
+        );
 
       // 0 means no creatorId set (for old resources)
       if (object?.creatorId === null) return 0;
@@ -164,18 +194,27 @@ export class ModelFactory {
     };
   }
 
-  static updateOne<TUpdateInput, TUpdateResult, TInstance>(
+  static updateOne<
+    TUpdateInput,
+    TUpdateResult,
+    TInstance,
+    TClass extends CommonModel,
+  >(
     prismaModel: PrismaUpdateModel<TUpdateResult>,
     schema: FactorySchema<TUpdateInput>,
     wrap?: (data: TUpdateResult) => TInstance,
   ) {
-    return async (
+    return async function (
+      this: TClass,
       id: number,
       update: TUpdateInput,
       queryParams: any, // Comes from req.query
-    ): Promise<TInstance | TUpdateResult> => {
+    ): Promise<TInstance | TUpdateResult> {
       if (!Number.isInteger(id))
-        throw new AppError('Invalid ID. Must be an integer.', 400);
+        throw new AppError(
+          `Invalid ID for ${this.modelName}. ID must be a valid integer.`,
+          400,
+        );
 
       const validatedUpdate = schema.update.safeParse(update);
 
@@ -199,18 +238,24 @@ export class ModelFactory {
       });
 
       if (!updated) {
-        throw new AppError(`Record with ID ${id} not found.`, 404);
+        throw new AppError(
+          `${this.capitalizedModelName} with ID ${id} was not found.`,
+          404,
+        );
       }
 
       return wrap ? wrap(updated) : updated;
     };
   }
 
-  static deleteOne<TDeleteResult, TInstance>(
+  static deleteOne<TDeleteResult, TInstance, TClass extends CommonModel>(
     prismaModel: PrismaDeleteModel<TDeleteResult>,
     wrap?: (data: TDeleteResult) => TInstance,
   ) {
-    return async (id: number): Promise<TInstance | TDeleteResult> => {
+    return async function (
+      this: TClass,
+      id: number,
+    ): Promise<TInstance | TDeleteResult> {
       const result = await prismaModel.delete({
         where: { id },
       });

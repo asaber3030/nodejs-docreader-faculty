@@ -6,6 +6,9 @@ import AppError from '../utils/AppError';
 import TopicModel from './Topic';
 
 export default class FacultyModel {
+  public static modelName: string = 'faculty';
+  public static capitalizedModelName: string = 'Faculty';
+
   private data: Partial<PrismaFaculty>;
 
   private static wrapper(data: PrismaFaculty): FacultyModel {
@@ -60,12 +63,5 @@ export default class FacultyModel {
     FacultyModel.wrapper,
   );
 
-  static deleteOne = async function (id: number) {
-    const [result, __] = await Promise.all([
-      db.faculty.delete({ where: { id } }),
-      TopicModel.deleteAllFacultyTopics(id),
-    ]);
-
-    return new FacultyModel(result);
-  };
+  static deleteOne = ModelFactory.deleteOne(db.faculty);
 }

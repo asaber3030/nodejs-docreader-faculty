@@ -5,6 +5,9 @@ import { ModelFactory } from './ModelFactory';
 import { QueryParamsService } from '../utils/QueryParamsService';
 
 export default class PermissionModel {
+  public static modelName: string = 'permission';
+  public static capitalizedModelName: string = 'Permission';
+
   private data: Partial<PrismaPermission>;
 
   private static wrapper(data: PrismaPermission): PermissionModel {

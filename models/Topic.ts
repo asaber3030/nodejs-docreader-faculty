@@ -6,6 +6,8 @@ import AppError from '../utils/AppError';
 import { QueryParamsService } from '../utils/QueryParamsService';
 
 export default class TopicModel {
+  public static modelName: string = 'topic';
+  public static capitalizedModelName: string = 'Topic';
   private data: Partial<PrismaTopic>;
 
   private static wrapper(data: PrismaTopic): TopicModel {
@@ -96,7 +98,10 @@ export default class TopicModel {
       });
 
     if (!object)
-      throw new AppError(`Couldn't find a topic with name '${name}'.`, 404);
+      throw new AppError(
+        `${this.capitalizedModelName} with name ${name} was not found.`,
+        404,
+      );
 
     return new TopicModel(object);
   }
@@ -112,7 +117,7 @@ export default class TopicModel {
 
     if (!validatedUpdate.success) {
       throw new AppError(
-        `Invalid update input: [ ${validatedUpdate.error.issues.map(
+        `Invalid update input. Issues: [ ${validatedUpdate.error.issues.map(
           issue => issue.message,
         )} ]`,
         400,
@@ -132,7 +137,10 @@ export default class TopicModel {
     });
 
     if (!updated) {
-      throw new AppError(`Topic with name ${name} not found.`, 404);
+      throw new AppError(
+        `${this.capitalizedModelName} with name ${name} was not found.`,
+        404,
+      );
     }
 
     return new TopicModel(updated);
