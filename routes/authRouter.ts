@@ -18,6 +18,6 @@ router.post(
   AuthController.createOrFetchUser,
 );
 
-router.post('/logout', AuthController.protect, AuthController.logout);
+router.post('/logout', AuthController.logout); // removed protect to hanldle logout for deleted users
 
 export default router;
