@@ -5,8 +5,11 @@ import { ModelFactory } from './ModelFactory';
 import { QueryParamsService } from '../utils/QueryParamsService';
 
 export default class LectureModel {
+  public static modelName: string = 'lecture';
+  public static capitalizedModelName: string = 'Lecture';
   public static PATH_INCLUDE =
     'subject.id,subject.name,subject.module.id,subject.module.semesterName,subject.module.name,subject.module.year.faculty';
+
   private data: Partial<PrismaLecture>;
 
   private static wrapper(data: PrismaLecture): LectureModel {

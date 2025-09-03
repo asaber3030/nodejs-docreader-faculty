@@ -26,6 +26,8 @@ interface OldWrittenQuestion extends NewWrittenQuestion {
 }
 
 export default class WrittenQuestionModel {
+  public static modelName: string = 'written question';
+  public static capitalizedModelName: string = 'Written question';
   private data: Partial<PrismaQuestion>;
 
   private static wrapper(data: PrismaQuestion): WrittenQuestionModel {

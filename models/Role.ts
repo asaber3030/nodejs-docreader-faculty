@@ -1,7 +1,6 @@
 import db from '../prisma/db';
 import {
   Role as PrismaRole,
-  Permission as PrismaPermission,
   PermissionAction,
   PermissionScope,
   PermissionResource,
@@ -21,6 +20,8 @@ type PartialPermission = {
 };
 
 export default class RoleModel {
+  public static modelName: string = 'role';
+  public static capitalizedModelName: string = 'Role';
   private data: Partial<PrismaRole>;
 
   private static wrapper(data: PrismaRole): RoleModel {
@@ -44,7 +45,7 @@ export default class RoleModel {
 
     if (validatedPermissionIdArray.error)
       throw new AppError(
-        `Invalid input: $[ ${validatedPermissionIdArray.error.issues.map(
+        `Invalid input. Issues: $[ ${validatedPermissionIdArray.error.issues.map(
           issue => issue.message,
         )} ]`,
         400,
@@ -69,7 +70,7 @@ export default class RoleModel {
 
     if (validatedPermissionIdArray.error)
       throw new AppError(
-        `Invalid input: [ ${validatedPermissionIdArray.error.issues.map(
+        `Invalid input. Issues: [ ${validatedPermissionIdArray.error.issues.map(
           issue => issue.message,
         )} ]`,
         400,

@@ -5,6 +5,8 @@ import { ModelFactory } from './ModelFactory';
 import buildInclude from '../utils/buildInclude';
 
 export default class LinkModel {
+  public static modelName: string = 'link';
+  public static capitalizedModelName: string = 'Link';
   public static PATH_INCLUDE =
     'lectureData.id,lectureData.title,lectureData.subject.id,lectureData.subject.name,lectureData.subject.module.id,lectureData.subject.module.name,lectureData.subject.module.semesterName';
   private data: Partial<PrismaLink>;
