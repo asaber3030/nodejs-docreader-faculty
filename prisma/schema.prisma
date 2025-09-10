@@ -117,6 +117,7 @@ model User {
   createdWrittenQuestions  WrittenQuestion[]     @relation(name: "WrittenQuestionCreator")
   createdRects  Rect[]     @relation(name: "RectCreator")
   createdSubQuestions  SubQuestion[]     @relation(name: "SubQuestionCreator")
+  events Event[] @relation(name: "EventUser")
 
   Topic Topic[] @relation(name: "TopicCreator")
 }
@@ -263,6 +264,7 @@ model Device {
   token     String @unique
   userId    Int
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  events    Event[] @relation(name: "EventDevice")
 
   createdAt DateTime? @default(now()) @db.Timestamp()
   updatedAt DateTime? @updatedAt @db.Timestamp()
@@ -405,8 +407,10 @@ model SubQuestion {
 
 model Event {
   id         BigInt @id @default(autoincrement())
-  userId     Int
-  deviceId   String?
+  userId     Int?
+  user       User? @relation(name: "EventUser", fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  deviceId   Int?
+  device     Device? @relation(name: "EventDevice", fields: [deviceId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   resource   String?
   resourceId Int?
   action     String?

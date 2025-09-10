@@ -3,8 +3,8 @@ import createModelSchema from './schema';
 
 const eventSchema = z.object({
   id: z.bigint(),
-  userId: z.number(),
-  deviceId: z.string().nullable().optional(),
+  userId: z.number().nullable().optional(),
+  deviceId: z.number().nullable().optional(),
   resource: z.string().nullable().optional(),
   resourceId: z.number().nullable().optional(),
   action: z.string().nullable().optional(),
