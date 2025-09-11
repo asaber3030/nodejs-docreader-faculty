@@ -177,6 +177,15 @@ export default class WrittenQuizController {
       image = filename;
       width = compressed.width;
       height = compressed.height;
+    } else if (
+      typeof req.body.image === 'string' &&
+      req.body.image.trim() !== '' &&
+      req.body.width &&
+      req.body.height
+    ) {
+      image = req.body.image.trim();
+      width = Number(req.body.width);
+      height = Number(req.body.height);
     }
 
     const tapes = JSON.parse(req.body.tapes);
