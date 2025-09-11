@@ -167,7 +167,6 @@ export default class LectureController {
     }
 
     req.body.note = await ImageUtils.processHtmlImages(req.body.note);
-    ImageUtils.deleteOldImages(oldLecture?.note || '', req.body.note || '');
 
     const updatedLecture = await LectureModel.updateOne(
       id,
@@ -191,8 +190,6 @@ export default class LectureController {
     const id = LectureController.extractLectureID(req);
 
     const lecture = await LectureModel.findOneById(id, {});
-
-    if (lecture?.note) ImageUtils.deleteImagesInHtml(lecture.note);
 
     await LectureModel.deleteOne(id);
 

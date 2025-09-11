@@ -114,17 +114,6 @@ export default class WrittenQuestionModel {
       },
     });
 
-    const deletedSubQuestions = await db.subQuestion.findMany({
-      where: {
-        questionId: questionId,
-        id: { notIn: updatedSubQuestions.map(({ id }) => id) },
-      },
-      select: { answer: true },
-    });
-
-    for (const sq of deletedSubQuestions)
-      ImageUtils.deleteImagesInHtml(sq.answer);
-
     await db.subQuestion.deleteMany({
       where: {
         questionId: questionId,
@@ -175,17 +164,9 @@ export default class WrittenQuestionModel {
       ),
     );
 
-    const oldSubQuestions = await db.subQuestion.findMany({
-      where: { questionId },
-    });
-
     await Promise.all(
       updatedSubQuestions.map(async sq => {
         sq.answer = await ImageUtils.processHtmlImages(sq.answer);
-        ImageUtils.deleteOldImages(
-          oldSubQuestions.find(({ id }) => sq.id === id)?.answer || '',
-          sq.answer,
-        );
       }),
     );
 
@@ -207,9 +188,6 @@ export default class WrittenQuestionModel {
       where: { id: writtenQuestion.quizId },
       data: { notifiable: true },
     });
-    ImageUtils.deleteFile(`/image/${writtenQuestion.image}`);
-    for (const subQuestion of writtenQuestion.subQuestions)
-      ImageUtils.deleteImagesInHtml(subQuestion.answer);
     return writtenQuestion;
   }
 
