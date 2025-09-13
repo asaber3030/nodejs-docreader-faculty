@@ -8,7 +8,7 @@ export default class LectureModel {
   public static modelName: string = 'lecture';
   public static capitalizedModelName: string = 'Lecture';
   public static PATH_INCLUDE =
-    'subject.id,subject.name,subject.module.id,subject.module.semesterName,subject.module.name,subject.module.year.faculty';
+    'subject.id,subject.name,subject.module.id,subject.module.semesterName,subject.module.name,subject.module.year.id,subject.module.year.faculty';
 
   private data: Partial<PrismaLecture>;
 
