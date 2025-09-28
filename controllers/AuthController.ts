@@ -176,7 +176,6 @@ export default class AuthController {
     next: NextFunction,
   ) {
     const jwtPayload = req.oauthJwtPayload;
-    const tokens = req.oauthTokens;
 
     const googleSubId = jwtPayload.sub;
 
@@ -186,12 +185,25 @@ export default class AuthController {
     try {
       user = await UserModel.findOneByGoogleSubId(googleSubId);
     } catch (error) {
+      const givenName = jwtPayload.given_name || '';
+      const familyName = jwtPayload.family_name || '';
+      let avatarName = `${givenName} ${familyName}`.trim();
+
+      // If both names are missing, use the part of the email before the "@"
+      if (!avatarName && jwtPayload.email) {
+        avatarName = jwtPayload.email.split('@')[0];
+      }
+
       const creationParameters = {
         googleSubId: jwtPayload.sub,
         givenName: jwtPayload.given_name || '',
         familyName: jwtPayload.family_name || '',
-        email: jwtPayload.email || '',
-        picture: jwtPayload.picture || '',
+        email: jwtPayload.email,
+        picture:
+          jwtPayload.picture ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            avatarName || 'User',
+          )}&background=random`,
         roleId: 3, // User ID
       };
 

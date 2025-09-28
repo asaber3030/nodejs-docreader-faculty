@@ -6,7 +6,7 @@ const fullSchema = z.object({
   googleSubId: z.string({ message: 'Invalid Google subject identifier.' }),
   givenName: z.string({ message: 'First name not provided.' }),
   familyName: z.string({ message: 'Family name not provided.' }),
-  email: z.string().trim().email({ message: 'Invalid Email.' }),
+  email: z.string().trim().email({ message: 'Invalid Email.' }).optional(),
   picture: z.string().url({ message: 'Invalid picture URL.' }),
   roleId: z.number().int({ message: 'Role ID can only be an integer.' }).min(0),
   facultyId: z.number().gt(0),
@@ -24,15 +24,8 @@ const fullSchema = z.object({
 const userSchema = createModelSchema(
   fullSchema,
   {
-    required: [
-      'googleSubId',
-      'familyName',
-      'givenName',
-      'email',
-      'picture',
-      'roleId',
-    ],
-    optional: [],
+    required: ['googleSubId', 'familyName', 'givenName', 'picture', 'roleId'],
+    optional: ['email'],
   },
   ['facultyId', 'yearId'],
   {

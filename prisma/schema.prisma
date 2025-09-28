@@ -88,7 +88,7 @@ model User {
   googleSubId     String           @unique
   givenName       String
   familyName      String
-  email           String
+  email           String?
   picture         String
   role            Role             @relation(fields: [roleId], references: [id])
   roleId          Int              @default(1)
