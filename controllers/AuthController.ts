@@ -199,7 +199,11 @@ export default class AuthController {
 
       if (createInput.error)
         throw new AppError(
-          `Error when creating user. Creation parameters: ${creationParameters}`,
+          `Error when creating user. Creation parameters:\n${JSON.stringify(
+            creationParameters,
+            null,
+            2,
+          )}`,
           500,
         );
 
