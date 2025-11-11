@@ -12,7 +12,7 @@ export default class WrittenQuizModel {
   public static capitalizedModelName: string = 'Written quiz';
 
   public static PATH_INCLUDE =
-    'lectureData.id,lectureData.type,lectureData.title,lectureData.subject.id,lectureData.subject.name,lectureData.subject.module.id,lectureData.subject.module.name,lectureData.subject.module.semesterName,lectureData.subject.module.year.faculty';
+    'lectureData.id,lectureData.type,lectureData.title,lectureData.subject.id,lectureData.subject.name,lectureData.subject.module.id,lectureData.subject.module.name,lectureData.subject.module.semesterName,lectureData.subject.module.customGPT,lectureData.subject.module.year.faculty';
   private data: Partial<PrismaQuiz>;
 
   private static wrapper(data: PrismaQuiz): WrittenQuizModel {

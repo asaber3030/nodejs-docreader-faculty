@@ -42,6 +42,7 @@ const subjectSchema = createModelSchema(
       'module.id',
       'module.semesterName',
       'module.name',
+      'module.customGPT',
       'module.year.faculty',
     ],
   },

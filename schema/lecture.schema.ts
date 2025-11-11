@@ -79,6 +79,7 @@ const lectureSchema = createModelSchema(
       'subject.module.id',
       'subject.module.semesterName',
       'subject.module.name',
+      'subject.module.customGPT',
       'subject.module.year.id',
       'subject.module.year.faculty',
     ],

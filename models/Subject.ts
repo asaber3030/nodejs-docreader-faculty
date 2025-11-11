@@ -7,7 +7,7 @@ export default class SubjectModel {
   public static modelName: string = 'subject';
   public static capitalizedModelName: string = 'Subject';
   public static PATH_INCLUDE =
-    'module.id,module.semesterName,module.name,module.year.faculty';
+    'module.id,module.semesterName,module.name,module.customGPT,module.year.faculty';
   private data: Partial<PrismaSubject>;
 
   private static wrapper(data: PrismaSubject): SubjectModel {

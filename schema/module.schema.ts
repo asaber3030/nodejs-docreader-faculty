@@ -16,7 +16,7 @@ const fullSchema = z
     icon: z
       .string()
       .url({ message: 'The icon field must contain the url of an icon.' }),
-
+    customGPT: z.string().nullable(),
     creatorId: z.number().int({ message: 'Creator ID must be an integer.' }),
     createdAt: z.date(),
     updatedAt: z.date(),
@@ -27,9 +27,9 @@ const moduleSchema = createModelSchema(
   fullSchema,
   {
     required: ['name', 'semesterName', 'yearId', 'icon', 'creatorId'],
-    optional: [],
+    optional: ['customGPT'],
   },
-  ['name', 'semesterName', 'yearId', 'icon'],
+  ['name', 'semesterName', 'yearId', 'icon', 'customGPT'],
   {
     defaultPage: 1,
     defaultSize: Number.POSITIVE_INFINITY,
@@ -40,6 +40,7 @@ const moduleSchema = createModelSchema(
       'semesterName',
       'yearId',
       'icon',
+      'customGPT',
       'creatorId',
       'updatedAt',
       'createdAt',
@@ -48,6 +49,7 @@ const moduleSchema = createModelSchema(
       'id',
       'name',
       'semesterName',
+      'customGPT',
       'yearId',
       'icon',
       'creatorId',

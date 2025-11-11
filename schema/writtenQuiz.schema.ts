@@ -50,6 +50,7 @@ const quizSchema = createModelSchema(
       'lectureData.subject.module.id',
       'lectureData.subject.module.semesterName',
       'lectureData.subject.module.name',
+      'lectureData.subject.module.customGPT',
       'lectureData.subject.module.year.faculty',
     ],
   },
