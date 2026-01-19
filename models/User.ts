@@ -110,7 +110,12 @@ class UserModel {
 
   static async findMany(query: any) {
     const search = query?.search;
+    const roleId = query?.roleId;
+    const yearId = query?.yearId;
+
     delete query?.search;
+    delete query?.roleId;
+    delete query?.yearId;
 
     const validatedQueryParams: any = QueryParamsService.parse<
       typeof userSchema.query
@@ -130,6 +135,16 @@ class UserModel {
         mode: 'insensitive',
       },
     };
+
+    if (roleId) {
+      const parsedRoleId = Number.parseInt(roleId);
+      if (!Number.isNaN(parsedRoleId)) where.roleId = parsedRoleId;
+    }
+
+    if (yearId) {
+      const parsedYearId = Number.parseInt(yearId);
+      if (!Number.isNaN(parsedYearId)) where.yearId = parsedYearId;
+    }
 
     if (validatedQueryParams.include)
       [users, total] = await Promise.all([
