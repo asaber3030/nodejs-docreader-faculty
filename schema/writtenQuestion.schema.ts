@@ -37,7 +37,7 @@ const questionSchema = createModelSchema(
     required: ['quizId', 'creatorId'],
     optional: ['image', 'width', 'height'],
   },
-  ['tapes', 'masks', 'subQuestions'],
+  ['tapes', 'masks', 'subQuestions', 'image', 'width', 'height'],
   {
     defaultPage: 1,
     defaultSize: 10,

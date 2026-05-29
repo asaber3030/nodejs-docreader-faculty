@@ -232,6 +232,30 @@ export default class WrittenQuizController {
   ) {
     const id = WrittenQuizController.extractQuestionID(req);
 
+    if (req.file) {
+      const filename = `${Math.floor(
+        Math.random() * 1_000_000_000,
+      )}-${Date.now()}.jpeg`;
+      const outputPath = path.join(__dirname, '../public/image', filename);
+      const compressed = await sharp(req.file.buffer)
+        .toFormat('jpeg')
+        .jpeg({ quality: 80 })
+        .toFile(outputPath);
+      req.body.image = filename;
+      req.body.width = compressed.width;
+      req.body.height = compressed.height;
+    }
+
+    if (typeof req.body.tapes === 'string') {
+      req.body.tapes = JSON.parse(req.body.tapes);
+    }
+    if (typeof req.body.masks === 'string') {
+      req.body.masks = JSON.parse(req.body.masks);
+    }
+    if (typeof req.body.subQuestions === 'string') {
+      req.body.subQuestions = JSON.parse(req.body.subQuestions);
+    }
+
     await WrittenQuestionModel.updateOne(id, req.user.id, req.body);
 
     const writtenQuestion = (await WrittenQuestionModel.findOneById(

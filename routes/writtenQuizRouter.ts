@@ -42,6 +42,7 @@ router
   .patch(
     AuthController.requirePermission('UPDATE', 'OWN', 'QUESTION'),
     AuthController.checkUserIsResourceCreator(WrittenQuestionModel),
+    upload.single('image'),
     WrittenQuizController.updateQuestion,
   )
   .delete(

@@ -73,7 +73,7 @@ export default class WrittenQuestionModel {
         400,
       );
 
-    const { masks, tapes, subQuestions } = validatedData.data;
+    const { masks, tapes, subQuestions, ...questionData } = validatedData.data;
 
     const newMasks: NewRect[] = [];
     const updatedMasks: OldRect[] = [];
@@ -175,6 +175,13 @@ export default class WrittenQuestionModel {
         db.subQuestion.update({ where: { id }, data: { ...subQuestion } }),
       ),
     );
+
+    if (Object.keys(questionData).length > 0) {
+      await db.writtenQuestion.update({
+        where: { id: questionId },
+        data: questionData,
+      });
+    }
   }
 
   static async deleteOne(id: number) {
